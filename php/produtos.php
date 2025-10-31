@@ -8,6 +8,13 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
     <script>(function(){const theme=localStorage.getItem('theme');if(theme==='light'){document.documentElement.classList.add('light-mode');}})();</script>
+    <!-- Estilos locais para o ícone de pesquisa -->
+    <style>
+        .nav-search{display:flex;align-items:center;gap:.5rem;}
+        .nav-search input[type="text"]{padding:.45rem .75rem;border-radius:24px;border:1px solid rgba(0,0,0,.08);background:transparent;color:inherit;min-width:160px}
+        .nav-search .nav-search-btn{border:none;background:transparent;padding:.35rem;border-radius:50%;cursor:pointer;color:inherit;display:inline-flex;align-items:center;justify-content:center}
+        .nav-search .nav-search-btn .fa-search{font-size:0.95rem}
+    </style>
 </head>
 <body>
 
@@ -24,7 +31,11 @@ if (!function_exists('is_active')) {
 
  <nav class="navbar scrolled" id="navbar">
     <div class="nav-container">
-        <div class="nav-search"><input type="text" placeholder="Pesquisar..."></div>
+        <!-- Substitua/inserir aqui o campo de pesquisa -->
+        <div class="nav-search">
+            <input type="text" placeholder="Pesquisar..." aria-label="Pesquisar">
+            <button class="nav-search-btn" aria-label="Pesquisar"><i class="fas fa-search"></i></button>
+        </div>
         <div class="nav-logo"><a href="../index.php"><img src="../assets/img/LOGOSUSANOO.png" alt="LOGOSUSANOO"></a></div>
         <div class="nav-right-group">
             <ul class="nav-menu" id="nav-menu">

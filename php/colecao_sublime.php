@@ -7,6 +7,14 @@
     <link rel="stylesheet" href="../css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
     <script>(function(){const theme=localStorage.getItem('theme');if(theme==='light'){document.documentElement.classList.add('light-mode');}})();</script>
+
+	<!-- Estilos para busca -->
+	<style>
+		.nav-search{display:flex;align-items:center;gap:.5rem;}
+		.nav-search input[type="text"]{padding:.45rem .75rem;border-radius:24px;border:1px solid rgba(0,0,0,.08);background:transparent;color:inherit;min-width:160px}
+		.nav-search .nav-search-btn{border:none;background:transparent;padding:.35rem;border-radius:50%;cursor:pointer;color:inherit;display:inline-flex;align-items:center;justify-content:center}
+		.nav-search .nav-search-btn .fa-search{font-size:0.95rem}
+	</style>
 </head>
 <?php
 $current = basename($_SERVER['PHP_SELF']);
@@ -23,7 +31,8 @@ if (!function_exists('is_active')) {
     <div class="nav-container">
         <!-- Pesquisa à esquerda -->
         <div class="nav-search">
-            <input type="text" placeholder="Pesquisar...">
+            <input type="text" placeholder="Pesquisar..." aria-label="Pesquisar">
+            <button class="nav-search-btn" aria-label="Pesquisar"><i class="fas fa-search"></i></button>
         </div>
         </div>
 
