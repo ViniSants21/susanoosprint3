@@ -20,7 +20,7 @@
 <body class="checkout-page-body">
 
 <?php
-// Bloco PHP para a lógica da navbar (mantido para consistência)
+// Bloco PHP para a lógica da navbar
 $current = basename($_SERVER['PHP_SELF']);
 if (!function_exists('is_active')) {
     function is_active($href, $current) {
@@ -30,7 +30,7 @@ if (!function_exists('is_active')) {
 }
 ?>
 
-<!-- Navbar Padrão de Páginas Internas com Dropdown -->
+<!-- Navbar -->
 <nav class="navbar scrolled" id="navbar">
     <div class="nav-container">
         <div class="nav-search"><input type="text" placeholder="Pesquisar..."></div>
@@ -84,18 +84,38 @@ if (!function_exists('is_active')) {
                         <label for="email">Email</label>
                         <input type="email" id="email" placeholder="seu@email.com" required>
                     </div>
-                </section>
-
-                <section class="checkout-section">
-                    <h2><i class="fas fa-map-marker-alt"></i> Endereço de Entrega</h2>
                     <div class="form-group">
                         <label for="name">Nome Completo</label>
                         <input type="text" id="name" placeholder="Seu nome completo" required>
                     </div>
+                </section>
+
+                <section class="checkout-section">
+                    <h2><i class="fas fa-map-marker-alt"></i> Endereço de Entrega</h2>
+                    
+                    <!-- CEP COMO PRIMEIRO CAMPO -->
+                    <div class="form-group">
+                        <label for="zip">CEP</label>
+                        <input type="text" id="zip" placeholder="00000-000" required maxlength="9">
+                    </div>
+
                     <div class="form-group">
                         <label for="address">Endereço</label>
                         <input type="text" id="address" placeholder="Rua, Avenida, etc." required>
                     </div>
+
+                    <!-- NOVOS CAMPOS: NÚMERO E COMPLEMENTO -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="number">Número</label>
+                            <input type="text" id="number" placeholder="Ex: 123" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="complement">Complemento</label>
+                            <input type="text" id="complement" placeholder="Apto, Bloco, etc. (Opcional)">
+                        </div>
+                    </div>
+
                     <div class="form-row">
                         <div class="form-group">
                             <label for="city">Cidade</label>
@@ -106,27 +126,17 @@ if (!function_exists('is_active')) {
                             <input type="text" id="state" placeholder="UF" required maxlength="2">
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label for="zip">CEP</label>
-                        <input type="text" id="zip" placeholder="00000-000" required>
-                    </div>
                 </section>
 
                 <section class="checkout-section">
                     <h2><i class="fas fa-truck"></i> Método de Envio</h2>
                     <div class="shipping-option">
                         <input type="radio" id="sedex" name="shipping" value="25.00" checked>
-                        <label for="sedex">
-                            <span>SEDEX</span>
-                            <span>R$ 25,00</span>
-                        </label>
+                        <label for="sedex"><span>SEDEX</span><span>R$ 25,00</span></label>
                     </div>
                     <div class="shipping-option">
                         <input type="radio" id="pac" name="shipping" value="15.00">
-                        <label for="pac">
-                            <span>PAC</span>
-                            <span>R$ 15,00</span>
-                        </label>
+                        <label for="pac"><span>PAC</span><span>R$ 15,00</span></label>
                     </div>
                 </section>
             </div>
@@ -194,7 +204,6 @@ if (!function_exists('is_active')) {
     </div>
 </main>
 
-
 <!-- Footer -->
 <footer class="footer">
     <div class="container">
@@ -211,7 +220,6 @@ if (!function_exists('is_active')) {
                     <a href="#" class="social-link">Twitter</a>
                 </div>
             </div>
-            
             <div class="footer-section">
                 <h4>Navegação</h4>
                 <ul>
@@ -221,7 +229,6 @@ if (!function_exists('is_active')) {
                     <li><a href="sobre.php">Sobre Nós</a></li>
                 </ul>
             </div>
-            
             <div class="footer-section">
                 <h4>Atendimento</h4>
                 <ul>
@@ -231,7 +238,6 @@ if (!function_exists('is_active')) {
                     <li><a href="#">Política de Privacidade</a></li>
                 </ul>
             </div>
-            
             <div class="footer-section">
                 <h4>Newsletter</h4>
                 <p>Receba novidades e ofertas exclusivas</p>
@@ -241,7 +247,6 @@ if (!function_exists('is_active')) {
                 </form>
             </div>
         </div>
-        
         <div class="footer-bottom">
             <p>&copy; 2024 Susanoo. Todos os direitos reservados.</p>
         </div>
@@ -249,8 +254,8 @@ if (!function_exists('is_active')) {
 </footer>
 
 <!-- Scripts -->
-<script src="../js/cart.js"></script> <!-- Seu script de carrinho existente -->
-<script src="../js/checkout.js"></script> <!-- O novo script para o checkout -->
+<script src="../js/cart.js"></script>
+<script src="../js/checkout.js"></script>
 <script src="../js/script.js"></script>
 <script src="../js/theme.js"></script>
 
