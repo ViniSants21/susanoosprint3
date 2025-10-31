@@ -36,6 +36,12 @@ if (!function_exists('is_active')) {
         #colecao-verao { background-color: #333; }
         #colecao-inverno { background-color: #444; }
         footer { background-color: #111; color: #fff; }
+
+		/* Regras para o campo de pesquisa com ícone */
+		.nav-search{display:flex;align-items:center;gap:.5rem;}
+		.nav-search input[type="text"]{padding:.45rem .75rem;border-radius:24px;border:1px solid rgba(255,255,255,.08);background:transparent;color:inherit;min-width:160px}
+		.nav-search .nav-search-btn{border:none;background:transparent;padding:.35rem;border-radius:50%;cursor:pointer;color:inherit;display:inline-flex;align-items:center;justify-content:center}
+		.nav-search .nav-search-btn .fa-search{font-size:0.95rem}
     </style>
 </head>
 <body>
@@ -43,7 +49,10 @@ if (!function_exists('is_active')) {
 <!-- Navbar idêntica à página de produtos -->
 <nav class="navbar scrolled" id="navbar">
     <div class="nav-container">
-        <div class="nav-search"><input type="text" placeholder="Pesquisar..."></div>
+        <div class="nav-search">
+            <input type="text" placeholder="Pesquisar..." aria-label="Pesquisar">
+            <button class="nav-search-btn" aria-label="Pesquisar"><i class="fas fa-search"></i></button>
+        </div>
         <div class="nav-logo"><a href="../index.php"><img src="../assets/img/LOGOSUSANOO.png" alt="LOGOSUSANOO"></a></div>
         <div class="nav-right-group">
             <ul class="nav-menu" id="nav-menu">
