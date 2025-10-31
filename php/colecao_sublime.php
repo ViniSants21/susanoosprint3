@@ -78,30 +78,30 @@ if (!function_exists('is_active')) {
                 <!-- Vasos -->
                 <div class="product-card" data-category="vasos">
                     <div class="card-image">
-                        <img src="../assets/img/Sublimecamisa1.png" alt="Vaso Zen">
+                        <img src="../assets/img/Camisa Polo Susanoo (1).png" alt="Camisa Polo Susanoo Preta">
                         <div class="card-overlay">
                             <button class="btn-quick-view">Ver Detalhes</button>
                         </div>
                     </div>
                     <div class="card-content">
-                        <h3>Vaso Zen</h3>
-                        <p class="product-desc">Cerâmica artesanal japonesa com acabamento fosco</p>
-                        <p class="price">R$ 299,90</p>
+                        <h3>Camisa Polo - COLLECTION SUBLIME </h3>
+                        <p class="product-desc">Minimalista e refinada, feita em algodão egípcio premium com elastano. Inspirada na elegância japonesa.</p>
+                        <p class="price">R$ 149,90</p>
                         <button class="btn btn-add-cart">Adicionar ao Carrinho</button>
                     </div>
                 </div>
 
                 <div class="product-card" data-category="vasos">
                     <div class="card-image">
-                        <img src="../assets/img/Sublimecamisa2.png" alt="Vaso Dragão">
+                        <img src="../assets/img/Camisa Polo Susanoo(Preta).png" alt="Vaso Dragão">
                         <div class="card-overlay">
                             <button class="btn-quick-view">Ver Detalhes</button>
                         </div>
                     </div>
                     <div class="card-content">
-                        <h3>Vaso Dragão</h3>
-                        <p class="product-desc">Design inspirado em escamas de dragão</p>
-                        <p class="price">R$ 399,90</p>
+                        <h3>Camisa Polo Preta - COLLECTION SUBLIME</h3>
+                        <p class="product-desc">Minimalista e refinada, feita em algodão egípcio premium com elastano. Inspirada na elegância japonesa.</p>
+                        <p class="price">R$ 159,90</p>
                         <button class="btn btn-add-cart">Adicionar ao Carrinho</button>
                     </div>
                 </div>
@@ -109,30 +109,30 @@ if (!function_exists('is_active')) {
                 <!-- Luminárias -->
                 <div class="product-card" data-category="luminarias">
                     <div class="card-image">
-                        <img src="../assets/img/Sublimecamisa3.png" alt="Luminária Sakura">
+                        <img src="../assets/img/Camisa Off-White SUBLIME.png" alt="Luminária Sakura">
                         <div class="card-overlay">
                             <button class="btn-quick-view">Ver Detalhes</button>
                         </div>
                     </div>
                     <div class="card-content">
-                        <h3>Luminária Sakura</h3>
-                        <p class="product-desc">Papel de arroz com estampas de cerejeiras</p>
-                        <p class="price">R$ 199,90</p>
+                        <h3>Camisa Polo Off-White - COLLECTION SUBLIME</h3>
+                        <p class="product-desc">Minimalista e refinada, feita em algodão egípcio premium com elastano. Inspirada na elegância japonesa.</p>
+                        <p class="price">R$ 149,90</p>
                         <button class="btn btn-add-cart">Adicionar ao Carrinho</button>
                     </div>
                 </div>
 
                 <div class="product-card" data-category="luminarias">
                     <div class="card-image">
-                        <img src="../assets/img/Sublimecamisa4.png" alt="Lanterna Oriental">
+                        <img src="../assets/img/Camisa Branca SUBLIME.png" alt="Lanterna Oriental">
                         <div class="card-overlay">
                             <button class="btn-quick-view">Ver Detalhes</button>
                         </div>
                     </div>
                     <div class="card-content">
-                        <h3>Lanterna Susanoo</h3>
-                        <p class="product-desc">Lanterna tradicional de bambu e papel</p>
-                        <p class="price">R$ 149,90</p>
+                        <h3>Camisa Polo Branca - COLLECTION SUBLIME</h3>
+                        <p class="product-desc">Minimalista e refinada, feita em algodão egípcio premium com elastano. Inspirada na elegância japonesa.</p>
+                        <p class="price">R$ 129,90</p>
                         <button class="btn btn-add-cart">Adicionar ao Carrinho</button>
                     </div>
                 </div>
@@ -140,81 +140,35 @@ if (!function_exists('is_active')) {
                 <!-- Conjuntos de Chá -->
                 <div class="product-card" data-category="cha">
                     <div class="card-image">
-                        <img src="../assets/img/Sublimecamisa1.png" alt="Conjunto Chá Tradicional">
+                        <img src="../assets/img/Camisa Marrom SUBLIME.png" alt="Conjunto Chá Tradicional">
                         <div class="card-overlay">
                             <button class="btn-quick-view">Ver Detalhes</button>
                         </div>
                     </div>
                     <div class="card-content">
-                        <h3>Conjunto de Chá Tradicional</h3>
-                        <p class="product-desc">5 peças em porcelana japonesa autêntica</p>
-                        <p class="price">R$ 459,90</p>
+                        <h3>Camisa Polo Marrom - COLLECTION SUBLIME</h3>
+                        <p class="product-desc">Minimalista e refinada, feita em algodão egípcio premium com elastano. Inspirada na elegância japonesa.</p>
+                        <p class="price">R$ 149,90</p>
                         <button class="btn btn-add-cart">Adicionar ao Carrinho</button>
                     </div>
                 </div>
 
                 <div class="product-card" data-category="cha">
                     <div class="card-image">
-                        <img src="../assets/img/Sublimecamisa2.png" alt="Bule Zen">
+                        <img src="../assets/img/Camisa Rosa SUBLIME.png" alt="Bule Zen">
                         <div class="card-overlay">
                             <button class="btn-quick-view">Ver Detalhes</button>
                         </div>
                     </div>
                     <div class="card-content">
-                        <h3>Bule Zen</h3>
-                        <p class="product-desc">Ferro fundido com design minimalista</p>
-                        <p class="price">R$ 329,90</p>
+                        <h3>Camisa Polo Rosa - COLLECTION SUBLIME</h3>
+                        <p class="product-desc">Minimalista e refinada, feita em algodão egípcio premium com elastano. Inspirada na elegância japonesa.</p>
+                        <p class="price">R$ 129,90</p>
                         <button class="btn btn-add-cart">Adicionar ao Carrinho</button>
                     </div>
                 </div>
 
-                <!-- Decoração -->
-                <div class="product-card" data-category="decoracao">
-                    <div class="card-image">
-                        <img src="../assets/img/Sublimecamisa3.png" alt="Espelho Oriental">
-                        <div class="card-overlay">
-                            <button class="btn-quick-view">Ver Detalhes</button>
-                        </div>
-                    </div>
-                    <div class="card-content">
-                        <h3>Espelho Feng Shui</h3>
-                        <p class="product-desc">Moldura em madeira com entalhes orientais</p>
-                        <p class="price">R$ 249,90</p>
-                        <button class="btn btn-add-cart">Adicionar ao Carrinho</button>
-                    </div>
-                </div>
-
-                <div class="product-card" data-category="decoracao">
-                    <div class="card-image">
-                        <img src="../assets/img/Sublimecamisa4.png" alt="Biombo Oriental">
-                        <div class="card-overlay">
-                            <button class="btn-quick-view">Ver Detalhes</button>
-                        </div>
-                    </div>
-                    <div class="card-content">
-                        <h3>Biombo Dragão</h3>
-                        <p class="product-desc">3 painéis com pinturas tradicionais</p>
-                        <p class="price">R$ 599,90</p>
-                        <button class="btn btn-add-cart">Adicionar ao Carrinho</button>
-                    </div>
-                </div>
-
-                <div class="product-card" data-category="decoracao">
-                    <div class="card-image">
-                        <img src="../assets/img/Sublimecamisa1.png" alt="Incensário">
-                        <div class="card-overlay">
-                            <button class="btn-quick-view">Ver Detalhes</button>
-                        </div>
-                    </div>
-                    <div class="card-content">
-                        <h3>Incensário Templo</h3>
-                        <p class="product-desc">Bronze artesanal com detalhes em ouro</p>
-                        <p class="price">R$ 179,90</p>
-                        <button class="btn btn-add-cart">Adicionar ao Carrinho</button>
-                    </div>
-                </div>
-            </div>
-        </div>
+               
     </section>
 
     <!-- Footer -->
