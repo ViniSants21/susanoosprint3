@@ -144,7 +144,7 @@
                     <div class="social-links-contact">
                         <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
                         <a href="#" title="Facebook"><i class="fab fa-facebook-f"></i></a>
-                        <a href="https://x.com/" title="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" title="Twitter"><i class="fab fa-twitter"></i></a>
                     </div>
                 </div>
             </div>
