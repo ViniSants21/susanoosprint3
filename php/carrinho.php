@@ -137,7 +137,7 @@ if (!function_exists('is_active')) {
                     <div class="social-links">
                         <a href="#" class="social-link">Instagram</a>
                         <a href="#" class="social-link">Facebook</a>
-                        <a href="#" class="social-link">Twitter</a>
+                        <a href="#" class="social-link">X</a>
                     </div>
                 </div>
                 
