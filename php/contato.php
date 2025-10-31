@@ -1,4 +1,3 @@
-<!-- davi de assis fabricio -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -11,7 +10,7 @@
     <!-- Adicione este link para os ícones (Font Awesome) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script>(function(){const theme=localStorage.getItem('theme');if(theme==='light'){document.documentElement.classList.add('light-mode');}})();</script>
-
+ 
     <!-- Estilos para o campo de pesquisa com ícone -->
     <style>
         .nav-search{display:flex;align-items:center;gap:.5rem;}
@@ -23,11 +22,11 @@
             .nav-search input[type="text"]{border:1px solid rgba(255,255,255,.08)}
         }
     </style>
-
+ 
     <!-- Remover o CSS do SweetAlert2 -->
     <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css"> -->
 </head>
-
+ 
 <body>
     <?php
     // Bloco PHP para o link ativo do menu
@@ -79,11 +78,11 @@
         <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
     </div>
 </nav>
-    
+   
     <main class="contact-page">
         <!-- Elemento de fundo para o efeito de gradiente animado -->
         <div class="background-gradient"></div>
-
+ 
             <div class="contact-container">
                 <!-- Lado Esquerdo: Formulário -->
                 <div class="contact-form-wrapper">
@@ -113,7 +112,7 @@
                         </button>
                     </form>
                 </div>
-
+ 
             <!-- Lado Direito: Informações -->
             <div class="contact-info-wrapper">
                 <div class="info-content">
@@ -151,7 +150,7 @@
             </div>
         </div>
     </main>
-    
+   
     <!-- Footer colado diretamente -->
     <footer class="footer">
         <div class="container">
@@ -201,26 +200,26 @@
         </div>
     </footer>
     <script src="../js/theme.js"></script> <!-- ou ../js/theme.js para páginas internas -->
-
+ 
     <script src="../js/script.js"></script>
-
+ 
     <!-- Remover o JS do SweetAlert2 -->
     <!-- <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> -->
-
+ 
     <script>
     document.getElementById('contactForm').addEventListener('submit', function(event) {
         event.preventDefault();
-
+ 
         var name = document.getElementById('name').value;
         var email = document.getElementById('email').value;
         var subject = document.getElementById('subject').value;
         var message = document.getElementById('message').value;
-
+ 
         if (name === '' || email === '' || subject === '' || message === '') {
             alert('Por favor, preencha todos os campos!');
             return;
         }
-
+ 
         alert('Mensagem enviada!');
         window.location.href = "../index.php"; // Redireciona para o index após mostrar a mensagem
     });
