@@ -4,30 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Susanoo - Estilo Oriental Moderno</title>
+
+    <!-- Folha de Estilo Principal -->
     <link rel="stylesheet" href="css/style.css">
+    
+    <!-- Fontes e Ícones Externos -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Script para Carregamento do Tema -->
     <script>(function(){const theme=localStorage.getItem('theme');if(theme==='light'){document.documentElement.classList.add('light-mode');}})();</script>
-
-    <!-- Estilos locais para o ícone de pesquisa -->
-    <style>
-        .nav-search{display:flex;align-items:center;gap:.5rem;}
-        .nav-search input[type="text"]{padding:.45rem .75rem;border-radius:24px;border:1px solid rgba(0,0,0,.08);background:transparent;color:inherit;min-width:160px}
-        .nav-search .nav-search-btn{border:none;background:transparent;padding:.35rem;border-radius:50%;cursor:pointer;color:inherit;display:inline-flex;align-items:center;justify-content:center}
-        .nav-search .nav-search-btn .fa-search{font-size:0.95rem}
-    </style>
 </head>
+
 <body class="home">
     <?php
-// Bloco PHP movido para dentro do Body para evitar erros de renderização
-$current = basename($_SERVER['PHP_SELF']);
-if (!function_exists('is_active')) {
-    function is_active($href, $current) {
-        $base = basename(parse_url($href, PHP_URL_PATH));
-        return $base === $current ? 'active' : '';
+    // Bloco PHP para definir a classe 'active' no link de navegação atual
+    $current = basename($_SERVER['PHP_SELF']);
+    if (!function_exists('is_active')) {
+        function is_active($href, $current) {
+            $base = basename(parse_url($href, PHP_URL_PATH));
+            return $base === $current ? 'active' : '';
+        }
     }
-}
-?>
+    ?>
 
     <!-- Navbar -->
     <nav class="navbar" id="navbar">
@@ -66,7 +65,40 @@ if (!function_exists('is_active')) {
         </div>
     </nav>
 
-    <!-- Hero Section -->
+    <!-- NOVO BANNER DE LANÇAMENTOS -->
+    <section class="new-arrival-banner">
+        <!-- Coluna de Imagem 1 -->
+        <div class="banner-image-placeholder img-1">
+            <!-- As imagens são definidas como background no seu arquivo style.css -->
+        </div>
+        <!-- Coluna de Imagem 2 -->
+        <div class="banner-image-placeholder img-2"></div>
+        
+        <!-- Coluna de Conteúdo Central -->
+        <div class="banner-center-content">
+            <div class="decorative-crosses crosses-left">
+                <span>✕</span><span>✕</span><span>✕</span><span>✕</span>
+            </div>
+            <h2>Novos Lançamentos</h2>
+            <p>Até 50% de desconto em todos os itens</p>
+            <a href="php/produtos.php" class="btn-shop">Compre Agora</a>
+            <div class="banner-social-icons">
+                <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="#" aria-label="X (Twitter)"><i class="fa-brands fa-x-twitter"></i></a>
+            </div>
+            <div class="decorative-crosses crosses-right">
+                <span>✕</span><span>✕</span><span>✕</span><span>✕</span>
+            </div>
+        </div>
+        
+        <!-- Coluna de Imagem 3 -->
+        <div class="banner-image-placeholder img-3"></div>
+        <!-- Coluna de Imagem 4 -->
+        <div class="banner-image-placeholder img-4"></div>
+    </section>
+
+    <!-- Seção Hero Principal -->
     <section class="hero">
         <div class="hero-background"><div class="wave-animation"></div></div>
         <div class="hero-content">
@@ -94,34 +126,25 @@ if (!function_exists('is_active')) {
             </div>
             <div class="products-grid">
                 
-<!-- PRODUTO 1 CORRIGIDO -->
-<div class="product-card" data-category="camisas"
-     data-name="Camisa Susanoo - Branca" data-price="299.90" data-img="../assets/img/costafoto.png"
-     data-imgs="../assets/img/costafoto.png" data-sizes="P|M|G|GG" 
-     data-longdesc="Uma camisa branca elegante com detalhes da cultura japonesa, perfeita para qualquer ocasião.">
-    <div class="card-image"><img src="assets/img/costafoto.png" alt="Camisa Branca"><div class="card-overlay"><button class="btn-quick-view">Ver Detalhes</button></div></div>
-    <div class="card-content"><h3>Camisa Susanoo - Preta</h3><p class="product-desc">Estilo e cultura japonesa</p><p class="price">R$ 109,99</p><button class="btn btn-add-cart">Adicionar ao Carrinho</button></div>
-</div>
+                <!-- PRODUTO 1 -->
+                <div class="product-card">
+                    <div class="card-image"><img src="assets/img/costafoto.png" alt="Camisa Preta"><div class="card-overlay"><button class="btn-quick-view">Ver Detalhes</button></div></div>
+                    <div class="card-content"><h3>Camisa Susanoo - Preta</h3><p class="product-desc">Estilo e cultura japonesa</p><p class="price">R$ 109,99</p><button class="btn btn-add-cart">Adicionar ao Carrinho</button></div>
+                </div>
 
-<!-- PRODUTO 2 CORRIGIDO -->
-<div class="product-card" data-category="calcas"
-     data-name="Calça Baggy Susanoo Cinza" data-price="199.90" data-img="../assets/img/calca.png"
-     data-imgs="../assets/img/calca.png" data-sizes="38|40|42|44" 
-     data-longdesc="Calça baggy confortável e estilosa, feita com material de alta qualidade para o uso diário.">
-    <div class="card-image"><img src="assets/img/calca.png" alt="Calça Cinza"><div class="card-overlay"><button class="btn-quick-view">Ver Detalhes</button></div></div>
-    <div class="card-content"><h3>Calça Baggy susanoo cinza</h3><p class="product-desc">Cor discreta, estilo que destaca</p><p class="price">R$ 67,99</p><button class="btn btn-add-cart">Adicionar ao Carrinho</button></div>
-</div>
+                <!-- PRODUTO 2 -->
+                <div class="product-card">
+                    <div class="card-image"><img src="assets/img/calca.png" alt="Calça Cinza"><div class="card-overlay"><button class="btn-quick-view">Ver Detalhes</button></div></div>
+                    <div class="card-content"><h3>Calça Baggy Susanoo Cinza</h3><p class="product-desc">Cor discreta, estilo que destaca</p><p class="price">R$ 67,99</p><button class="btn btn-add-cart">Adicionar ao Carrinho</button></div>
+                </div>
 
-<!-- PRODUTO 3 CORRIGIDO -->
-<div class="product-card" data-category="acessorios"
-     data-name="Acessórios" data-price="459.90" data-img="../assets/img/bone.png"
-     data-imgs="../assets/img/bone.png" data-sizes="Único" 
-     data-longdesc="Uma coleção de acessórios inspirados na cerimônia tradicional japonesa, adicionando um toque de elegância.">
-    <div class="card-image"><img src="assets/img/bone.png" alt="Boné"><div class="card-overlay"><button class="btn-quick-view">Ver Detalhes</button></div></div>
-    <div class="card-content"><h3>Acessórios</h3><p class="product-desc">Faça seus detalhes uma cerimônia tradicional japonesa</p><p class="price">R$ 39,90</p><button class="btn btn-add-cart">Adicionar ao Carrinho</button></div>
-</div>
+                <!-- PRODUTO 3 -->
+                <div class="product-card">
+                    <div class="card-image"><img src="assets/img/bone.png" alt="Boné"><div class="card-overlay"><button class="btn-quick-view">Ver Detalhes</button></div></div>
+                    <div class="card-content"><h3>Acessórios</h3><p class="product-desc">Faça seus detalhes uma cerimônia tradicional japonesa</p><p class="price">R$ 39,90</p><button class="btn btn-add-cart">Adicionar ao Carrinho</button></div>
+                </div>
 
-                <!-- Botão "Ver Todos" movido para dentro da grade para garantir centralização -->
+                <!-- Botão "Ver Todos" -->
                 <div class="cta-section">
                     <a href="php/produtos.php" class="btn btn-outline">Ver Todos os Produtos</a>
                 </div>
@@ -189,10 +212,11 @@ if (!function_exists('is_active')) {
             </div>
         </div>
     </footer>
-
     
+    <!-- Botão Voltar ao Topo -->
     <button id="backToTop" class="back-to-top"><span>↑</span></button>
 
+    <!-- Scripts JavaScript -->
     <script src="js/cart.js"></script>
     <script src="js/script.js"></script>
     <script src="js/theme.js"></script> 

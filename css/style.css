@@ -1175,3 +1175,121 @@ html.light-mode .dropdown-user-name {
     text-align: center;
     color: var(--text-muted, #a1a1aa);
 }
+/* ======================================= */
+/*        NOVO BANNER DE LANÇAMENTOS       */
+/* ======================================= */
+.new-arrival-banner {
+    display: grid;
+    
+    grid-template-columns: repeat(2, 1fr) 2fr repeat(2, 1fr);
+    background-color: var(--bg-secondary); /* Usa a cor de fundo secundária do seu tema */
+    overflow: hidden;
+}
+
+.banner-image-placeholder {
+    background-color: #333; /* Cor de fundo caso a imagem não carregue */
+    background-size: cover;
+    background-position: center;
+    min-height: 450px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-family: 'Noto Sans JP', sans-serif;
+    text-align: center;
+    transition: transform var(--transition-medium);
+}
+
+.banner-image-placeholder:hover {
+    transform: scale(1.05); /* Efeito de zoom sutil no hover */
+}
+
+
+
+ .banner-image-placeholder.img-1 { background-image: url('../assets/img/sublimez.png'); } 
+ .banner-image-placeholder.img-2 { background-image: url('../assets/img/Essential2-banner.png'); } 
+ .banner-image-placeholder.img-3 { background-image: url('../assets/img/Susanoo-verao.png'); } 
+/* .banner-image-placeholder.img-4 { background-image: url('../assets/img/sua-imagem-4.jpg'); } */
+
+
+.banner-center-content {
+    background-color: var(--bg-tertiary); /* Usa a cor de fundo terciária do seu tema */
+    color: var(--text-primary);
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    position: relative;
+    border-left: 1px solid rgba(139, 92, 246, 0.2);
+    border-right: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+.banner-center-content h2 {
+    font-family: var(--font-display);
+    font-size: 2.8rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--primary-purple); /* Roxo principal */
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.banner-center-content p {
+    font-family: var(--font-main);
+    font-size: 1rem;
+    margin: 0.5rem 0 1.5rem 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-secondary);
+}
+
+.banner-center-content .btn-shop {
+    background-color: transparent;
+    color: var(--text-primary);
+    border: 2px solid var(--primary-purple);
+    padding: 10px 30px;
+    text-decoration: none;
+    text-transform: uppercase;
+    font-weight: 500;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+}
+
+.banner-center-content .btn-shop:hover {
+    background-color: var(--primary-purple);
+    color: var(--text-primary);
+    box-shadow: var(--shadow-glow);
+}
+
+.banner-social-icons {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.banner-social-icons a {
+    color: var(--text-secondary);
+    font-size: 1.2rem;
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.banner-social-icons a:hover {
+    color: var(--primary-purple);
+    transform: scale(1.1);
+}
+
+.decorative-crosses {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: bold;
+    line-height: 1;
+    position: absolute;
+    color: var(--primary-purple);
+    opacity: 0.5;
+}
+
+.crosses-left { left: 20px; top: 50%; transform: translateY(-50%); }
+.crosses-right { right: 20px; top: 50%; transform: translateY(-50%); }
+.decorative-crosses span { display: block; margin: 10px 0; }
