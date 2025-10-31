@@ -82,7 +82,7 @@ if (!function_exists('is_active')) {
     <footer class="footer">
         <div class="container">
             <div class="footer-content">
-                <div class="footer-section"><div class="footer-logo"><h3>須佐能乎</h3><span>SUSANOO</span></div><p>Desperte seu poder interior com estilo único e elegância oriental.</p><div class="social-links"><a href="#" class="social-link">Instagram</a><a href="#" class="social-link">Facebook</a><a href="#" class="social-link">Twitter</a></div></div>
+                <div class="footer-section"><div class="footer-logo"><h3>須佐能乎</h3><span>SUSANOO</span></div><p>Desperte seu poder interior com estilo único e elegância oriental.</p><div class="social-links"><a href="#" class="social-link">Instagram</a><a href="#" class="social-link">Facebook</a><a href="#" class="social-link">X</a></div></div>
                 <div class="footer-section"><h4>Navegação</h4><ul><li><a href="../index.php">Home</a></li><li><a href="produtos.php">Produtos</a></li><li><a href="colecoes.php">Coleções</a></li><li><a href="sobre.php">Sobre Nós</a></li></ul></div>
                 <div class="footer-section"><h4>Atendimento</h4><ul><li><a href="contato.php">Contato</a></li><li><a href="#">FAQ</a></li><li><a href="#">Trocas e Devoluções</a></li><li><a href="#">Política de Privacidade</a></li></ul></div>
                 <div class="footer-section"><h4>Newsletter</h4><p>Receba novidades e ofertas exclusivas</p><form class="newsletter-form"><input type="email" placeholder="Seu email" required><button type="submit" class="btn btn-primary">Inscrever</button></form></div>
