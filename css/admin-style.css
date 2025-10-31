@@ -1,0 +1,139 @@
+/* ======================================= */
+/*    CSS PARA O PAINEL ADMIN - SUSANOO    */
+/* ======================================= */
+:root {
+    --admin-bg: #111827;
+    --sidebar-bg: #1f2937;
+    --card-bg: #1f2937;
+    --border-color: #374151;
+    --text-light: #f9fafb;
+    --text-muted: #9ca3af;
+    --accent: #8B5CF6;
+    --green: #10B981;
+    --red: #EF4444;
+}
+
+* { box-sizing: border-box; }
+
+body.admin-body {
+    margin: 0;
+    font-family: 'Noto Sans JP', sans-serif;
+    background-color: var(--admin-bg);
+    color: var(--text-light);
+    display: flex;
+}
+
+/* --- Layout Principal --- */
+.admin-sidebar {
+    width: 240px;
+    background-color: var(--sidebar-bg);
+    height: 100vh;
+    position: fixed;
+    top: 0; left: 0;
+    padding: 20px;
+    display: flex; flex-direction: column;
+}
+
+.admin-main-content {
+    margin-left: 240px; /* Mesmo que a largura da sidebar */
+    width: calc(100% - 240px);
+    padding: 30px;
+}
+
+/* --- Sidebar --- */
+.sidebar-header { text-align: center; margin-bottom: 30px; }
+.sidebar-header img { max-width: 100px; }
+
+.sidebar-nav ul { list-style: none; padding: 0; margin: 0; }
+.sidebar-nav a {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 12px 15px;
+    border-radius: 8px;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-weight: 500;
+    margin-bottom: 5px;
+    transition: all 0.3s ease;
+}
+.sidebar-nav a:hover {
+    background-color: var(--admin-bg);
+    color: #fff;
+}
+.sidebar-nav a.active {
+    background-color: var(--accent);
+    color: #fff;
+}
+.sidebar-nav a i { width: 20px; text-align: center; }
+.sidebar-footer { margin-top: auto; }
+
+/* --- Conteúdo Principal --- */
+.page-header h1 { font-family: 'Playfair Display', serif; font-size: 2.5rem; margin: 0 0 20px; }
+
+/* Grid de Estatísticas */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.stat-card {
+    background-color: var(--card-bg);
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+}
+.stat-card h3 {
+    font-size: 1rem;
+    color: var(--text-muted);
+    margin: 0 0 10px;
+}
+.stat-card .stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0 0 5px;
+}
+.stat-card .stat-change {
+    font-weight: 600;
+    color: var(--green);
+}
+.stat-card .stat-change.negative { color: var(--red); }
+.stat-card .chart-placeholder {
+    height: 80px;
+    margin-top: 20px;
+    opacity: 0.7;
+}
+
+/* Tabela de Dados (para produtos e usuários) */
+.data-table-wrapper {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    overflow: hidden;
+}
+.table-header { display: flex; justify-content: space-between; align-items: center; padding: 20px; }
+.btn-add {
+    background-color: var(--accent);
+    color: #fff; padding: 10px 15px; border-radius: 5px;
+    text-decoration: none; font-weight: 500;
+}
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.data-table th, .data-table td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+.data-table thead { background-color: var(--admin-bg); }
+.data-table tbody tr:hover { background-color: #2a374a; }
+.status-active { color: var(--green); }
+.status-inactive { color: var(--red); }
+.action-buttons button {
+    background: none; border: none; cursor: pointer;
+    font-size: 1.1rem; padding: 5px;
+    color: var(--text-muted);
+}
+.action-buttons button:hover { color: #fff; }

@@ -1,0 +1,301 @@
+/* ============================================= */
+/*  CSS para a Página de Configurações - Susanoo  */
+/* ============================================= */
+
+:root {
+    --primary-purple: #8B5CF6;
+    --dark-bg: #000000;
+    --dark-card: #111111;
+    --input-bg: #1f2937;
+    --border-color: #374151;
+    --text-light: #f9fafb;
+    --text-muted: #a1a1aa;
+}
+
+.settings-page-body {
+    background-color: var(--dark-bg);
+    color: var(--text-light);
+    padding-top: 80px; /* Espaço para a navbar fixa */
+}
+
+.settings-main-content {
+    padding: 40px 0;
+}
+
+.settings-header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.settings-layout {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    gap: 30px;
+}
+
+/* Menu Lateral */
+.settings-nav ul {
+    list-style: none;
+    padding: 0;
+    position: sticky;
+    top: 110px; /* Distância do topo (navbar + espaço) */
+}
+.settings-nav a {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--text-muted);
+    font-weight: 500;
+    margin-bottom: 8px;
+    transition: background-color 0.3s, color 0.3s;
+}
+.settings-nav a:hover {
+    background-color: var(--dark-card);
+    color: var(--text-light);
+}
+.settings-nav a.active {
+    background-color: var(--primary-purple);
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.2);
+}
+.settings-nav a i {
+    width: 20px;
+    text-align: center;
+}
+
+/* Painéis de Conteúdo */
+.settings-panel {
+    background-color: var(--dark-card);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 30px;
+    display: none; /* Escondido por padrão */
+}
+.settings-panel.active {
+    display: block; /* Visível quando ativo */
+}
+.settings-panel h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.form-group-settings {
+    margin-bottom: 25px;
+}
+.form-group-settings label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 10px;
+}
+.form-group-settings input[type="text"],
+.form-group-settings input[type="email"],
+.form-group-settings input[type="password"] {
+    width: 100%;
+    max-width: 400px;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background-color: var(--input-bg);
+    color: var(--text-light);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+.form-group-settings input:focus {
+    outline: none;
+    border-color: var(--primary-purple);
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.25);
+}
+
+/* Avatar Upload */
+.avatar-settings-group {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+.avatar-preview-img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+.avatar-upload-label {
+    padding: 10px 15px;
+    background-color: var(--input-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    cursor: pointer;
+}
+input[type="file"] { display: none; }
+
+/* Theme Toggle */
+.theme-switch-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+.theme-switch {
+    display: inline-block;
+    height: 34px;
+    position: relative;
+    width: 60px;
+}
+.theme-switch input { display: none; }
+.slider {
+    background-color: var(--input-bg);
+    bottom: 0; left: 0; right: 0; top: 0;
+    cursor: pointer;
+    position: absolute;
+    transition: .4s;
+    border-radius: 34px;
+}
+.slider:before {
+    background-color: #fff;
+    bottom: 4px; content: "";
+    height: 26px; left: 4px;
+    position: absolute;
+    transition: .4s;
+    width: 26px;
+    border-radius: 50%;
+}
+input:checked + .slider {
+    background-color: var(--primary-purple);
+}
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+.settings-footer {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+}
+
+/* Responsividade */
+@media(max-width: 768px) {
+    .settings-layout {
+        grid-template-columns: 1fr;
+    }
+    .settings-nav ul {
+        position: static;
+        display: flex;
+        overflow-x: auto;
+        padding-bottom: 15px;
+    }
+    .settings-nav a {
+        white-space: nowrap;
+    }
+}
+/* ================================================= */
+/*  CSS EXTRA PARA A PÁGINA DE PERFIL (HISTÓRICO)    */
+/* ================================================= */
+
+.profile-info-card {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+    background-color: var(--dark-card);
+    padding: 25px;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    margin-bottom: 30px;
+}
+
+.profile-info-avatar {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.profile-info-details h3 {
+    margin: 0 0 5px;
+    font-size: 1.5rem;
+    color: var(--text-light);
+}
+
+.profile-info-details p {
+    margin: 0;
+    color: var(--text-muted);
+}
+
+.order-history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.order-item-card {
+    background-color: var(--dark-card);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 20px;
+    transition: background-color 0.3s;
+}
+.order-item-card:hover {
+    background-color: #1a1a1a;
+}
+
+.order-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    padding-bottom: 15px;
+    margin-bottom: 15px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.order-item-header h4 {
+    margin: 0;
+    font-size: 1.1rem;
+}
+.order-item-header h4 span {
+    font-weight: 400;
+    color: var(--text-muted);
+}
+.order-status {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    background-color: rgba(16, 185, 129, 0.1);
+    color: #10B981;
+}
+.order-status.pending {
+    background-color: rgba(245, 158, 11, 0.1);
+    color: #F59E0B;
+}
+
+.order-item-body {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.order-products-preview {
+    display: flex;
+    gap: -15px; /* Efeito de sobreposição */
+}
+.order-product-img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--dark-bg);
+}
+
+.order-details-link {
+    color: var(--primary-purple);
+    text-decoration: none;
+    font-weight: 500;
+}
