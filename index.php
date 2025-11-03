@@ -27,7 +27,12 @@
         }
     }
     ?>
-
+<style>
+		.nav-search{display:flex;align-items:center;gap:.5rem;}
+		.nav-search input[type="text"]{padding:.45rem .75rem;border-radius:24px;border:1px solid rgba(0,0,0,.08);background:transparent;color:inherit;min-width:160px}
+		.nav-search .nav-search-btn{border:none;background:transparent;padding:.35rem;border-radius:50%;cursor:pointer;color:inherit;display:inline-flex;align-items:center;justify-content:center}
+		.nav-search .nav-search-btn .fa-search{font-size:0.95rem}
+	</style>
     <!-- Navbar -->
     <nav class="navbar" id="navbar">
         <div class="nav-container">
@@ -79,8 +84,8 @@
             <div class="decorative-crosses crosses-left">
                 <span>✕</span><span>✕</span><span>✕</span><span>✕</span>
             </div>
-            <h2>Novos Lançamentos</h2>
-            <p>Até 50% de desconto em todos os itens</p>
+            <h2>Susanoo</h2>
+            <p>Esilo que domina</p>
             <a href="php/produtos.php" class="btn-shop">Compre Agora</a>
             <div class="banner-social-icons">
                 <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
@@ -160,7 +165,7 @@
                 <p class="section-subtitle">Linhas exclusivas inspiradas na cultura japonesa</p>
             </div>
             <div class="collections-grid">
-                <div class="collection-card large"><img src="assets/img/susanoo inverno.png" alt="Coleção Tempestade"><div class="collection-overlay"><div class="collection-content"><h3>Linha de Inverno</h3><p>Esquente-se com estilo</p><a href="php/colecoes.php" class="btn btn-outline">Explorar</a></div></div></div>
+                <div class="collection-card"><img src="assets/img/susanoo inverno.png" alt="Coleção Tempestade"><div class="collection-overlay"><div class="collection-content"><h3>Linha de Inverno</h3><p>Esquente-se com estilo</p><a href="php/colecoes.php" class="btn btn-outline">Explorar</a></div></div></div>
                 <div class="collection-card"><img src="assets/img/inverno shibuya (1).png" alt="Linha Dragão"><div class="collection-overlay"><div class="collection-content"><h3>Linha de Verão</h3><p>Força e elegância</p><a href="php/colecoes.php" class="btn btn-outline">Ver Mais</a></div></div></div>
                 <div class="collection-card"><img src="assets/img/sublime.png" alt="Sakura"><div class="collection-overlay"><div class="collection-content"><h3>Coleção Sublime</h3><p>Delicadeza oriental</p><a href="php/colecoes.php" class="btn btn-outline">Descobrir</a></div></div></div>
             </div>

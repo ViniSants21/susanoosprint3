@@ -6,6 +6,8 @@
     box-sizing: border-box;
 }
 
+
+
 :root {
     /* ... (suas variáveis de cor permanecem as mesmas) ... */
     --bg-primary: #000000;
@@ -1180,116 +1182,375 @@ html.light-mode .dropdown-user-name {
 /* ======================================= */
 .new-arrival-banner {
     display: grid;
-    
     grid-template-columns: repeat(2, 1fr) 2fr repeat(2, 1fr);
-    background-color: var(--bg-secondary); /* Usa a cor de fundo secundária do seu tema */
+    background: transparent; /* Remove o fundo cinza */
     overflow: hidden;
+    min-height: 600px; /* Mantém a altura aumentada */
+    position: relative;
 }
 
 .banner-image-placeholder {
-    background-color: #333; /* Cor de fundo caso a imagem não carregue */
+    background-color: transparent; 
     background-size: cover;
     background-position: center;
-    min-height: 450px;
+    height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
-    font-family: 'Noto Sans JP', sans-serif;
-    text-align: center;
-    transition: transform var(--transition-medium);
+    position: relative;
+    overflow: hidden;
+    transition: all var(--transition-medium);
+}
+
+/* Efeitos de hover mais elaborados */
+.banner-image-placeholder::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, rgba(139, 92, 246, 0.1), rgba(167, 139, 250, 0.1));
+    opacity: 0;
+    transition: opacity var(--transition-medium);
+    z-index: 1;
+}
+
+.banner-image-placeholder::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.6s ease;
 }
 
 .banner-image-placeholder:hover {
-    transform: scale(1.05); /* Efeito de zoom sutil no hover */
+    transform: scale(1.08); /* Aumenta mais o zoom */
 }
 
+.banner-image-placeholder:hover::before {
+    opacity: 1;
+}
 
+.banner-image-placeholder:hover::after {
+    left: 100%;
+}
 
- .banner-image-placeholder.img-1 { background-image: url('../assets/img/sublimez.png'); } 
- .banner-image-placeholder.img-2 { background-image: url('../assets/img/Essential2-banner.png'); } 
- .banner-image-placeholder.img-3 { background-image: url('../assets/img/Susanoo-verao.png'); } 
- .banner-image-placeholder.img-4 { background-image: url('../assets/img/Imag'); } 
-
+/* MANTENDO AS IMAGENS ORIGINAIS QUE VOCÊ JÁ TINHA */
+.banner-image-placeholder.img-1 { background-image: url('../assets/img/IMG3.png'); }
+.banner-image-placeholder.img-2 { background-image: url('../assets/img/Imagem2.png'); }
+.banner-image-placeholder.img-3 { background-image: url('../assets/img/IMG5.png'); }
+.banner-image-placeholder.img-4 { background-image: url('../assets/img/Imagem.png'); }
 
 .banner-center-content {
-    background-color: var(--bg-tertiary); /* Usa a cor de fundo terciária do seu tema */
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.05), rgba(167, 139, 250, 0.08)); /* Gradiente sutil */
     color: var(--text-primary);
-    padding: 2rem;
+    padding: 3rem 2rem;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     text-align: center;
     position: relative;
-    border-left: 1px solid rgba(139, 92, 246, 0.2);
-    border-right: 1px solid rgba(139, 92, 246, 0.2);
+    border-left: 1px solid rgba(139, 92, 246, 0.3);
+    border-right: 1px solid rgba(139, 92, 246, 0.3);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
 }
 
 .banner-center-content h2 {
     font-family: var(--font-display);
-    font-size: 2.8rem;
+    font-size: 3rem; /* Aumenta um pouco o tamanho */
     font-weight: 700;
-    margin: 0;
-    color: var(--primary-purple); /* Roxo principal */
+    margin: 0 0 1rem 0;
+    background: linear-gradient(135deg, var(--primary-purple), var(--light-purple), var(--secondary-purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
     text-transform: uppercase;
-    letter-spacing: 2px;
+    letter-spacing: 3px;
+    line-height: 1.1;
 }
 
 .banner-center-content p {
     font-family: var(--font-main);
-    font-size: 1rem;
-    margin: 0.5rem 0 1.5rem 0;
+    font-size: 1.1rem;
+    margin: 0 0 2.5rem 0;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 2px;
     color: var(--text-secondary);
+    font-weight: 500;
 }
 
 .banner-center-content .btn-shop {
-    background-color: transparent;
+    background: transparent;
     color: var(--text-primary);
     border: 2px solid var(--primary-purple);
-    padding: 10px 30px;
+    padding: 14px 40px;
     text-decoration: none;
     text-transform: uppercase;
-    font-weight: 500;
+    font-weight: 600;
     border-radius: 50px;
-    transition: all 0.3s ease;
+    transition: all 0.4s ease;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.banner-center-content .btn-shop::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, var(--primary-purple), transparent);
+    transition: left 0.6s ease;
+    z-index: -1;
 }
 
 .banner-center-content .btn-shop:hover {
     background-color: var(--primary-purple);
     color: var(--text-primary);
     box-shadow: var(--shadow-glow);
+    transform: translateY(-3px) scale(1.05);
+    border-color: transparent;
+}
+
+.banner-center-content .btn-shop:hover::before {
+    left: 100%;
 }
 
 .banner-social-icons {
     display: flex;
     gap: 1.5rem;
-    margin-top: 2rem;
+    margin-top: 2.5rem;
 }
 
 .banner-social-icons a {
     color: var(--text-secondary);
-    font-size: 1.2rem;
-    transition: color 0.3s ease, transform 0.3s ease;
+    font-size: 1.3rem;
+    transition: all 0.4s ease;
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(139, 92, 246, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.banner-social-icons a::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--primary-purple), var(--secondary-purple));
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    border-radius: 50%;
+}
+
+.banner-social-icons a i {
+    position: relative;
+    z-index: 1;
 }
 
 .banner-social-icons a:hover {
-    color: var(--primary-purple);
-    transform: scale(1.1);
+    color: var(--text-primary);
+    transform: translateY(-5px) scale(1.1);
+    box-shadow: var(--shadow-medium);
+}
+
+.banner-social-icons a:hover::before {
+    opacity: 1;
 }
 
 .decorative-crosses {
     font-family: var(--font-display);
-    font-size: 1.5rem;
+    font-size: 1.8rem;
     font-weight: bold;
     line-height: 1;
     position: absolute;
     color: var(--primary-purple);
-    opacity: 0.5;
+    opacity: 0.4;
+    z-index: 1;
 }
 
-.crosses-left { left: 20px; top: 50%; transform: translateY(-50%); }
-.crosses-right { right: 20px; top: 50%; transform: translateY(-50%); }
-.decorative-crosses span { display: block; margin: 10px 0; }
+.crosses-left { 
+    left: 25px; 
+    top: 50%; 
+    transform: translateY(-50%); 
+}
+
+.crosses-right { 
+    right: 25px; 
+    top: 50%; 
+    transform: translateY(-50%); 
+}
+
+.decorative-crosses span { 
+    display: block; 
+    margin: 12px 0; 
+    transition: all 0.3s ease;
+}
+
+.decorative-crosses span:hover {
+    opacity: 0.8;
+    transform: scale(1.2);
+    color: var(--light-purple);
+}
+
+/* Responsividade */
+@media (max-width: 1024px) {
+    .new-arrival-banner {
+        min-height: 500px;
+    }
+    
+    .banner-center-content h2 {
+        font-size: 2.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .new-arrival-banner {
+        min-height: 400px;
+        grid-template-columns: 1fr;
+        grid-template-rows: repeat(5, 200px);
+    }
+    
+    .banner-center-content {
+        grid-row: 3;
+    }
+    
+    .banner-center-content h2 {
+        font-size: 2rem;
+    }
+    
+    .decorative-crosses {
+        display: none;
+    }
+}
+/* ======================================= */
+/*       AJUSTES DE ESPAÇAMENTO            */
+/* ======================================= */
+
+/* Diminui o espaço entre o banner e a seção hero */
+.new-arrival-banner {
+    margin-bottom: 0; /* Remove margem inferior */
+}
+
+.hero {
+    padding-top: 2rem; /* Reduz o padding superior da seção hero */
+    margin-top: -1rem; /* Puxa a seção hero para mais perto do banner */
+}
+
+/* ======================================= */
+/*       COLECÕES - 3 BANNERS IGUAIS       */
+/* ======================================= */
+
+.collections-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 colunas iguais */
+    grid-template-rows: 400px; /* Altura fixa igual para todos */
+    gap: 1.5rem;
+}
+
+/* Remove a classe .large que fazia um banner ser maior */
+.collection-card.large {
+    grid-row: span 1; /* Todos ocupam a mesma altura */
+}
+
+.collection-card {
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all var(--transition-medium);
+    height: 100%; /* Garante que todos tenham a mesma altura */
+}
+
+/* Efeito de hover com ampliação */
+.collection-card:hover {
+    transform: scale(1.05); /* Ampliação no hover */
+    box-shadow: var(--shadow-glow);
+    border-color: var(--primary-purple);
+}
+
+.collection-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Garante que as imagens preencham igualmente */
+    transition: transform var(--transition-slow);
+}
+
+.collection-card:hover img {
+    transform: scale(1.1); /* Zoom na imagem ao passar o mouse */
+}
+
+.collection-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, rgba(0,0,0,0.7), rgba(139, 92, 246, 0.4));
+    display: flex;
+    align-items: flex-end;
+    padding: 2rem;
+    opacity: 0;
+    transition: all var(--transition-medium);
+}
+
+.collection-card:hover .collection-overlay {
+    opacity: 1;
+}
+
+.collection-content {
+    color: var(--text-primary);
+    transform: translateY(20px);
+    transition: transform var(--transition-medium);
+}
+
+.collection-card:hover .collection-content {
+    transform: translateY(0);
+}
+
+.collection-content h3 {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.collection-content p {
+    margin-bottom: 1rem;
+    opacity: 0.9;
+}
+
+/* Responsividade para os 3 banners */
+@media (max-width: 1024px) {
+    .collections-grid {
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: 350px 350px;
+    }
+}
+
+@media (max-width: 768px) {
+    .collections-grid {
+        grid-template-columns: 1fr;
+        grid-template-rows: repeat(3, 300px);
+    }
+    
+    /* Ajuste adicional para mobile - reduz mais o espaço */
+    .hero {
+        padding-top: 1rem;
+        margin-top: -2rem;
+    }
+}
