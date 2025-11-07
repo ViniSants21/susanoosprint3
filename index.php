@@ -81,9 +81,31 @@
         
         <!-- Coluna de Conteúdo Central -->
         <div class="banner-center-content">
-            <div class="decorative-crosses crosses-left">
-                <span>✕</span><span>✕</span><span>✕</span><span>✕</span>
-            </div>
+            <!-- SUBSTITUA O CÓDIGO DA LANTERNA ESQUERDA POR ISTO -->
+<!-- CÓDIGO ATUALIZADO PARA O CARROSSEL ESQUERDO (SÓ LETRAS) -->
+<div class="decorative-crosses crosses-left">
+    <div class="icon-carousel">
+        <div class="carousel-track">
+            <!-- Lista de Caracteres Originais -->
+           <div class="carousel-icon" data-icon="kanji">桜</div> <!-- Sakura -->
+            <div class="carousel-icon" data-icon="kanji">和</div> <!-- Harmonia -->
+            <div class="carousel-icon" data-icon="kanji">〶</div> <!-- Sonho -->
+            <div class="carousel-icon" data-icon="kanji">美</div> <!-- Beleza -->
+            <div class="carousel-icon" data-icon="kanji">㋶</div> <!-- Amor -->
+            <div class="carousel-icon" data-icon="kanji">光</div> <!-- Luz -->
+            <div class="carousel-icon" data-icon="kanji">水</div> <!-- Shinobi / Ninja -->
+
+            <!-- Lista Duplicada para o Loop Infinito -->
+             <div class="carousel-icon" data-icon="kanji">丧</div>
+            <div class="carousel-icon" data-icon="kanji">㋭</div>
+            <div class="carousel-icon" data-icon="kanji">夢</div>
+            <div class="carousel-icon" data-icon="kanji">⿕</div>
+            <div class="carousel-icon" data-icon="kanji">愛</div>
+            <div class="carousel-icon" data-icon="kanji">光</div>
+            <div class="carousel-icon" data-icon="kanji">⽗</div>
+        </div>
+    </div>
+</div>
             <h2>Susanoo</h2>
             <p>Esilo que domina</p>
             <a href="php/produtos.php" class="btn-shop">Compre Agora</a>
@@ -92,9 +114,31 @@
                 <a href="https://www.instagram.com/xz.assis" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
                 <a href="#" aria-label="X (Twitter)"><i class="fa-brands fa-x-twitter"></i></a>
             </div>
-            <div class="decorative-crosses crosses-right">
-                <span>✕</span><span>✕</span><span>✕</span><span>✕</span>
-            </div>
+            <!-- SUBSTITUA O CÓDIGO DA LANTERNA DIREITA POR ISTO -->
+<!-- CÓDIGO ATUALIZADO PARA O CARROSSEL DIREITO (SÓ LETRAS) -->
+<div class="decorative-crosses crosses-right">
+    <div class="icon-carousel">
+        <div class="carousel-track">
+            <!-- Lista de Caracteres Originais -->
+            <div class="carousel-icon" data-icon="kanji">桜</div> <!-- Sakura -->
+            <div class="carousel-icon" data-icon="kanji">和</div> <!-- Harmonia -->
+            <div class="carousel-icon" data-icon="kanji">〶</div> <!-- Sonho -->
+            <div class="carousel-icon" data-icon="kanji">美</div> <!-- Beleza -->
+            <div class="carousel-icon" data-icon="kanji">㋶</div> <!-- Amor -->
+            <div class="carousel-icon" data-icon="kanji">光</div> <!-- Luz -->
+            <div class="carousel-icon" data-icon="kanji">水</div> <!-- Água -->
+
+            <!-- Lista Duplicada para o Loop Infinito -->
+            <div class="carousel-icon" data-icon="kanji">丧</div>
+            <div class="carousel-icon" data-icon="kanji">㋭</div>
+            <div class="carousel-icon" data-icon="kanji">夢</div>
+            <div class="carousel-icon" data-icon="kanji">⿕</div>
+            <div class="carousel-icon" data-icon="kanji">愛</div>
+            <div class="carousel-icon" data-icon="kanji">光</div>
+            <div class="carousel-icon" data-icon="kanji">⽗</div>
+        </div>
+    </div>
+</div>
         </div>
         
         <!-- Coluna de Imagem 3 -->
@@ -116,7 +160,7 @@
                 </div>
             </div>
             <div class="hero-image">
-                <div class="product-showcase"><div class="floating-product"><img src="assets/img/capa.png" alt="Produto Susanoo" class="hero-product-img"></div></div>
+                <div class="product-showcase"><div class="floating-product"><img src="assets/img/index.png" alt="Produto Susanoo" class="hero-product-img"></div></div>
             </div>
         </div>
         <div class="scroll-indicator"><span>Descubra Mais</span><div class="scroll-arrow"></div></div>
@@ -124,6 +168,20 @@
 
     <!-- Produtos em Destaque -->
     <section class="featured-products">
+        <div class="sakura-container">
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+    </div>
         <div class="container">
             <div class="section-header">
                 <h2 class="section-title">Produtos em Destaque</h2>

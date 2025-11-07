@@ -1382,40 +1382,110 @@ html.light-mode .dropdown-user-name {
     opacity: 1;
 }
 
+/* ======================================= */
+/*    CARROSSEL VERTICAL DE ÍCONES NEON    */
+/* ======================================= */
+
+/* Animação que move a "esteira" de ícones para cima */
+@keyframes scroll-vertical {
+    from {
+        transform: translateY(0);
+    }
+    to {
+        /* Move para cima exatamente a altura da primeira lista de ícones */
+        transform: translateY(-50%); 
+    }
+}
+
+/* Container principal que serve como "máscara" */
 .decorative-crosses {
-    font-family: var(--font-display);
-    font-size: 1.8rem;
-    font-weight: bold;
-    line-height: 1;
     position: absolute;
-    color: var(--primary-purple);
-    opacity: 0.4;
+    top: 0;
+    height: 100%;
     z-index: 1;
+    display: flex; /* Adicionado para alinhamento */
+    align-items: center; /* Adicionado para alinhamento */
 }
 
-.crosses-left { 
-    left: 25px; 
-    top: 50%; 
-    transform: translateY(-50%); 
+.crosses-left { left: 15px; }
+.crosses-right { right: 15px; }
+
+.icon-carousel {
+    height: 100%;
+    overflow: hidden; /* ESSENCIAL: Esconde os ícones fora da área visível */
+    /* Adiciona um gradiente para suavizar as bordas superior e inferior */
+    -webkit-mask-image: linear-gradient(transparent, black 20%, black 80%, transparent);
+    mask-image: linear-gradient(transparent, black 20%, black 80%, transparent);
 }
 
-.crosses-right { 
-    right: 25px; 
-    top: 50%; 
-    transform: translateY(-50%); 
+/* A "esteira" que contém todos os ícones e que será animada */
+.carousel-track {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* Aplica a animação */
+    animation: scroll-vertical 40s linear infinite;
 }
 
-.decorative-crosses span { 
-    display: block; 
-    margin: 12px 0; 
+/* O carrossel da direita terá a animação reversa (scroll para baixo) */
+.crosses-right .carousel-track {
+    animation-direction: reverse;
+}
+
+/* Estilo para cada ícone individualmente */
+.carousel-icon {
+    height: 80px; /* Altura de cada "slot" de ícone */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 20px 0; /* Espaçamento vertical entre os ícones */
     transition: all 0.3s ease;
 }
 
-.decorative-crosses span:hover {
-    opacity: 0.8;
-    transform: scale(1.2);
-    color: var(--light-purple);
+.carousel-icon:hover {
+    transform: scale(1.1);
 }
+
+
+/* ================================================= */
+/*    NOVOS ESTILOS PARA ÍCONES (BRILHO SUTIL)     */
+/* ================================================= */
+
+/* Adicionado para garantir que não haja fundo no contêiner do ícone */
+.carousel-icon {
+    background: transparent !important;
+}
+
+/* Estilo para os ícones que são Kanjis (texto) com brilho reduzido */
+.carousel-icon[data-icon="kanji"] {
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: var(--light-purple); /* Cor base um pouco mais suave */
+    
+    /* Efeito neon mais focado e menos espalhado */
+    text-shadow:
+        0 0 7px var(--secondary-purple), /* Brilho principal, mais suave */
+        0 0 18px var(--dark-purple);     /* Brilho de fundo, mais escuro e sutil */
+}
+
+/* Estilo para os ícones que são imagens SVG com brilho reduzido */
+
+
+/* Você pode manter o efeito de hover ou ajustá-lo também, se desejar */
+.carousel-icon[data-icon="kanji"]:hover {
+     text-shadow:
+        0 0 8px var(--light-purple),
+        0 0 20px var(--secondary-purple);
+}
+
+
+
+
+
+
+
+
+
 
 /* Responsividade */
 @media (max-width: 1024px) {
@@ -1562,4 +1632,87 @@ html.light-mode .dropdown-user-name {
         padding-top: 1rem;
         margin-top: -2rem;
     }
+}
+/* ======================================================= */
+/*          ANIMAÇÃO: QUEDA DE PÉTALAS DE SAKURA           */
+/* ======================================================= */
+
+/* 
+  Animação que simula a queda e o giro da pétala.
+  Ela se move para baixo (top), para os lados (translateX) e gira (rotate).
+*/
+@keyframes fall-and-flutter {
+    0% {
+        top: -10%;
+        opacity: 1;
+        transform: translateX(0vw) rotate(0deg);
+    }
+    20% {
+        transform: translateX(-10vw) rotate(45deg);
+    }
+    40% {
+        transform: translateX(10vw) rotate(90deg);
+    }
+    60% {
+        transform: translateX(-5vw) rotate(135deg);
+    }
+    80% {
+        transform: translateX(5vw) rotate(180deg);
+    }
+    100% {
+        top: 110%; /* Move a pétala para fora da tela, para baixo */
+        opacity: 0.5;
+        transform: translateX(-2vw) rotate(225deg);
+    }
+}
+
+.featured-products {
+    position: relative;
+    overflow: hidden; /* Importante para as pétalas sumirem fora da seção */
+}
+
+.sakura-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+}
+
+.petal {
+    position: absolute;
+    top: -10%; /* Começa fora da tela, no topo */
+    
+    /* Código do SVG da pétala diretamente no CSS */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 50'%3E%3Cpath fill='%23C4B5FD' d='M25 0 C20 -5, 5 15, 25 50 C45 15, 30 -5, 25 0 Z'/%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+    
+    /* Aplica a animação com loop infinito */
+    animation: fall-and-flutter infinite linear;
+}
+
+/* 
+  A MÁGICA DA NATURALIDADE: 
+  Damos a cada pétala um tamanho, posição inicial, velocidade (duração) 
+  e atraso diferentes para que o efeito não pareça robótico.
+*/
+.petal:nth-child(1) { width: 20px; height: 20px; left: 10%; animation-duration: 15s; animation-delay: -5s; }
+.petal:nth-child(2) { width: 15px; height: 15px; left: 20%; animation-duration: 10s; animation-delay: -10s; }
+.petal:nth-child(3) { width: 25px; height: 25px; left: 30%; animation-duration: 20s; animation-delay: -3s; }
+.petal:nth-child(4) { width: 18px; height: 18px; left: 40%; animation-duration: 13s; animation-delay: -13s; }
+.petal:nth-child(5) { width: 22px; height: 22px; left: 50%; animation-duration: 18s; animation-delay: -8s; }
+.petal:nth-child(6) { width: 16px; height: 16px; left: 60%; animation-duration: 12s; animation-delay: -2s; }
+.petal:nth-child(7) { width: 30px; height: 30px; left: 70%; animation-duration: 17s; animation-delay: -17s; }
+.petal:nth-child(8) { width: 15px; height: 15px; left: 80%; animation-duration: 9s; animation-delay: -7s; }
+.petal:nth-child(9) { width: 20px; height: 20px; left: 90%; animation-duration: 16s; animation-delay: -1s; }
+.petal:nth-child(10) { width: 25px; height: 25px; left: 5%; animation-duration: 22s; animation-delay: -15s; }
+.petal:nth-child(11) { width: 18px; height: 18px; left: 85%; animation-duration: 14s; animation-delay: -11s; }
+.petal:nth-child(12) { width: 16px; height: 16px; left: 45%; animation-duration: 19s; animation-delay: -4s; }
+
+/* Garante que o conteúdo dos produtos fique na frente da animação */
+.featured-products .container {
+    position: relative;
+    z-index: 1;
 }
