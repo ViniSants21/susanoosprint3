@@ -112,7 +112,7 @@ if (!function_exists('is_active')) {
             <div class="products-grid">
                 <div class="product-card" data-category="camisas"
                     data-name="Camisa Polo Susanoo Preta" data-price="149.90" data-img="../assets/img/Camisa Polo Susanoo (1).png"
-                    data-imgs="../assets/img/Camisa Polo Susanoo (1).png|../assets/img/Camisa Polo Susanoo(Preta).png" data-sizes="P|M|G|GG|XG"
+                    data-imgs="../assets/img/Camisa Polo Susanoo (1).png|../assets/img/susanoo costas polo preta.png|../assets/img/Logo Onda SUSANOO bordada.png|../assets/img/Logo SUSANOO bordada.png" data-sizes="P|M|G|GG|XG"
                     data-longdesc="Camisa Polo Susanoo Preta: Feita em algodão egípcio premium. Elegância japonesa moderna.">
                     <div class="card-image"><img src="../assets/img/Camisa Polo Susanoo (1).png" alt="Camisa Polo Susanoo Preta"><div class="card-overlay"><button class="btn-quick-view">Ver Detalhes</button></div></div>
                     <div class="card-content"><h3>Camisa Polo - COLLECTION SUBLIME</h3><p class="product-desc">Feita em algodão egípcio premium. Elegância japonesa moderna.</p><p class="price">R$ 149,90</p><button class="btn btn-add-cart">Adicionar ao Carrinho</button></div>
