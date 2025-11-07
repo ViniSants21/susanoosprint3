@@ -96,20 +96,20 @@ if (!function_exists('is_active')) {
 
     <section id="colecao-sublime" class="banner">
         <div class="banner-content">
-            <a href="produtos.php" class="btn btn-primary">Ver Peças Únicas</a>
+            <a href="colecao_sublime.php" class="btn btn-primary">Ver Peças Únicas</a>
         </div>
     </section>
 
     <section id="colecao-verao" class="banner">
         <div class="banner-content">
             <!-- COLECAO VERAO -->
-            <a href="produtos.php" class="btn btn-secondary-dark">Descobrir a Leveza</a>
+            <a href="colecao_verao.php" class="btn btn-secondary-dark">Descobrir a Leveza</a>
         </div>
     </section>
 
     <section id="colecao-inverno" class="banner content-right">
         <div class="banner-content">
-            <a href="produtos.php" class="btn btn-primary">Enfrente o Frio</a>
+            <a href="colecao_inverno.php" class="btn btn-primary">Enfrente o Frio</a>
         </div>
     </section>
 </main>
