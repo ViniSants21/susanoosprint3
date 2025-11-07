@@ -91,38 +91,41 @@ document.addEventListener('DOMContentLoaded', function() {
         const selectedPayment = document.querySelector('input[name="payment"]:checked').value;
 
         if (selectedPayment === 'pix') {
-            const fakePixKey = '00020126580014br.gov.bcb.pix0136123e4567-e12b-12d1-a456-4266554400005204000053039865802BR5913SUSANOO_LOJA6008BRASILIA62070503***6304E2A4';
-            Swal.fire({
-                title: "Pedido realizado! Pague com PIX",
-                html: `
-                    <p>Aponte a câmera do seu celular para o QR Code abaixo ou copie o código.</p>
-                    <input type="text" value="${fakePixKey}" readonly style="width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ddd; text-align: center; cursor: pointer;" onclick="this.select(); document.execCommand('copy');">
-                `,
-                imageUrl: `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(fakePixKey)}`,
-                imageAlt: 'QR Code para pagamento PIX',
-                confirmButtonText: "Pagamento Concluído",
-                confirmButtonColor: '#8B5CF6'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    localStorage.removeItem('cart');
-                    window.location.href = "../index.php";
-                }
-            });
-        } else {
-            Swal.fire({
-                title: "Pedido realizado!",
-                text: "Obrigado por comprar na Susanoo! Você receberá os detalhes no seu email.",
-                icon: "success",
-                confirmButtonText: "Voltar para o Início",
-                confirmButtonColor: '#8B5CF6'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    localStorage.removeItem('cart');
-                    window.location.href = "../index.php";
-                }
-            });
+    const fakePixKey = '00020126360014BR.GOV.BCB.PIX0114+551299642265752040000530398654040.995802BR5922Kaua de Souza Oliveira6009SAO PAULO62140510XUJpKCA9dA6304771E';
+    Swal.fire({
+        title: "Pedido realizado! Pague com PIX",
+        html: `
+            <p>Aponte a câmera do seu celular para o QR Code abaixo ou copie o código.</p>
+            <input type="text" value="${fakePixKey}" readonly style="width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ddd; text-align: center; cursor: pointer;" onclick="this.select(); document.execCommand('copy');">
+        `,
+        // Caminho ajustado para a imagem local
+        imageUrl: '../assets/img/qrcode.jfif',
+        imageAlt: 'QR Code para pagamento PIX',
+        imageWidth: 180, // Opcional: defina a largura para manter o tamanho
+        imageHeight: 180, // Opcional: defina a altura para manter o tamanho
+        confirmButtonText: "Pagamento Concluído",
+        confirmButtonColor: '#8B5CF6'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            localStorage.removeItem('cart');
+            window.location.href = "../index.php";
         }
     });
+} else {
+    Swal.fire({
+        title: "Pedido realizado!",
+        text: "Obrigado por comprar na Susanoo! Você receberá os detalhes no seu email.",
+        icon: "success",
+        confirmButtonText: "Voltar para o Início",
+        confirmButtonColor: '#8B5CF6'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            localStorage.removeItem('cart');
+            window.location.href = "../index.php";
+        }
+    });
+}
+});
 
     // ===================================================================
     // LÓGICA DO CEP (BUSCA AUTOMÁTICA E MÁSCARA)
