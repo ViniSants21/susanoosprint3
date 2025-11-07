@@ -81,9 +81,30 @@
         
         <!-- Coluna de Conteúdo Central -->
         <div class="banner-center-content">
-            <div class="decorative-crosses crosses-left">
-                <span>✕</span><span>✕</span><span>✕</span><span>✕</span>
-            </div>
+            <!-- SUBSTITUA O CÓDIGO DA LANTERNA ESQUERDA POR ISTO -->
+<div class="decorative-crosses crosses-left">
+    <div class="icon-carousel">
+        <div class="carousel-track">
+            <!-- Lista de Ícones Originais -->
+            <div class="carousel-icon" data-icon="kanji">竜</div> <!-- Dragão -->
+            <div class="carousel-icon"><img src="assets/icons/Japan_icon1.svg" alt="Luminária Japonesa"></div>
+            <div class="carousel-icon" data-icon="kanji">力</div> <!-- Força -->
+            <div class="carousel-icon"><img src="assets/icons/Japan_icon2.svg" alt="Portão Torii"></div>
+            <div class="carousel-icon" data-icon="kanji">魂</div> <!-- Alma -->
+            <div class="carousel-icon"><img src="assets/icons/Japan_icon3.svg" alt="Onda Japonesa"></div>
+            <div class="carousel-icon" data-icon="kanji">侍</div> <!-- Samurai -->
+
+            <!-- Lista Duplicada para o Loop Infinito -->
+            <div class="carousel-icon" data-icon="kanji">竜</div>
+            <div class="carousel-icon"><img src="assets/icons/Japan_icon1.svg" alt="Luminária Japonesa"></div>
+            <div class="carousel-icon" data-icon="kanji">力</div>
+            <div class="carousel-icon"><img src="assets/icons/Japan_icon2.svg" alt="Portão Torii"></div>
+            <div class="carousel-icon" data-icon="kanji">魂</div>
+            <div class="carousel-icon"><img src="assets/icons/Japan_icon3.svg" alt="Onda Japonesa"></div>
+            <div class="carousel-icon" data-icon="kanji">侍</div>
+        </div>
+    </div>
+</div>
             <h2>Susanoo</h2>
             <p>Esilo que domina</p>
             <a href="php/produtos.php" class="btn-shop">Compre Agora</a>
@@ -92,9 +113,30 @@
                 <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
                 <a href="#" aria-label="X (Twitter)"><i class="fa-brands fa-x-twitter"></i></a>
             </div>
-            <div class="decorative-crosses crosses-right">
-                <span>✕</span><span>✕</span><span>✕</span><span>✕</span>
-            </div>
+            <!-- SUBSTITUA O CÓDIGO DA LANTERNA DIREITA POR ISTO -->
+<div class="decorative-crosses crosses-right">
+    <div class="icon-carousel">
+        <div class="carousel-track">
+            <!-- Lista de Ícones Originais -->
+            <div class="carousel-icon" data-icon="kanji">桜</div> <!-- Sakura -->
+            <div class="carousel-icon"><img src="assets/icons/Japan_icon4.svg" alt="Leque Japonês"></div>
+            <div class="carousel-icon" data-icon="kanji">和</div> <!-- Harmonia -->
+            <div class="carousel-icon"><img src="assets/icons/Japan_icon3.svg" alt="Dragão Japonês"></div>
+            <div class="carousel-icon" data-icon="kanji">夢</div> <!-- Sonho -->
+            <div class="carousel-icon"><img src="assets/icons/Japan_icon2.svg" alt="Carpa Koi"></div>
+            <div class="carousel-icon" data-icon="kanji">美</div> <!-- Beleza -->
+
+            <!-- Lista Duplicada para o Loop Infinito -->
+            <div class="carousel-icon" data-icon="kanji">桜</div>
+            <div class="carousel-icon"><img src="assets/icons/Japan_icon4.svg" alt="Leque Japonês"></div>
+            <div class="carousel-icon" data-icon="kanji">和</div>
+            <div class="carousel-icon"><img src="assets/icons/Japan_icon3.svg" alt="Dragão Japonês"></div>
+            <div class="carousel-icon" data-icon="kanji">夢</div>
+            <div class="carousel-icon"><img src="assets/icons/Japan_icon2.svg" alt="Carpa Koi"></div>
+            <div class="carousel-icon" data-icon="kanji">美</div>
+        </div>
+    </div>
+</div>
         </div>
         
         <!-- Coluna de Imagem 3 -->
