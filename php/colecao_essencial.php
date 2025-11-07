@@ -93,13 +93,13 @@ if (!function_exists('is_active')) {
         <div class="products-grid">
             <div class="product-card">
                 <div class="card-image">
-                    <img src="../assets/img/Camisapreta_essentials (1).png" alt="Camisa Essential">
+                    <img src="../assets/img/Camisa Boxy Susanoo.jpg" alt="Camisa Boxy">
                     <div class="card-overlay">
                         <button class="btn-quick-view">Ver Detalhes</button>
                     </div>
                 </div>
                 <div class="card-content">
-                    <h3>Camiseta Essentials Susanoo Preta</h3>
+                    <h3>Camiseta Boxy Susanoo Preta</h3>
                     <p class="product-desc">Camiseta da coleção Essentials cor preto e branco</p>
                     <p class="price">R$ 109,90</p>
                     <button class="btn btn-add-cart">Adicionar ao Carrinho</button>
@@ -108,13 +108,13 @@ if (!function_exists('is_active')) {
 
             <div class="product-card">
                 <div class="card-image">
-                    <img src="../assets/img/Camisapreta_essentials (2).png" alt="Camisa Essential">
+                    <img src="../assets/img/camisasusanoo.png" alt="Camisa Essential">
                     <div class="card-overlay">
                         <button class="btn-quick-view">Ver Detalhes</button>
                     </div>
                 </div>
                 <div class="card-content">
-                    <h3>Camiseta Essentials Susanoo Branca</h3>
+                    <h3>Camiseta Regular Susanoo Branca</h3>
                     <p class="product-desc">Camiseta da coleção Essentials cor branco e preto</p>
                     <p class="price">R$ 109,90</p>
                     <button class="btn btn-add-cart">Adicionar ao Carrinho</button>
