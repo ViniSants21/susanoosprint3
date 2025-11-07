@@ -86,49 +86,28 @@ if (!function_exists('is_active')) {
 <section class="products-section">
     <div class="container">
         <div class="products-grid">
-            <div class="product-card">
-                <div class="card-image">
-                    <img src="../assets/img/inverno.png" alt="Casaco Yukimura">
-                    <div class="card-overlay">
-                        <button class="btn-quick-view">Ver Detalhes</button>
-                    </div>
-                </div>
-                <div class="card-content">
-                    <h3>Casaco Yukimura</h3>
-                    <p class="product-desc">Lã premium com corte japonês contemporâneo.</p>
-                    <p class="price">R$ 499,90</p>
-                    <button class="btn btn-add-cart">Adicionar ao Carrinho</button>
-                </div>
+            <!-- data-imgs = FOTOS FRENTE E VERSO -->
+            <div class="product-card" data-category="casacos"
+                data-name="Casaco Yukimura" data-price="499.90" data-img="../assets/img/inverno.png"
+                data-imgs="../assets/img/inverno.png" data-sizes="P|M|G|GG|XG"
+                data-longdesc="Casaco Yukimura: Lã premium, corte japonês contemporâneo, forro térmico, ideal para o inverno.">
+                <div class="card-image"><img src="../assets/img/inverno.png" alt="Casaco Yukimura"><div class="card-overlay"><button class="btn-quick-view">Ver Detalhes</button></div></div>
+                <div class="card-content"><h3>Casaco Yukimura</h3><p class="product-desc">Lã premium com corte japonês contemporâneo.</p><p class="price">R$ 499,90</p><button class="btn btn-add-cart">Adicionar ao Carrinho</button></div>
             </div>
-
-            <div class="product-card">
-                <div class="card-image">
-                    <img src="../assets/img/inverno.png" alt="Sobretudo Hokkaido">
-                    <div class="card-overlay">
-                        <button class="btn-quick-view">Ver Detalhes</button>
-                    </div>
-                </div>
-                <div class="card-content">
-                    <h3>Sobretudo Hokkaido</h3>
-                    <p class="product-desc">Design minimalista e proteção térmica elegante.</p>
-                    <p class="price">R$ 599,90</p>
-                    <button class="btn btn-add-cart">Adicionar ao Carrinho</button>
-                </div>
+            <!-- data-imgs = FOTOS FRENTE E VERSO -->
+            <div class="product-card" data-category="casacos"
+                data-name="Sobretudo Hokkaido" data-price="599.90" data-img="../assets/img/inverno.png"
+                data-imgs="../assets/img/inverno.png" data-sizes="P|M|G|GG|XG"
+                data-longdesc="Sobretudo Hokkaido: Design minimalista, proteção térmica elegante, tecido impermeável, perfeito para dias frios.">
+                <div class="card-image"><img src="../assets/img/inverno.png" alt="Sobretudo Hokkaido"><div class="card-overlay"><button class="btn-quick-view">Ver Detalhes</button></div></div>
+                <div class="card-content"><h3>Sobretudo Hokkaido</h3><p class="product-desc">Design minimalista e proteção térmica elegante.</p><p class="price">R$ 599,90</p><button class="btn btn-add-cart">Adicionar ao Carrinho</button></div>
             </div>
-
-            <div class="product-card">
-                <div class="card-image">
-                    <img src="../assets/img/inverno.png" alt="Gorro Shinobi">
-                    <div class="card-overlay">
-                        <button class="btn-quick-view">Ver Detalhes</button>
-                    </div>
-                </div>
-                <div class="card-content">
-                    <h3>Gorro Shinobi</h3>
-                    <p class="product-desc">Aqueça-se com estilo e leveza ninja.</p>
-                    <p class="price">R$ 89,90</p>
-                    <button class="btn btn-add-cart">Adicionar ao Carrinho</button>
-                </div>
+            <div class="product-card" data-category="acessorios"
+                data-name="Gorro Shinobi" data-price="89.90" data-img="../assets/img/inverno.png"
+                data-imgs="../assets/img/inverno.png" data-sizes="Único"
+                data-longdesc="Gorro Shinobi: Aqueça-se com estilo, leveza ninja, tecido macio e confortável.">
+                <div class="card-image"><img src="../assets/img/inverno.png" alt="Gorro Shinobi"><div class="card-overlay"><button class="btn-quick-view">Ver Detalhes</button></div></div>
+                <div class="card-content"><h3>Gorro Shinobi</h3><p class="product-desc">Aqueça-se com estilo e leveza ninja.</p><p class="price">R$ 89,90</p><button class="btn btn-add-cart">Adicionar ao Carrinho</button></div>
             </div>
         </div>
     </div>

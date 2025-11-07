@@ -192,9 +192,108 @@ if (!function_exists('is_active')) {
 	</div>
 </footer>
 
+</body>
 <!-- JS -->
 <script src="../js/cart.js"></script>
 <script src="../js/script.js"></script>
 <script src="../js/theme.js"></script>
+</script>
+<style>
+/* Animação e cor para o coração de favorito */
+.btn-fav {
+  transition: color 0.2s;
+  font-size: 1.6em;
+  color: #888;
+  outline: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  vertical-align: middle;
+  will-change: transform;
+}
+.btn-fav.favorited {
+  color: #e63946;
+  animation: fav-pop 0.35s cubic-bezier(.4,2,.6,1) both;
+}
+@keyframes fav-pop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.4); }
+  60% { transform: scale(0.9); }
+  100% { transform: scale(1); }
+}
+</style>
+<script>
+// Corrige adicionar ao carrinho, favoritar e troca de imagem
+document.addEventListener('DOMContentLoaded', function() {
+	// --- Adicionar ao carrinho ---
+	const addToCartForm = document.getElementById('addToCartForm');
+	if (addToCartForm) {
+		addToCartForm.addEventListener('submit', function(e) {
+			e.preventDefault();
+			const name = addToCartForm.querySelector('input[name="product_name"]').value;
+			const priceText = addToCartForm.querySelector('input[name="product_price"]').value;
+			const price = parseFloat(priceText.replace('R$', '').replace(',', '.').trim());
+			const category = addToCartForm.querySelector('input[name="product_category"]').value;
+			const sizeInput = addToCartForm.querySelector('input[name="size"]:checked');
+			const size = sizeInput ? sizeInput.value : '';
+			const image = document.getElementById('mainImage')?.src || '';
+			// Cria um id único para o produto + tamanho
+			const id = (name + '-' + size).replace(/\s+/g, '-').toLowerCase();
+			if (typeof addToCart === 'function') {
+				addToCart({ id, name, price, image, size, category });
+				// Feedback visual
+				const btn = addToCartForm.querySelector('.btn-cta');
+				if (btn) {
+					const original = btn.textContent;
+					btn.textContent = 'Adicionado!';
+					btn.style.background = '#10B981';
+					setTimeout(() => {
+						btn.textContent = original;
+						btn.style.background = '';
+					}, 1800);
+				}
+			} else {
+				alert('Erro ao adicionar ao carrinho.');
+			}
+		});
+	}
+
+	// --- Favoritar produto ---
+	const favBtn = document.getElementById('favBtn');
+	if (favBtn) {
+		favBtn.addEventListener('click', function() {
+			const pressed = favBtn.getAttribute('aria-pressed') === 'true';
+			favBtn.setAttribute('aria-pressed', String(!pressed));
+			favBtn.textContent = pressed ? '♡' : '♥';
+			favBtn.classList.toggle('favorited', !pressed);
+			if (!pressed) {
+				favBtn.classList.remove('fav-pop-reset');
+				void favBtn.offsetWidth; // força reflow para reiniciar animação
+				favBtn.classList.add('fav-pop-reset');
+			}
+		});
+		favBtn.addEventListener('animationend', function() {
+			favBtn.classList.remove('fav-pop-reset');
+		});
+	}
+
+	// --- Troca de imagem principal ao clicar nas miniaturas ---
+	const thumbs = document.querySelectorAll('.thumb');
+	const mainImage = document.getElementById('mainImage');
+	if (thumbs.length && mainImage) {
+		thumbs.forEach(thumb => {
+			thumb.addEventListener('click', function() {
+				thumbs.forEach(t => t.classList.remove('active'));
+				thumb.classList.add('active');
+				const src = thumb.getAttribute('data-src');
+				if (src) {
+					mainImage.src = src;
+				}
+			});
+		});
+	}
+});
+</script>
+</html>
 </body>
 </html>

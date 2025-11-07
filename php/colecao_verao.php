@@ -107,49 +107,27 @@ if (!function_exists('is_active')) {
     <section class="products-section">
         <div class="container">
             <div class="products-grid">
-                <div class="product-card">
-                    <div class="card-image">
-                        <img src="../assets/img/CamisaVerao1.png" alt="Camisa de Linho Bege">
-                        <div class="card-overlay">
-                            <button class="btn-quick-view">Ver Detalhes</button>
-                        </div>
-                    </div>
-                    <div class="card-content">
-                        <h3>Camisa de Linho Bege</h3>
-                        <p class="product-desc">Conforto natural com toque leve para o verão.</p>
-                        <p class="price">R$ 139,90</p>
-                        <button class="btn btn-add-cart">Adicionar ao Carrinho</button>
-                    </div>
+            <!-- data-imgs = FOTOS FRENTE E VERSO -->
+                <div class="product-card" data-category="camisas"
+                    data-name="Camisa de Linho Bege" data-price="139.90" data-img="../assets/img/CamisaVerao1.png"
+                    data-imgs="../assets/img/CamisaVerao1.png|../assets/img/CamisaVerao2.png" data-sizes="P|M|G|GG|XG"
+                    data-longdesc="Camisa de Linho Bege: Conforto natural, toque leve, perfeita para o verão.">
+                    <div class="card-image"><img src="../assets/img/CamisaVerao1.png" alt="Camisa de Linho Bege"><div class="card-overlay"><button class="btn-quick-view">Ver Detalhes</button></div></div>
+                    <div class="card-content"><h3>Camisa de Linho Bege</h3><p class="product-desc">Conforto natural com toque leve para o verão.</p><p class="price">R$ 139,90</p><button class="btn btn-add-cart">Adicionar ao Carrinho</button></div>
                 </div>
-
-                <div class="product-card">
-                    <div class="card-image">
-                        <img src="../assets/img/CamisaVerao2.png" alt="Camisa Azul Claro">
-                        <div class="card-overlay">
-                            <button class="btn-quick-view">Ver Detalhes</button>
-                        </div>
-                    </div>
-                    <div class="card-content">
-                        <h3>Camisa Azul Claro</h3>
-                        <p class="product-desc">Ideal para dias ensolarados com estilo leve.</p>
-                        <p class="price">R$ 129,90</p>
-                        <button class="btn btn-add-cart">Adicionar ao Carrinho</button>
-                    </div>
+                <div class="product-card" data-category="camisas"
+                    data-name="Camisa Azul Claro" data-price="129.90" data-img="../assets/img/CamisaVerao2.png"
+                    data-imgs="../assets/img/CamisaVerao2.png|../assets/img/CamisaVerao1.png" data-sizes="P|M|G|GG|XG"
+                    data-longdesc="Camisa Azul Claro: Ideal para dias ensolarados, estilo leve e fresco.">
+                    <div class="card-image"><img src="../assets/img/CamisaVerao2.png" alt="Camisa Azul Claro"><div class="card-overlay"><button class="btn-quick-view">Ver Detalhes</button></div></div>
+                    <div class="card-content"><h3>Camisa Azul Claro</h3><p class="product-desc">Ideal para dias ensolarados com estilo leve.</p><p class="price">R$ 129,90</p><button class="btn btn-add-cart">Adicionar ao Carrinho</button></div>
                 </div>
-
-                <div class="product-card">
-                    <div class="card-image">
-                        <img src="../assets/img/CamisaVerao3.png" alt="Camisa Branca Casual">
-                        <div class="card-overlay">
-                            <button class="btn-quick-view">Ver Detalhes</button>
-                        </div>
-                    </div>
-                    <div class="card-content">
-                        <h3>Camisa Branca Casual</h3>
-                        <p class="product-desc">Simplicidade elegante para o dia a dia.</p>
-                        <p class="price">R$ 119,90</p>
-                        <button class="btn btn-add-cart">Adicionar ao Carrinho</button>
-                    </div>
+                <div class="product-card" data-category="camisas"
+                    data-name="Camisa Branca Casual" data-price="119.90" data-img="../assets/img/CamisaVerao3.png"
+                    data-imgs="../assets/img/CamisaVerao3.png|../assets/img/CamisaVerao2.png" data-sizes="P|M|G|GG|XG"
+                    data-longdesc="Camisa Branca Casual: Simplicidade elegante para o dia a dia, tecido leve e confortável.">
+                    <div class="card-image"><img src="../assets/img/CamisaVerao3.png" alt="Camisa Branca Casual"><div class="card-overlay"><button class="btn-quick-view">Ver Detalhes</button></div></div>
+                    <div class="card-content"><h3>Camisa Branca Casual</h3><p class="product-desc">Simplicidade elegante para o dia a dia.</p><p class="price">R$ 119,90</p><button class="btn btn-add-cart">Adicionar ao Carrinho</button></div>
                 </div>
             </div>
         </div>
