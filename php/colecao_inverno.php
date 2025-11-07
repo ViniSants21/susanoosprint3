@@ -3,11 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Coleção inverno</title>
+    <title>Coleção Inverno - Susanoo</title>
     <link rel="stylesheet" href="../css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
     <script>(function(){const theme=localStorage.getItem('theme');if(theme==='light'){document.documentElement.classList.add('light-mode');}})();</script>
+    <style>
+        .nav-search{display:flex;align-items:center;gap:.5rem;}
+        .nav-search input[type="text"]{padding:.45rem .75rem;border-radius:24px;border:1px solid rgba(0,0,0,.08);background:transparent;color:inherit;min-width:160px}
+        .nav-search .nav-search-btn{border:none;background:transparent;padding:.35rem;border-radius:50%;cursor:pointer;color:inherit;display:inline-flex;align-items:center;justify-content:center}
+        .nav-search .nav-search-btn .fa-search{font-size:0.95rem}
+    </style>
 </head>
+
+<body>
 <?php
 $current = basename($_SERVER['PHP_SELF']);
 if (!function_exists('is_active')) {
@@ -17,262 +27,167 @@ if (!function_exists('is_active')) {
     }
 }
 ?>
-<body>
-<!-- Navbar -->
+
+<!-- NAVBAR IGUAL À DA INDEX -->
 <nav class="navbar" id="navbar">
     <div class="nav-container">
-        <!-- Pesquisa à esquerda -->
         <div class="nav-search">
-            <input type="text" placeholder="Pesquisar...">
-        </div>
+            <input type="text" placeholder="Pesquisar..." aria-label="Pesquisar">
+            <button class="nav-search-btn" aria-label="Pesquisar"><i class="fas fa-search"></i></button>
         </div>
 
-        <!-- Logo central -->
         <div class="nav-logo">
-            <img src="../assets/img/LOGOSUSANOO.png" alt="LOGOSUSANOO">
+            <a href="../index.php"><img src="../assets/img/LOGOSUSANOO.png" alt="LOGOSUSANOO"></a>
         </div>
 
-        <!-- Menu à direita -->
-        <ul class="nav-menu" id="nav-menu">
-            <li><a href="../index.php" class="nav-link <?php echo is_active('../index.php', $current); ?>">Home</a></li>
-            <li><a href="produtos.php" class="nav-link <?php echo is_active('produtos.php', $current); ?>">Produtos</a></li>
-            <li><a href="colecoes.php" class="nav-link <?php echo is_active('colecoes.php', $current); ?>">Coleções</a></li>
-            <li><a href="sobre.php" class="nav-link <?php echo is_active('sobre.php', $current); ?>">Sobre</a></li>
-            <li><a href="contato.php" class="nav-link <?php echo is_active('contato.php', $current); ?>">Contato</a></li>
-        </ul>
+        <div class="nav-right-group">
+            <ul class="nav-menu" id="nav-menu">
+                <li><a href="../index.php" class="nav-link <?php echo is_active('../index.php', $current); ?>">Home</a></li>
+                <li><a href="produtos.php" class="nav-link <?php echo is_active('produtos.php', $current); ?>">Produtos</a></li>
+                <li><a href="colecoes.php" class="nav-link <?php echo is_active('colecoes.php', $current); ?>">Coleções</a></li>
+                <li><a href="sobre.php" class="nav-link <?php echo is_active('sobre.php', $current); ?>">Sobre</a></li>
+                <li><a href="contato.php" class="nav-link <?php echo is_active('contato.php', $current); ?>">Contato</a></li>
+            </ul>
 
-        <!-- Menu hambúrguer (mobile) -->
-        <div class="hamburger" id="hamburger">
-            <span></span>
-            <span></span>
-            <span></span>
+            <div class="nav-icons">
+                <div class="profile-dropdown-wrapper">
+                    <a href="login.php" class="nav-icon-link" aria-label="Login"><i class="fas fa-user"></i></a>
+                    <div class="profile-dropdown-menu">
+                        <div class="dropdown-header">
+                            <img src="../assets/img/avatar.png" alt="Avatar" class="dropdown-avatar">
+                            <div>
+                                <div class="dropdown-user-name">Seu Nome</div>
+                                <div class="dropdown-user-email">seu@email.com</div>
+                            </div>
+                        </div>
+                        <ul class="dropdown-links">
+                            <li class="dropdown-link-item"><a href="perfil.php"><i class="fas fa-id-card"></i> Visualizar Perfil</a></li>
+                            <li class="dropdown-link-item"><a href="configuracoes.php"><i class="fas fa-cog"></i> Configurações</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <a href="carrinho.php" class="nav-icon-link" aria-label="Carrinho"><i class="fas fa-shopping-bag"></i></a>
+            </div>
         </div>
+
+        <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
     </div>
 </nav>
 
-    <!-- Page Header -->
-    <section class="page-header">
-        <div class="container">
-            <h1 class="page-title">Nossos Produtos</h1>
-            <p class="page-subtitle">Descubra nossa coleção de Inverno</p>
-        </div>
-    </section>
+<!-- CABEÇALHO -->
+<section class="page-header">
+    <div class="container">
+        <h1 class="page-title">Coleção de Inverno</h1>
+        <p class="page-subtitle">Descubra a elegância e o aconchego da estação</p>
+    </div>
+</section>
 
-    <!-- Filters -->
-    <section class="filters-section">
-        <div class="container">
-            <div class="filters">
-                <button class="filter-btn active" data-filter="all">Inverno</button>
-                
+<!-- PRODUTOS -->
+<section class="products-section">
+    <div class="container">
+        <div class="products-grid">
+            <div class="product-card">
+                <div class="card-image">
+                    <img src="../assets/img/inverno.png" alt="Casaco Yukimura">
+                    <div class="card-overlay">
+                        <button class="btn-quick-view">Ver Detalhes</button>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <h3>Casaco Yukimura</h3>
+                    <p class="product-desc">Lã premium com corte japonês contemporâneo.</p>
+                    <p class="price">R$ 499,90</p>
+                    <button class="btn btn-add-cart">Adicionar ao Carrinho</button>
+                </div>
             </div>
-        </div>
-    </section>
 
-    <!-- Products Grid -->
-    <section class="products-section">
-        <div class="container">
-            <div class="products-grid">
-                <!-- Vasos -->
-                <div class="product-card" data-category="vasos">
-                    <div class="card-image">
-                        <img src="../assets/img/inverno.png" alt="Camisa Essential">
-                        <div class="card-overlay">
-                            <button class="btn-quick-view">Ver Detalhes</button>
-                        </div>
-                    </div>
-                    <div class="card-content">
-                        <h3>Vaso Zen</h3>
-                        <p class="product-desc">Cerâmica artesanal japonesa com acabamento fosco</p>
-                        <p class="price">R$ 299,90</p>
-                        <button class="btn btn-add-cart">Adicionar ao Carrinho</button>
+            <div class="product-card">
+                <div class="card-image">
+                    <img src="../assets/img/inverno.png" alt="Sobretudo Hokkaido">
+                    <div class="card-overlay">
+                        <button class="btn-quick-view">Ver Detalhes</button>
                     </div>
                 </div>
+                <div class="card-content">
+                    <h3>Sobretudo Hokkaido</h3>
+                    <p class="product-desc">Design minimalista e proteção térmica elegante.</p>
+                    <p class="price">R$ 599,90</p>
+                    <button class="btn btn-add-cart">Adicionar ao Carrinho</button>
+                </div>
+            </div>
 
-                <div class="product-card" data-category="vasos">
-                    <div class="card-image">
-                        <img src="../assets/img/inverno.png" alt="Camisa Essential">
-                        <div class="card-overlay">
-                            <button class="btn-quick-view">Ver Detalhes</button>
-                        </div>
-                    </div>
-                    <div class="card-content">
-                        <h3>Vaso Dragão</h3>
-                        <p class="product-desc">Design inspirado em escamas de dragão</p>
-                        <p class="price">R$ 399,90</p>
-                        <button class="btn btn-add-cart">Adicionar ao Carrinho</button>
+            <div class="product-card">
+                <div class="card-image">
+                    <img src="../assets/img/inverno.png" alt="Gorro Shinobi">
+                    <div class="card-overlay">
+                        <button class="btn-quick-view">Ver Detalhes</button>
                     </div>
                 </div>
-
-                <!-- Luminárias -->
-                <div class="product-card" data-category="luminarias">
-                    <div class="card-image">
-                        <img src="../assets/img/inverno.png" alt="Camisa Essential">>
-                        <div class="card-overlay">
-                            <button class="btn-quick-view">Ver Detalhes</button>
-                        </div>
-                    </div>
-                    <div class="card-content">
-                        <h3>Luminária Sakura</h3>
-                        <p class="product-desc">Papel de arroz com estampas de cerejeiras</p>
-                        <p class="price">R$ 199,90</p>
-                        <button class="btn btn-add-cart">Adicionar ao Carrinho</button>
-                    </div>
-                </div>
-
-                <div class="product-card" data-category="luminarias">
-                    <div class="card-image">
-                        <img src="../assets/img/inverno.png" alt="Camisa Essential">
-                        <div class="card-overlay">
-                            <button class="btn-quick-view">Ver Detalhes</button>
-                        </div>
-                    </div>
-                    <div class="card-content">
-                        <h3>Lanterna Susanoo</h3>
-                        <p class="product-desc">Lanterna tradicional de bambu e papel</p>
-                        <p class="price">R$ 149,90</p>
-                        <button class="btn btn-add-cart">Adicionar ao Carrinho</button>
-                    </div>
-                </div>
-
-                <!-- Conjuntos de Chá -->
-                <div class="product-card" data-category="cha">
-                    <div class="card-image">
-                        <img src="../assets/img/inverno.png" alt="Camisa Essential">
-                        <div class="card-overlay">
-                            <button class="btn-quick-view">Ver Detalhes</button>
-                        </div>
-                    </div>
-                    <div class="card-content">
-                        <h3>Conjunto de Chá Tradicional</h3>
-                        <p class="product-desc">5 peças em porcelana japonesa autêntica</p>
-                        <p class="price">R$ 459,90</p>
-                        <button class="btn btn-add-cart">Adicionar ao Carrinho</button>
-                    </div>
-                </div>
-
-                <div class="product-card" data-category="cha">
-                    <div class="card-image">
-                        <img src="../assets/img/inverno.png" alt="Camisa Essential">
-                        <div class="card-overlay">
-                            <button class="btn-quick-view">Ver Detalhes</button>
-                        </div>
-                    </div>
-                    <div class="card-content">
-                        <h3>Bule Zen</h3>
-                        <p class="product-desc">Ferro fundido com design minimalista</p>
-                        <p class="price">R$ 329,90</p>
-                        <button class="btn btn-add-cart">Adicionar ao Carrinho</button>
-                    </div>
-                </div>
-
-                <!-- Decoração -->
-                <div class="product-card" data-category="decoracao">
-                    <div class="card-image">
-                        <img src="../assets/img/inverno.png" alt="Camisa Essential">
-                        <div class="card-overlay">
-                            <button class="btn-quick-view">Ver Detalhes</button>
-                        </div>
-                    </div>
-                    <div class="card-content">
-                        <h3>Espelho Feng Shui</h3>
-                        <p class="product-desc">Moldura em madeira com entalhes orientais</p>
-                        <p class="price">R$ 249,90</p>
-                        <button class="btn btn-add-cart">Adicionar ao Carrinho</button>
-                    </div>
-                </div>
-
-                <div class="product-card" data-category="decoracao">
-                    <div class="card-image">
-                        <img src="../assets/img/inverno.png" alt="Camisa Essential">
-                        <div class="card-overlay">
-                            <button class="btn-quick-view">Ver Detalhes</button>
-                        </div>
-                    </div>
-                    <div class="card-content">
-                        <h3>Biombo Dragão</h3>
-                        <p class="product-desc">3 painéis com pinturas tradicionais</p>
-                        <p class="price">R$ 599,90</p>
-                        <button class="btn btn-add-cart">Adicionar ao Carrinho</button>
-                    </div>
-                </div>
-
-                <div class="product-card" data-category="decoracao">
-                    <div class="card-image">
-                       <img src="../assets/img/inverno.png" alt="Camisa Essential">
-                        <div class="card-overlay">
-                            <button class="btn-quick-view">Ver Detalhes</button>
-                        </div>
-                    </div>
-                    <div class="card-content">
-                        <h3>Incensário Templo</h3>
-                        <p class="product-desc">Bronze artesanal com detalhes em ouro</p>
-                        <p class="price">R$ 179,90</p>
-                        <button class="btn btn-add-cart">Adicionar ao Carrinho</button>
-                    </div>
+                <div class="card-content">
+                    <h3>Gorro Shinobi</h3>
+                    <p class="product-desc">Aqueça-se com estilo e leveza ninja.</p>
+                    <p class="price">R$ 89,90</p>
+                    <button class="btn btn-add-cart">Adicionar ao Carrinho</button>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <div class="footer-logo">
-                        <h3>須佐能乎</h3>
-                        <span>SUSANOO</span>
-                    </div>
-                    <p>Desperte seu poder interior com estilo único e elegância oriental.</p>
-                    <div class="social-links">
-                        <a href="#" class="social-link">Instagram</a>
-                        <a href="#" class="social-link">Facebook</a>
-                        <a href="#" class="social-link">X</a>
-                    </div>
-                </div>
-                
-                <div class="footer-section">
-                    <h4>Navegação</h4>
-                    <ul>
-                        <li><a href="../index.php">Home</a></li>
-                        <li><a href="produtos.php">Produtos</a></li>
-                        <li><a href="colecoes.php">Coleções</a></li>
-                        <li><a href="sobre.php">Sobre Nós</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-section">
-                    <h4>Atendimento</h4>
-                    <ul>
-                        <li><a href="contato.php">Contato</a></li>
-                        <li><a href="#">FAQ</a></li>
-                        <li><a href="#">Trocas e Devoluções</a></li>
-                        <li><a href="#">Política de Privacidade</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-section">
-                    <h4>Newsletter</h4>
-                    <p>Receba novidades e ofertas exclusivas</p>
-                    <form class="newsletter-form">
-                        <input type="email" placeholder="Seu email" required>
-                        <button type="submit" class="btn btn-primary">Inscrever</button>
-                    </form>
+<!-- RODAPÉ -->
+<footer class="footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-section">
+                <div class="footer-logo"><h3>須佐能乎</h3><span>SUSANOO</span></div>
+                <p>Desperte seu poder interior com estilo único e elegância oriental.</p>
+                <div class="social-links">
+                    <a href="#" class="social-link">Instagram</a>
+                    <a href="#" class="social-link">Facebook</a>
+                    <a href="#" class="social-link">X</a>
                 </div>
             </div>
-            
-            <div class="footer-bottom">
-                <p>&copy; 2024 Susanoo. Todos os direitos reservados.</p>
+
+            <div class="footer-section">
+                <h4>Navegação</h4>
+                <ul>
+                    <li><a href="../index.php">Home</a></li>
+                    <li><a href="produtos.php">Produtos</a></li>
+                    <li><a href="colecoes.php">Coleções</a></li>
+                    <li><a href="sobre.php">Sobre Nós</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h4>Atendimento</h4>
+                <ul>
+                    <li><a href="contato.php">Contato</a></li>
+                    <li><a href="#">FAQ</a></li>
+                    <li><a href="#">Trocas e Devoluções</a></li>
+                    <li><a href="#">Política de Privacidade</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h4>Newsletter</h4>
+                <p>Receba novidades e ofertas exclusivas</p>
+                <form class="newsletter-form">
+                    <input type="email" placeholder="Seu email" required>
+                    <button type="submit" class="btn btn-primary">Inscrever</button>
+                </form>
             </div>
         </div>
-    </footer>
 
-    <!-- Back to Top Button -->
-    <button id="backToTop" class="back-to-top">
-        <span>↑</span>
-    </button>
+        <div class="footer-bottom">
+            <p>&copy; <?php echo date('Y'); ?> Susanoo. Todos os direitos reservados por Davi de Assis, Kauã Souza, Lucas Limas e Vinicius Queiroz.</p>
+        </div>
+    </div>
+</footer>
 
-    <script src="../js/script.js"></script>
-    <script src="../js/theme.js"></script> <!-- ou ../js/theme.js para páginas internas -->
+<button id="backToTop" class="back-to-top"><span>↑</span></button>
+
+<script src="../js/cart.js"></script>
+<script src="../js/script.js"></script>
+<script src="../js/theme.js"></script>
 </body>
 </html>

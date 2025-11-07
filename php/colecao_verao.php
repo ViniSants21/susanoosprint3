@@ -3,12 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Coleção de verão</title>
+    <title>Coleção de Verão</title>
     <link rel="stylesheet" href="../css/style.css">
-    <script>(function(){const theme=localStorage.getItem('theme');if(theme==='light'){document.documentElement.classList.add('light-mode');}})();</script>
-    
+
+    <!-- Fontes e ícones -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Script de tema -->
+    <script>
+        (function(){
+            const theme = localStorage.getItem('theme');
+            if(theme === 'light'){ document.documentElement.classList.add('light-mode'); }
+        })();
+    </script>
+
+    <style>
+        .nav-search { display:flex; align-items:center; gap:.5rem; }
+        .nav-search input[type="text"] {
+            padding:.45rem .75rem; border-radius:24px;
+            border:1px solid rgba(0,0,0,.08); background:transparent;
+            color:inherit; min-width:160px;
+        }
+        .nav-search .nav-search-btn {
+            border:none; background:transparent;
+            padding:.35rem; border-radius:50%; cursor:pointer;
+            color:inherit; display:inline-flex; align-items:center; justify-content:center;
+        }
+        .nav-search .nav-search-btn .fa-search { font-size:0.95rem; }
+    </style>
 </head>
+
 <?php
 $current = basename($_SERVER['PHP_SELF']);
 if (!function_exists('is_active')) {
@@ -18,57 +43,63 @@ if (!function_exists('is_active')) {
     }
 }
 ?>
+
 <body>
-<!-- Navbar -->
-<nav class="navbar" id="navbar">
-    <div class="nav-container">
-        <!-- Pesquisa à esquerda -->
-        <div class="nav-search">
-            <input type="text" placeholder="Pesquisar...">
-        </div>
-        </div>
+    <!-- Navbar -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <!-- Pesquisa à esquerda -->
+            <div class="nav-search">
+                <input type="text" placeholder="Pesquisar..." aria-label="Pesquisar">
+                <button class="nav-search-btn" aria-label="Pesquisar"><i class="fas fa-search"></i></button>
+            </div>
 
-        <!-- Logo central -->
-        <div class="nav-logo">
-            <img src="../assets/img/LOGOSUSANOO.png" alt="LOGOSUSANOO">
-        </div>
+            <!-- Logo central -->
+            <div class="nav-logo">
+                <a href="../index.php"><img src="../assets/img/LOGOSUSANOO.png" alt="LOGOSUSANOO"></a>
+            </div>
 
-        <!-- Menu à direita -->
-        <ul class="nav-menu" id="nav-menu">
-            <li><a href="../index.php" class="nav-link <?php echo is_active('../index.php', $current); ?>">Home</a></li>
-            <li><a href="produtos.php" class="nav-link <?php echo is_active('produtos.php', $current); ?>">Produtos</a></li>
-            <li><a href="colecoes.php" class="nav-link <?php echo is_active('colecoes.php', $current); ?>">Coleções</a></li>
-            <li><a href="sobre.php" class="nav-link <?php echo is_active('sobre.php', $current); ?>">Sobre</a></li>
-            <li><a href="contato.php" class="nav-link <?php echo is_active('contato.php', $current); ?>">Contato</a></li>
-        </ul>
+            <!-- Menu e ícones à direita -->
+            <div class="nav-right-group">
+                <ul class="nav-menu" id="nav-menu">
+                    <li><a href="../index.php" class="nav-link <?php echo is_active('../index.php', $current); ?>">Home</a></li>
+                    <li><a href="produtos.php" class="nav-link <?php echo is_active('produtos.php', $current); ?>">Produtos</a></li>
+                    <li><a href="colecoes.php" class="nav-link <?php echo is_active('colecoes.php', $current); ?>">Coleções</a></li>
+                    <li><a href="sobre.php" class="nav-link <?php echo is_active('sobre.php', $current); ?>">Sobre</a></li>
+                    <li><a href="contato.php" class="nav-link <?php echo is_active('contato.php', $current); ?>">Contato</a></li>
+                </ul>
 
-        <!-- Menu hambúrguer (mobile) -->
-        <div class="hamburger" id="hamburger">
-            <span></span>
-            <span></span>
-            <span></span>
+                <div class="nav-icons">
+                    <div class="profile-dropdown-wrapper">
+                        <a href="login.php" class="nav-icon-link" aria-label="Login"><i class="fas fa-user"></i></a>
+                        <div class="profile-dropdown-menu">
+                            <div class="dropdown-header">
+                                <img src="../assets/img/avatar.png" alt="Avatar" class="dropdown-avatar">
+                                <div>
+                                    <div class="dropdown-user-name">Seu Nome</div>
+                                    <div class="dropdown-user-email">seu@email.com</div>
+                                </div>
+                            </div>
+                            <ul class="dropdown-links">
+                                <li class="dropdown-link-item"><a href="perfil.php"><i class="fas fa-id-card"></i> Visualizar Perfil</a></li>
+                                <li class="dropdown-link-item"><a href="configuracoes.php"><i class="fas fa-cog"></i> Configurações</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <a href="carrinho.php" class="nav-icon-link" aria-label="Carrinho"><i class="fas fa-shopping-bag"></i></a>
+                </div>
+            </div>
+
+            <!-- Menu hambúrguer (mobile) -->
+            <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
         </div>
-    </div>
-</nav>
+    </nav>
 
     <!-- Page Header -->
     <section class="page-header">
         <div class="container">
-            <h1 class="page-title">Nossos Produtos</h1>
-            <p class="page-subtitle">Descubra nossa coleção completa de decoração oriental</p>
-        </div>
-    </section>
-
-    <!-- Filters -->
-    <section class="filters-section">
-        <div class="container">
-            <div class="filters">
-                <button class="filter-btn active" data-filter="all">Todos</button>
-                <button class="filter-btn" data-filter="vasos">Vasos</button>
-                <button class="filter-btn" data-filter="luminarias">Luminárias</button>
-                <button class="filter-btn" data-filter="cha">Conjuntos de Chá</button>
-                <button class="filter-btn" data-filter="decoracao">Decoração</button>
-            </div>
+            <h1 class="page-title">Coleção de Verão</h1>
+            <p class="page-subtitle">Leveza, estilo e conforto em cada detalhe</p>
         </div>
     </section>
 
@@ -76,141 +107,47 @@ if (!function_exists('is_active')) {
     <section class="products-section">
         <div class="container">
             <div class="products-grid">
-                <!-- Vasos -->
-                <div class="product-card" data-category="vasos">
+                <div class="product-card">
                     <div class="card-image">
-                        <img src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=300&h=250&fit=crop&crop=center" alt="Vaso Zen">
+                        <img src="../assets/img/CamisaVerao1.png" alt="Camisa de Linho Bege">
                         <div class="card-overlay">
                             <button class="btn-quick-view">Ver Detalhes</button>
                         </div>
                     </div>
                     <div class="card-content">
-                        <h3>Vaso Zen</h3>
-                        <p class="product-desc">Cerâmica artesanal japonesa com acabamento fosco</p>
-                        <p class="price">R$ 299,90</p>
+                        <h3>Camisa de Linho Bege</h3>
+                        <p class="product-desc">Conforto natural com toque leve para o verão.</p>
+                        <p class="price">R$ 139,90</p>
                         <button class="btn btn-add-cart">Adicionar ao Carrinho</button>
                     </div>
                 </div>
 
-                <div class="product-card" data-category="vasos">
+                <div class="product-card">
                     <div class="card-image">
-                        <img src="https://images.unsplash.com/photo-1578748405290-fc9e84d52d00?w=300&h=250&fit=crop&crop=center" alt="Vaso Dragão">
+                        <img src="../assets/img/CamisaVerao2.png" alt="Camisa Azul Claro">
                         <div class="card-overlay">
                             <button class="btn-quick-view">Ver Detalhes</button>
                         </div>
                     </div>
                     <div class="card-content">
-                        <h3>Vaso Dragão</h3>
-                        <p class="product-desc">Design inspirado em escamas de dragão</p>
-                        <p class="price">R$ 399,90</p>
+                        <h3>Camisa Azul Claro</h3>
+                        <p class="product-desc">Ideal para dias ensolarados com estilo leve.</p>
+                        <p class="price">R$ 129,90</p>
                         <button class="btn btn-add-cart">Adicionar ao Carrinho</button>
                     </div>
                 </div>
 
-                <!-- Luminárias -->
-                <div class="product-card" data-category="luminarias">
+                <div class="product-card">
                     <div class="card-image">
-                        <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=250&fit=crop&crop=center" alt="Luminária Sakura">
+                        <img src="../assets/img/CamisaVerao3.png" alt="Camisa Branca Casual">
                         <div class="card-overlay">
                             <button class="btn-quick-view">Ver Detalhes</button>
                         </div>
                     </div>
                     <div class="card-content">
-                        <h3>Luminária Sakura</h3>
-                        <p class="product-desc">Papel de arroz com estampas de cerejeiras</p>
-                        <p class="price">R$ 199,90</p>
-                        <button class="btn btn-add-cart">Adicionar ao Carrinho</button>
-                    </div>
-                </div>
-
-                <div class="product-card" data-category="luminarias">
-                    <div class="card-image">
-                        <img src="https://images.unsplash.com/photo-1578748405290-fc9e84d52d00?w=300&h=250&fit=crop&crop=center" alt="Lanterna Oriental">
-                        <div class="card-overlay">
-                            <button class="btn-quick-view">Ver Detalhes</button>
-                        </div>
-                    </div>
-                    <div class="card-content">
-                        <h3>Lanterna Susanoo</h3>
-                        <p class="product-desc">Lanterna tradicional de bambu e papel</p>
-                        <p class="price">R$ 149,90</p>
-                        <button class="btn btn-add-cart">Adicionar ao Carrinho</button>
-                    </div>
-                </div>
-
-                <!-- Conjuntos de Chá -->
-                <div class="product-card" data-category="cha">
-                    <div class="card-image">
-                        <img src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=300&h=250&fit=crop&crop=center" alt="Conjunto Chá Tradicional">
-                        <div class="card-overlay">
-                            <button class="btn-quick-view">Ver Detalhes</button>
-                        </div>
-                    </div>
-                    <div class="card-content">
-                        <h3>Conjunto de Chá Tradicional</h3>
-                        <p class="product-desc">5 peças em porcelana japonesa autêntica</p>
-                        <p class="price">R$ 459,90</p>
-                        <button class="btn btn-add-cart">Adicionar ao Carrinho</button>
-                    </div>
-                </div>
-
-                <div class="product-card" data-category="cha">
-                    <div class="card-image">
-                        <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=250&fit=crop&crop=center" alt="Bule Zen">
-                        <div class="card-overlay">
-                            <button class="btn-quick-view">Ver Detalhes</button>
-                        </div>
-                    </div>
-                    <div class="card-content">
-                        <h3>Bule Zen</h3>
-                        <p class="product-desc">Ferro fundido com design minimalista</p>
-                        <p class="price">R$ 329,90</p>
-                        <button class="btn btn-add-cart">Adicionar ao Carrinho</button>
-                    </div>
-                </div>
-
-                <!-- Decoração -->
-                <div class="product-card" data-category="decoracao">
-                    <div class="card-image">
-                        <img src="https://images.unsplash.com/photo-1578748405290-fc9e84d52d00?w=300&h=250&fit=crop&crop=center" alt="Espelho Oriental">
-                        <div class="card-overlay">
-                            <button class="btn-quick-view">Ver Detalhes</button>
-                        </div>
-                    </div>
-                    <div class="card-content">
-                        <h3>Espelho Feng Shui</h3>
-                        <p class="product-desc">Moldura em madeira com entalhes orientais</p>
-                        <p class="price">R$ 249,90</p>
-                        <button class="btn btn-add-cart">Adicionar ao Carrinho</button>
-                    </div>
-                </div>
-
-                <div class="product-card" data-category="decoracao">
-                    <div class="card-image">
-                        <img src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=300&h=250&fit=crop&crop=center" alt="Biombo Oriental">
-                        <div class="card-overlay">
-                            <button class="btn-quick-view">Ver Detalhes</button>
-                        </div>
-                    </div>
-                    <div class="card-content">
-                        <h3>Biombo Dragão</h3>
-                        <p class="product-desc">3 painéis com pinturas tradicionais</p>
-                        <p class="price">R$ 599,90</p>
-                        <button class="btn btn-add-cart">Adicionar ao Carrinho</button>
-                    </div>
-                </div>
-
-                <div class="product-card" data-category="decoracao">
-                    <div class="card-image">
-                        <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=250&fit=crop&crop=center" alt="Incensário">
-                        <div class="card-overlay">
-                            <button class="btn-quick-view">Ver Detalhes</button>
-                        </div>
-                    </div>
-                    <div class="card-content">
-                        <h3>Incensário Templo</h3>
-                        <p class="product-desc">Bronze artesanal com detalhes em ouro</p>
-                        <p class="price">R$ 179,90</p>
+                        <h3>Camisa Branca Casual</h3>
+                        <p class="product-desc">Simplicidade elegante para o dia a dia.</p>
+                        <p class="price">R$ 119,90</p>
                         <button class="btn btn-add-cart">Adicionar ao Carrinho</button>
                     </div>
                 </div>
@@ -223,10 +160,7 @@ if (!function_exists('is_active')) {
         <div class="container">
             <div class="footer-content">
                 <div class="footer-section">
-                    <div class="footer-logo">
-                        <h3>須佐能乎</h3>
-                        <span>SUSANOO</span>
-                    </div>
+                    <div class="footer-logo"><h3>須佐能乎</h3><span>SUSANOO</span></div>
                     <p>Desperte seu poder interior com estilo único e elegância oriental.</p>
                     <div class="social-links">
                         <a href="#" class="social-link">Instagram</a>
@@ -234,7 +168,7 @@ if (!function_exists('is_active')) {
                         <a href="#" class="social-link">X</a>
                     </div>
                 </div>
-                
+
                 <div class="footer-section">
                     <h4>Navegação</h4>
                     <ul>
@@ -244,7 +178,7 @@ if (!function_exists('is_active')) {
                         <li><a href="sobre.php">Sobre Nós</a></li>
                     </ul>
                 </div>
-                
+
                 <div class="footer-section">
                     <h4>Atendimento</h4>
                     <ul>
@@ -254,7 +188,7 @@ if (!function_exists('is_active')) {
                         <li><a href="#">Política de Privacidade</a></li>
                     </ul>
                 </div>
-                
+
                 <div class="footer-section">
                     <h4>Newsletter</h4>
                     <p>Receba novidades e ofertas exclusivas</p>
@@ -264,19 +198,17 @@ if (!function_exists('is_active')) {
                     </form>
                 </div>
             </div>
-            
+
             <div class="footer-bottom">
-                <p>&copy; 2024 Susanoo. Todos os direitos reservados.</p>
+                <p>&copy; <?php echo date('Y'); ?> Susanoo. Todos os direitos reservados por Davi de Assis, Kauã Souza, Lucas Limas e Vinicius Queiroz.</p>
             </div>
         </div>
     </footer>
 
-    <!-- Back to Top Button -->
-    <button id="backToTop" class="back-to-top">
-        <span>↑</span>
-    </button>
+    <!-- Back to Top -->
+    <button id="backToTop" class="back-to-top"><span>↑</span></button>
 
     <script src="../js/script.js"></script>
-    <script src="../js/theme.js"></script> <!-- ou ../js/theme.js para páginas internas -->
+    <script src="../js/theme.js"></script>
 </body>
 </html>

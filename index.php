@@ -165,9 +165,9 @@
                 <p class="section-subtitle">Linhas exclusivas inspiradas na cultura japonesa</p>
             </div>
             <div class="collections-grid">
-                <div class="collection-card"><img src="assets/img/susanoo inverno.png" alt="Coleção Tempestade"><div class="collection-overlay"><div class="collection-content"><h3>Linha de Inverno</h3><p>Esquente-se com estilo</p><a href="php/colecoes.php" class="btn btn-outline">Explorar</a></div></div></div>
-                <div class="collection-card"><img src="assets/img/inverno shibuya (1).png" alt="Linha Dragão"><div class="collection-overlay"><div class="collection-content"><h3>Linha de Verão</h3><p>Força e elegância</p><a href="php/colecoes.php" class="btn btn-outline">Ver Mais</a></div></div></div>
-                <div class="collection-card"><img src="assets/img/sublime.png" alt="Sakura"><div class="collection-overlay"><div class="collection-content"><h3>Coleção Sublime</h3><p>Delicadeza oriental</p><a href="php/colecoes.php" class="btn btn-outline">Descobrir</a></div></div></div>
+                <div class="collection-card"><img src="assets/img/susanoo inverno.png" alt="Coleção Tempestade"><div class="collection-overlay"><div class="collection-content"><h3>Linha de Inverno</h3><p>Esquente-se com estilo</p><a href="php/colecao_inverno.php" class="btn btn-outline">Explorar</a></div></div></div>
+                <div class="collection-card"><img src="assets/img/inverno shibuya (1).png" alt="Linha Dragão"><div class="collection-overlay"><div class="collection-content"><h3>Linha de Verão</h3><p>Força e elegância</p><a href="php/colecao_verao.php" class="btn btn-outline">Ver Mais</a></div></div></div>
+                <div class="collection-card"><img src="assets/img/sublime.png" alt="Sakura"><div class="collection-overlay"><div class="collection-content"><h3>Coleção Sublime</h3><p>Delicadeza oriental</p><a href="php/colecao_sublime.php" class="btn btn-outline">Descobrir</a></div></div></div>
             </div>
         </div>
     </section>
