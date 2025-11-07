@@ -20,6 +20,13 @@
 			}
 		})();
 	</script>
+
+	<style>
+		.nav-search{display:flex;align-items:center;gap:.5rem;}
+		.nav-search input[type="text"]{padding:.45rem .75rem;border-radius:24px;border:1px solid rgba(0,0,0,.08);background:transparent;color:inherit;min-width:160px}
+		.nav-search .nav-search-btn{border:none;background:transparent;padding:.35rem;border-radius:50%;cursor:pointer;color:inherit;display:inline-flex;align-items:center;justify-content:center}
+		.nav-search .nav-search-btn .fa-search{font-size:0.95rem}
+	</style>
 </head>
 <body class="detalhes-page">
 
@@ -50,7 +57,10 @@ if (!function_exists('is_active')) {
 <!-- Navbar -->
 <nav class="navbar scrolled" id="navbar">
 	<div class="nav-container">
-		<div class="nav-search"><input type="text" placeholder="Pesquisar..."></div>
+		<div class="nav-search">
+			<input type="text" placeholder="Pesquisar..." aria-label="Pesquisar">
+			<button type="button" class="nav-search-btn" aria-label="Pesquisar"><i class="fas fa-search"></i></button>
+		</div>
 		<div class="nav-logo"><a href="../index.php"><img src="../assets/img/LOGOSUSANOO.png" alt="LOGOSUSANOO"></a></div>
 		<div class="nav-right-group">
 			<ul class="nav-menu" id="nav-menu">
@@ -184,58 +194,7 @@ if (!function_exists('is_active')) {
 
 <!-- JS -->
 <script src="../js/cart.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-	const thumbs = document.querySelectorAll('.thumb');
-	const mainImage = document.getElementById('mainImage');
-	if (mainImage && thumbs.length > 0) {
-		thumbs.forEach(thumb => {
-			thumb.addEventListener('click', function() {
-				mainImage.src = this.dataset.src;
-				thumbs.forEach(t => t.classList.remove('active'));
-				this.classList.add('active');
-			});
-		});
-	}
-	document.getElementById('favBtn')?.addEventListener('click', function() {
-		this.classList.toggle('active');
-	});
-	document.getElementById('addToCartForm')?.addEventListener('submit', function(e) {
-		e.preventDefault();
-		let selectedSize = 'Único';
-		const radios = this.querySelectorAll('input[name="size"]');
-		if (radios.length > 0) {
-			const checkedRadio = Array.from(radios).find(r => r.checked);
-			if (!checkedRadio) {
-				alert('Por favor, selecione um tamanho.');
-				return;
-			}
-			selectedSize = checkedRadio.value;
-		}
-		const productData = {
-			id: (this.querySelector('input[name="product_name"]').value + '-' + selectedSize).replace(/\s+/g, '-').toLowerCase(),
-			name: this.querySelector('input[name="product_name"]').value,
-			price: parseFloat(this.querySelector('input[name="product_price"]').value.replace('R$', '').replace(',', '.')),
-			image: mainImage.src,
-			size: selectedSize,
-			category: this.querySelector('input[name="product_category"]').value
-		};
-		if (typeof addToCart === 'function') {
-			addToCart(productData);
-			const button = this.querySelector('.btn-cta');
-			const originalText = button.textContent;
-			button.textContent = 'Adicionado!';
-			button.style.background = '#10B981';
-			setTimeout(() => {
-				button.textContent = originalText;
-				button.style.background = '';
-			}, 2000);
-		} else {
-			console.error("A função addToCart não foi encontrada. Verifique se o script cart.js está sendo carregado corretamente.");
-		}
-	});
-});
-</script>
+<script src="../js/script.js"></script>
 <script src="../js/theme.js"></script>
 </body>
 </html>
