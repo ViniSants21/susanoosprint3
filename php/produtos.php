@@ -91,8 +91,24 @@ if (!function_exists('is_active')) {
 
     <!-- Products Grid -->
     <section class="products-section">
+        <section class="featured-products">
+        <div class="sakura-container">
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+    </div>
         <div class="container">
             <div class="products-grid">
+                
                 <!-- Camisas -->
                 <div class="product-card" data-category="camisas"
                      data-name="Camisa Brazil" data-price="99.90" data-img="../assets/img/camisabr.png"
