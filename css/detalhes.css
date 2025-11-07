@@ -73,6 +73,7 @@ body.detalhes-page{
   display:flex;
   align-items:flex-start; /* garante que a imagem comece no topo do frame */
   justify-content:center;
+  
 }
 /* modern browsers: aspect-ratio set to 4/5 for product images (keeps consistent frame) */
 .image-figure { aspect-ratio: 4 / 5; } /* mantém proporção consistente */

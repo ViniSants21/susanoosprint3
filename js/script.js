@@ -113,6 +113,35 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Base de produtos usada pela busca (padronizada conforme produtos.php)
         const allProducts = [
+            // Produtos do index.php
+            {
+                name: "Camisa Susanoo - Preta",
+                price: "109.99",
+                img: "assets/img/costafoto.png",
+                imgs: "../assets/img/camisajpnsred.png|../assets/img/camisajpnsredback.png|../assets/img/camisajpnsreddetailbeside.png|../assets/img/camisajpnsreddetail.png",
+                sizes: "P|M|G|GG|XG",
+                longdesc: "Camisa Susanoo Preta: Estilo e cultura japonesa, algodão premium, modelagem confortável.",
+                category: "camisas"
+            },
+            {
+                name: "Calça Baggy Susanoo Cinza",
+                price: "67.99",
+                img: "assets/img/calca.png",
+                imgs: "../assets/img/calca.png|../assets/img/calcadetail.png|../assets/img/calcadetail2.png",
+                sizes: "P|M|G|GG|XG",
+                longdesc: "Calça Baggy Susanoo Cinza: Cor discreta, estilo que destaca, tecido leve e resistente.",
+                category: "calcas"
+            },
+            {
+                name: "Boné Amaterasu",
+                price: "39.90",
+                img: "assets/img/bone.png",
+                imgs: "../assets/img/boneoldschool.png|../assets/img/boneoldschool2.png|../assets/img/boneoldschool3.png",
+                sizes: "Único",
+                longdesc: "Boné Amaterasu: Aba curva, bordado exclusivo, ajuste confortável, inspiração japonesa.",
+                category: "acessorios"
+            },
+            // Produtos do produtos.php
             {
                 name: "Camisa Brazil",
                 price: "99.90",

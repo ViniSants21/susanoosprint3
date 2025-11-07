@@ -96,7 +96,7 @@ if (!function_exists('is_active')) {
                 <!-- Camisas -->
                 <div class="product-card" data-category="camisas"
                      data-name="Camisa Brazil" data-price="99.90" data-img="../assets/img/camisabr.png"
-                     data-imgs="../assets/img/camisabrazil.png|../assets/img/camisabrazilback.png" data-sizes="P|M|G|GG|XG"
+                     data-imgs="../assets/img/camisabrazil.png|../assets/img/camisabrazilback.png|../assets/img/camisabrazildetail.png|../assets/img/camisabrazilupdetail.png|../assets/img/camisabrazilbackdetail.png" data-sizes="P|M|G|GG|XG"
                      data-longdesc="Camisa Brazil: Confeccionada em algodão premium, acabamento reforçado nas costuras, modelagem regular que se adapta ao corpo. Ideal para uso diário, possui estampas inspiradas na cultura oriental e tratamento anti-pilling.">
                     <div class="card-image"><img src="../assets/img/camisabr.png" alt="Camisa Tradicional"><div class="card-overlay"><button class="btn-quick-view">Ver Detalhes</button></div></div>
                     <div class="card-content"><h3>Camisa Brazil</h3><p class="product-desc">Algodão leve, Historia pesada</p><p class="price">R$ 99,90</p><button class="btn btn-add-cart">Adicionar ao Carrinho</button></div>
@@ -117,10 +117,10 @@ if (!function_exists('is_active')) {
                     <div class="card-content"><h3>Moletom Sakura</h3><p class="product-desc">Forro macio com estampa de cerejeira</p><p class="price">R$ 129,90</p><button class="btn btn-add-cart">Adicionar ao Carrinho</button></div>
                 </div>
                 <div class="product-card" data-category="moletons"
-                     data-name="Moletom Susanoo" data-price="279.90" data-img="../assets/img/moletombege.png"
-                     data-imgs="../assets/img/moletombege1.png|../assets/img/moletombege2.png" data-sizes="P|M|G|GG|XG"
+                     data-name="Moletom Susanoo" data-price="279.90" data-img="../assets/img/moletomroxo.png"
+                     data-imgs="../assets/img/moletomroxo.png|../assets/img/moletomroxoback.png" data-sizes="P|M|G|GG|XG"
                      data-longdesc="Moletom Susanoo: Corte urbano, logo bordado, material durável e resistente a lavagens. Perfeito para compor looks casuais.">
-                    <div class="card-image"><img src="../assets/img/moletombege.png" alt="Moletom Susanoo"><div class="card-overlay"><button class="btn-quick-view">Ver Detalhes</button></div></div>
+                    <div class="card-image"><img src="../assets/img/moletomroxo.png" alt="Moletom Susanoo"><div class="card-overlay"><button class="btn-quick-view">Ver Detalhes</button></div></div>
                     <div class="card-content"><h3>Moletom Susanoo</h3><p class="product-desc">Moletom com capuz e logo bordado</p><p class="price">R$ 139,90</p><button class="btn btn-add-cart">Adicionar ao Carrinho</button></div>
                 </div>
                 <!-- Calças -->
@@ -141,7 +141,7 @@ if (!function_exists('is_active')) {
                 <!-- Acessórios (tamanho Único) -->
                 <div class="product-card" data-category="acessorios"
                      data-name="Boné AMATERASU" data-price="69.90" data-img="../assets/img/bonebarra.png"
-                     data-imgs="../assets/img/bonebarra.png|../assets/img/boneamaterasuback.png" data-sizes="Único"
+                     data-imgs="../assets/img/boneamaterasucompleto.png|../assets/img/boneamaterasuback.png" data-sizes="Único"
                      data-longdesc="Boné AMATERASU: Tecido respirável com aba estruturada e bordado exclusivo. Ajuste traseiro e detalhe interno antissuor.">
                     <div class="card-image"><img src="../assets/img/bonebarra.png" alt="Boné Amaterasu"><div class="card-overlay"><button class="btn-quick-view">Ver Detalhes</button></div></div>
                     <div class="card-content"><h3>Boné AMATERASU</h3><p class="product-desc">Chama negra que nunca para</p><p class="price">R$ 69,90</p><button class="btn btn-add-cart">Adicionar ao Carrinho</button></div>

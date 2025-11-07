@@ -89,7 +89,7 @@
             <a href="php/produtos.php" class="btn-shop">Compre Agora</a>
             <div class="banner-social-icons">
                 <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-                <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="https://www.instagram.com/xz.assis" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
                 <a href="#" aria-label="X (Twitter)"><i class="fa-brands fa-x-twitter"></i></a>
             </div>
             <div class="decorative-crosses crosses-right">
@@ -131,22 +131,32 @@
             </div>
             <div class="products-grid">
                 
+
                 <!-- PRODUTO 1 -->
-                <div class="product-card">
+                <div class="product-card" data-category="camisas"
+                    data-name="Camisa Susanoo - Preta" data-price="109.99" data-img="../assets/img/camisajpnsred.png"
+                    data-imgs="../assets/img/camisajpnsred.png|../assets/img/camisajpnsredback.png|../assets/img/camisajpnsreddetailbeside.png|../assets/img/camisajpnsreddetail.png" data-sizes="P|M|G|GG|XG"
+                    data-longdesc="Camisa Susanoo Preta: Estilo e cultura japonesa, algodão premium, modelagem confortável.">
                     <div class="card-image"><img src="assets/img/costafoto.png" alt="Camisa Preta"><div class="card-overlay"><button class="btn-quick-view">Ver Detalhes</button></div></div>
                     <div class="card-content"><h3>Camisa Susanoo - Preta</h3><p class="product-desc">Estilo e cultura japonesa</p><p class="price">R$ 109,99</p><button class="btn btn-add-cart">Adicionar ao Carrinho</button></div>
                 </div>
 
                 <!-- PRODUTO 2 -->
-                <div class="product-card">
+                <div class="product-card" data-category="calcas"
+                    data-name="Calça Baggy Susanoo Cinza" data-price="67.99" data-img="assets/img/calca.png"
+                    data-imgs="../assets/img/calca.png|../assets/img/calcadetail.png|../assets/img/calcadetail2.png" data-sizes="P|M|G|GG|XG"
+                    data-longdesc="Calça Baggy Susanoo Cinza: Cor discreta, estilo que destaca, tecido leve e resistente.">
                     <div class="card-image"><img src="assets/img/calca.png" alt="Calça Cinza"><div class="card-overlay"><button class="btn-quick-view">Ver Detalhes</button></div></div>
                     <div class="card-content"><h3>Calça Baggy Susanoo Cinza</h3><p class="product-desc">Cor discreta, estilo que destaca</p><p class="price">R$ 67,99</p><button class="btn btn-add-cart">Adicionar ao Carrinho</button></div>
                 </div>
 
                 <!-- PRODUTO 3 -->
-                <div class="product-card">
-                    <div class="card-image"><img src="assets/img/bone.png" alt="Boné"><div class="card-overlay"><button class="btn-quick-view">Ver Detalhes</button></div></div>
-                    <div class="card-content"><h3>Acessórios</h3><p class="product-desc">Faça seus detalhes uma cerimônia tradicional japonesa</p><p class="price">R$ 39,90</p><button class="btn btn-add-cart">Adicionar ao Carrinho</button></div>
+                <div class="product-card" data-category="acessorios"
+                    data-name="Boné Amaterasu" data-price="39.90" data-img="assets/img/bone.png"
+                    data-imgs="../assets/img/boneoldschool.png|../assets/img/boneoldschool2.png|../assets/img/boneoldschool3.png" data-sizes="Único"
+                    data-longdesc="Boné Old School: Aba curva, bordado exclusivo, ajuste confortável, inspiração japonesa.">
+                    <div class="card-image"><img src="assets/img/bone.png" alt="Boné Amaterasu"><div class="card-overlay"><button class="btn-quick-view">Ver Detalhes</button></div></div>
+                    <div class="card-content"><h3>Boné Old School</h3><p class="product-desc">Aba curva, bordado exclusivo, ajuste confortável</p><p class="price">R$ 39,90</p><button class="btn btn-add-cart">Adicionar ao Carrinho</button></div>
                 </div>
 
                 <!-- Botão "Ver Todos" -->
