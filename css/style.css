@@ -1328,6 +1328,7 @@ html.light-mode .dropdown-user-name {
     display: flex;
     gap: 1.5rem;
     margin-top: 2.5rem;
+    text-decoration: none;
 }
 
 .banner-social-icons a {
@@ -1343,6 +1344,7 @@ html.light-mode .dropdown-user-name {
     background: rgba(139, 92, 246, 0.1);
     position: relative;
     overflow: hidden;
+    text-decoration: none;
 }
 
 .banner-social-icons a::before {
@@ -1356,6 +1358,7 @@ html.light-mode .dropdown-user-name {
     opacity: 0;
     transition: opacity 0.4s ease;
     border-radius: 50%;
+    text-decoration: none;
 }
 
 .banner-social-icons a i {
