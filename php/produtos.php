@@ -111,7 +111,7 @@ if (!function_exists('is_active')) {
                 <!-- Moletons -->
                 <div class="product-card" data-category="moletons"
                      data-name="Moletom Sakura" data-price="249.90" data-img="../assets/img/moletommarrom.png"
-                     data-imgs="../assets/img/moletommarrom.png|../assets/img/moletommarrom_2.png" data-sizes="P|M|G|GG|XG"
+                     data-imgs="../assets/img/moletomsakurafront.png|../assets/img/moletomsakuraback.png" data-sizes="P|M|G|GG|XG"
                      data-longdesc="Moletom Sakura: Interior felpado, capuz com ajuste, bolsos canguru. Estampa temática de cerejeira com tintas ecológicas, ideal para baixas temperaturas.">
                     <div class="card-image"><img src="../assets/img/moletommarrom.png" alt="Moletom Sakura"><div class="card-overlay"><button class="btn-quick-view">Ver Detalhes</button></div></div>
                     <div class="card-content"><h3>Moletom Sakura</h3><p class="product-desc">Forro macio com estampa de cerejeira</p><p class="price">R$ 129,90</p><button class="btn btn-add-cart">Adicionar ao Carrinho</button></div>
@@ -141,7 +141,7 @@ if (!function_exists('is_active')) {
                 <!-- Acessórios (tamanho Único) -->
                 <div class="product-card" data-category="acessorios"
                      data-name="Boné AMATERASU" data-price="69.90" data-img="../assets/img/bonebarra.png"
-                     data-imgs="../assets/img/bonebarra.png|../assets/img/bone.png" data-sizes="Único"
+                     data-imgs="../assets/img/bonebarra.png|../assets/img/boneamaterasuback.png" data-sizes="Único"
                      data-longdesc="Boné AMATERASU: Tecido respirável com aba estruturada e bordado exclusivo. Ajuste traseiro e detalhe interno antissuor.">
                     <div class="card-image"><img src="../assets/img/bonebarra.png" alt="Boné Amaterasu"><div class="card-overlay"><button class="btn-quick-view">Ver Detalhes</button></div></div>
                     <div class="card-content"><h3>Boné AMATERASU</h3><p class="product-desc">Chama negra que nunca para</p><p class="price">R$ 69,90</p><button class="btn btn-add-cart">Adicionar ao Carrinho</button></div>

@@ -133,7 +133,7 @@ if (!function_exists('is_active')) {
 				<div class="actions">
 					<button type="submit" class="btn-cta">Adicionar ao carrinho</button>
 					<button type="button" id="favBtn" class="btn-fav" aria-pressed="false" title="Favoritar">♡</button>
-				</div>
+				</div>	
 
 				<div class="note">Disponível no checkout com parcelamento</div>
 
