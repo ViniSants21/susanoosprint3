@@ -158,7 +158,7 @@
                 </div>
             </div>
             <div class="hero-image">
-                <div class="product-showcase"><div class="floating-product"><img src="assets/img/capa.png" alt="Produto Susanoo" class="hero-product-img"></div></div>
+                <div class="product-showcase"><div class="floating-product"><img src="assets/img/index.png" alt="Produto Susanoo" class="hero-product-img"></div></div>
             </div>
         </div>
         <div class="scroll-indicator"><span>Descubra Mais</span><div class="scroll-arrow"></div></div>
