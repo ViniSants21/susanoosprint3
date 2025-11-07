@@ -111,35 +111,80 @@ document.addEventListener('DOMContentLoaded', function() {
             return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
         }
 
-        // Base de produtos usada pela busca (expanda conforme necessário)
+        // Base de produtos usada pela busca (padronizada conforme produtos.php)
         const allProducts = [
-            // index.php / featured
-            { name: 'Camisa Susanoo - Branca', price: '299.90', img: 'assets/img/costafoto.png', imgs: 'assets/img/costafoto.png', sizes: 'P|M|G|GG', longdesc: 'Uma camisa branca elegante com detalhes da cultura japonesa, perfeita para qualquer ocasião.', category: 'camisas' },
-            { name: 'Calça Baggy Susanoo Cinza', price: '199.90', img: 'assets/img/calca.png', imgs: 'assets/img/calca.png', sizes: '38|40|42|44', longdesc: 'Calça baggy confortável e estilosa.', category: 'calcas' },
-            { name: 'Acessórios', price: '39.90', img: 'assets/img/bone.png', imgs: 'assets/img/bone.png', sizes: 'Único', longdesc: 'Coleção de acessórios inspirados na cerimônia tradicional japonesa.', category: 'acessorios' },
-
-            // colecao_sublime
-            { name: 'Camisa Polo - COLLECTION SUBLIME', price: '149.90', img: 'assets/img/Camisa Polo Susanoo (1).png', imgs: 'assets/img/Camisa Polo Susanoo (1).png', sizes: 'P|M|G|GG', longdesc: 'Minimalista e refinada.', category: 'sublime' },
-            { name: 'Camisa Polo Preta - COLLECTION SUBLIME', price: '159.90', img: 'assets/img/Camisa Polo Susanoo(Preta).png', imgs: 'assets/img/Camisa Polo Susanoo(Preta).png', sizes: 'P|M|G|GG', longdesc: 'Minimalista e refinada.', category: 'sublime' },
-            { name: 'Camisa Polo Off-White - COLLECTION SUBLIME', price: '149.90', img: 'assets/img/Camisa Off-White SUBLIME.png', imgs: 'assets/img/Camisa Off-White SUBLIME.png', sizes: 'P|M|G|GG', longdesc: 'Minimalista e refinada.', category: 'sublime' },
-            { name: 'Camisa Polo Branca - COLLECTION SUBLIME', price: '129.90', img: 'assets/img/Camisa Branca SUBLIME.png', imgs: 'assets/img/Camisa Branca SUBLIME.png', sizes: 'P|M|G|GG', longdesc: 'Minimalista e refinada.', category: 'sublime' },
-            { name: 'Camisa Polo Marrom - COLLECTION SUBLIME', price: '149.90', img: 'assets/img/Camisa Marrom SUBLIME.png', imgs: 'assets/img/Camisa Marrom SUBLIME.png', sizes: 'P|M|G|GG', longdesc: 'Minimalista e refinada.', category: 'sublime' },
-            { name: 'Camisa Polo Rosa - COLLECTION SUBLIME', price: '129.90', img: 'assets/img/Camisa Rosa SUBLIME.png', imgs: 'assets/img/Camisa Rosa SUBLIME.png', sizes: 'P|M|G|GG', longdesc: 'Minimalista e refinada.', category: 'sublime' },
-
-            // colecao_essencial
-            { name: 'Camiseta Essentials Susanoo Preta', price: '109.90', img: 'assets/img/Camisapreta_essentials (1).png', imgs: 'assets/img/Camisapreta_essentials (1).png', sizes: 'P|M|G|GG', longdesc: 'Camiseta da coleção Essentials.', category: 'essencial' },
-            { name: 'Camiseta Essentials Susanoo Branca', price: '109.90', img: 'assets/img/Camisapreta_essentials (2).png', imgs: 'assets/img/Camisapreta_essentials (2).png', sizes: 'P|M|G|GG', longdesc: 'Camiseta da coleção Essentials.', category: 'essencial' },
-            { name: 'Camiseta Essentials Susanoo Roxa Escura', price: '109.90', img: 'assets/img/Camisapreta_essentials (3).png', imgs: 'assets/img/Camisapreta_essentials (3).png', sizes: 'P|M|G|GG', longdesc: 'Camiseta da coleção Essentials.', category: 'essencial' },
-            { name: 'Moletom Essentials Susanoo Preto', price: '149.90', img: 'assets/img/Moletom_preto.jpeg', imgs: 'assets/img/Moletom_preto.jpeg', sizes: 'P|M|G|GG', longdesc: 'Moletom Essentials preto.', category: 'essencial' },
-            { name: 'Moletom Essentials Susanoo Branco', price: '149.90', img: 'assets/img/Moletom_branco.jpeg', imgs: 'assets/img/Moletom_branco.jpeg', sizes: 'P|M|G|GG', longdesc: 'Moletom Essentials branco.', category: 'essencial' },
-            { name: 'Moletom Essentials Susanoo Roxa Escura', price: '150.90', img: 'assets/img/Moletom_roxa.jpeg', imgs: 'assets/img/Moletom_roxa.jpeg', sizes: 'P|M|G|GG', longdesc: 'Moletom Essentials roxa escura.', category: 'essencial' },
-
-            // outros exemplos observados
-            { name: 'Camisa Brazil', price: '129.90', img: 'assets/img/camisabr.png', imgs: 'assets/img/camisabr.png', sizes: 'P|M|G|GG', longdesc: 'Camisa Brazil.', category: 'camisas' },
-            { name: 'Camisa Sopro', price: '119.90', img: 'assets/img/sopro.png', imgs: 'assets/img/sopro.png', sizes: 'P|M|G|GG', longdesc: 'Camisa Sopro.', category: 'camisas' },
-            { name: 'Moletom Sakura', price: '199.90', img: 'assets/img/moletommarrom.png', imgs: 'assets/img/moletommarrom.png', sizes: 'P|M|G|GG', longdesc: 'Moletom Sakura.', category: 'moletom' },
-            { name: 'Boné AMATERASU', price: '59.90', img: 'assets/img/bonebarra.png', imgs: 'assets/img/bonebarra.png', sizes: 'Único', longdesc: 'Boné AMATERASU.', category: 'acessorios' },
-            // ADICIONE mais produtos aqui conforme necessário
+            {
+                name: "Camisa Brazil",
+                price: "99.90",
+                img: "assets/img/camisabr.png",
+                imgs: "assets/img/camisabrazil.png|assets/img/camisabrazilback.png",
+                sizes: "P|M|G|GG|XG",
+                longdesc: "Camisa Brazil: Confeccionada em algodão premium, acabamento reforçado nas costuras, modelagem regular que se adapta ao corpo. Ideal para uso diário, possui estampas inspiradas na cultura oriental e tratamento anti-pilling.",
+                category: "camisas"
+            },
+            {
+                name: "Camisa Sopro",
+                price: "99.90",
+                img: "assets/img/sopro.png",
+                imgs: "assets/img/sopros.png|assets/img/sopro2.png",
+                sizes: "P|M|G|GG|XG",
+                longdesc: "Camisa Sopro: Tecido leve com toque seco, estampa serigráfica resistente, gola reforçada. Inspirada no vento, design minimalista com caimento fluido.",
+                category: "camisas"
+            },
+            {
+                name: "Moletom Sakura",
+                price: "249.90",
+                img: "assets/img/moletommarrom.png",
+                imgs: "assets/img/moletommarrom.png|assets/img/moletommarrom_2.png",
+                sizes: "P|M|G|GG|XG",
+                longdesc: "Moletom Sakura: Interior felpado, capuz com ajuste, bolsos canguru. Estampa temática de cerejeira com tintas ecológicas, ideal para baixas temperaturas.",
+                category: "moletons"
+            },
+            {
+                name: "Moletom Susanoo",
+                price: "279.90",
+                img: "assets/img/moletombege.png",
+                imgs: "assets/img/moletombege1.png|assets/img/moletombege2.png",
+                sizes: "P|M|G|GG|XG",
+                longdesc: "Moletom Susanoo: Corte urbano, logo bordado, material durável e resistente a lavagens. Perfeito para compor looks casuais.",
+                category: "moletons"
+            },
+            {
+                name: "Jorts Hakama",
+                price: "199.90",
+                img: "assets/img/jortscinza.png",
+                imgs: "assets/img/jortscinza.png|assets/img/jortscinza_back.png",
+                sizes: "P|M|G|GG|XG",
+                longdesc: "Jorts Hakama: Calça com corte inspirado em hakama, bolsos reforçados, tecido com elasticidade leve para conforto. Ideal para looks modernos.",
+                category: "calcas"
+            },
+            {
+                name: "Calça Cargo",
+                price: "169.90",
+                img: "assets/img/calcamodelofem.png",
+                imgs: "assets/img/calcamodelofem.png|assets/img/calcamodelofem_2.png",
+                sizes: "P|M|G|GG|XG",
+                longdesc: "Calça Cargo: Vários bolsos utilitários, cordão interno na cintura, acabamento resistente. Perfeita para uso urbano e funcional.",
+                category: "calcas"
+            },
+            {
+                name: "Boné AMATERASU",
+                price: "69.90",
+                img: "assets/img/bonebarra.png",
+                imgs: "assets/img/bonebarra.png|assets/img/bone.png",
+                sizes: "Único",
+                longdesc: "Boné AMATERASU: Tecido respirável com aba estruturada e bordado exclusivo. Ajuste traseiro e detalhe interno antissuor.",
+                category: "acessorios"
+            },
+            {
+                name: "Bandana Oriental",
+                price: "39.90",
+                img: "assets/img/chaveiro.png",
+                imgs: "assets/img/chaveiro.png|assets/img/yeah.png",
+                sizes: "Único",
+                longdesc: "Chaveiro/Acc: Material metálico com banho resistente, detalhe temático e embalagem presenteável.",
+                category: "acessorios"
+            }
         ];
 
         function buildProductUrl(product, isIndex) {

@@ -14,7 +14,7 @@
     
     <!-- Script para Carregamento do Tema -->
     <script>(function(){const theme=localStorage.getItem('theme');if(theme==='light'){document.documentElement.classList.add('light-mode');}})();</script>
-</head>
+</head> 
 
 <body class="home">
     <?php

@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -10,6 +9,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <script>(function(){const theme=localStorage.getItem('theme');if(theme==='light'){document.documentElement.classList.add('light-mode');}})();</script>
+    <style>
+        .nav-search{display:flex;align-items:center;gap:.5rem;}
+        .nav-search input[type="text"]{padding:.45rem .75rem;border-radius:24px;border:1px solid rgba(0,0,0,.08);background:transparent;color:inherit;min-width:160px}
+        .nav-search .nav-search-btn{border:none;background:transparent;padding:.35rem;border-radius:50%;cursor:pointer;color:inherit;display:inline-flex;align-items:center;justify-content:center}
+        .nav-search .nav-search-btn .fa-search{font-size:0.95rem}
+    </style>
 </head>
 <body class="login-body">
     <?php
@@ -25,7 +30,10 @@ if (!function_exists('is_active')) {
 
     <nav class="navbar scrolled" id="navbar">
         <div class="nav-container">
-            <div class="nav-search"><input type="text" placeholder="Pesquisar..."></div>
+            <div class="nav-search">
+                <input type="text" placeholder="Pesquisar..." aria-label="Pesquisar">
+                <button type="button" class="nav-search-btn" aria-label="Pesquisar"><i class="fas fa-search"></i></button>
+            </div>
             <div class="nav-logo"><a href="../index.php"><img src="../assets/img/LOGOSUSANOO.png" alt="LOGOSUSANOO"></a></div>
             <div class="nav-right-group">
                 <ul class="nav-menu" id="nav-menu">
@@ -91,6 +99,7 @@ if (!function_exists('is_active')) {
         </div>
     </footer>
 
+<script src="../js/script.js"></script>
 <script>
 // --- LÓGICA DA PÁGINA DE LOGIN (UNIFICADA) ---
 document.addEventListener('DOMContentLoaded', function() {
