@@ -168,6 +168,20 @@
 
     <!-- Produtos em Destaque -->
     <section class="featured-products">
+        <div class="sakura-container">
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+    </div>
         <div class="container">
             <div class="section-header">
                 <h2 class="section-title">Produtos em Destaque</h2>
