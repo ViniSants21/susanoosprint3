@@ -1240,10 +1240,10 @@ html.light-mode .dropdown-user-name {
 }
 
 /* MANTENDO AS IMAGENS ORIGINAIS QUE VOCÊ JÁ TINHA */
-.banner-image-placeholder.img-1 { background-image: url('../assets/img/IMG3.png'); }
-.banner-image-placeholder.img-2 { background-image: url('../assets/img/Imagem2.png'); }
-.banner-image-placeholder.img-3 { background-image: url('../assets/img/IMG5.png'); }
-.banner-image-placeholder.img-4 { background-image: url('../assets/img/Imagem.png'); }
+.banner-image-placeholder.img-1 { background-image: url('../assets/img/IMGBAN1.png'); }
+.banner-image-placeholder.img-2 { background-image: url('../assets/img/IMGBAN2.png'); }
+.banner-image-placeholder.img-3 { background-image: url('../assets/img/IMGBAN3.png'); }
+.banner-image-placeholder.img-4 { background-image: url('../assets/img/IMGBAN4.png'); }
 
 .banner-center-content {
     background: linear-gradient(135deg, rgba(139, 92, 246, 0.05), rgba(167, 139, 250, 0.08)); /* Gradiente sutil */
