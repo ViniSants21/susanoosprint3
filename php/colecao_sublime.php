@@ -113,44 +113,104 @@ if (!function_exists('is_active')) {
                 <div class="product-card" data-category="camisas"
                     data-name="Camisa Polo Susanoo Preta" data-price="149.90" data-img="../assets/img/Camisa Polo Susanoo (1).png"
                     data-imgs="../assets/img/Camisa Polo Susanoo (1).png|../assets/img/susanoo costas polo preta.png|../assets/img/Logo Onda SUSANOO bordada.png|../assets/img/Logo SUSANOO bordada.png" data-sizes="P|M|G|GG|XG"
-                    data-longdesc="Camisa Polo Susanoo Preta: Feita em algodão egípcio premium. Elegância japonesa moderna.">
+                    data-longdesc="Feita em algodão egípcio premium, a Camisa Polo Susanoo combina conforto, força e sofisticação minimalista. Inspirada na elegância japonesa moderna, traz bordados exclusivos, corte preciso e um toque suave que valoriza qualquer ocasião.
+
+100% algodão egípcio premium
+
+Design inspirado na cultura japonesa
+
+Bordado SUSANOO e número 9 nas mangas
+
+Gola estruturada com abotoamento discreto
+
+Cor preta com detalhes brancos contrastantes">
                     <div class="card-image"><img src="../assets/img/Camisa Polo Susanoo (1).png" alt="Camisa Polo Susanoo Preta"><div class="card-overlay"><button class="btn-quick-view">Ver Detalhes</button></div></div>
                     <div class="card-content"><h3>Camisa Polo - COLLECTION SUBLIME</h3><p class="product-desc">Feita em algodão egípcio premium. Elegância japonesa moderna.</p><p class="price">R$ 149,90</p><button class="btn btn-add-cart">Adicionar ao Carrinho</button></div>
                 </div>
                 <div class="product-card" data-category="camisas"
                     data-name="Camisa Polo Preta" data-price="159.90" data-img="../assets/img/Camisa Polo Susanoo(Preta).png"
                     data-imgs="../assets/img/Camisa Polo Susanoo(Preta).png|../assets/img/Camisa Polo Susanoo (1).png" data-sizes="P|M|G|GG|XG"
-                    data-longdesc="Camisa Polo Preta: Design minimalista e corte preciso, com inspiração japonesa.">
+                    data-longdesc="Feita em algodão egípcio premium, a Camisa Polo Susanoo Preta combina conforto, força e sofisticação minimalista. Inspirada na elegância japonesa moderna, traz bordados exclusivos, corte preciso e um toque suave que valoriza qualquer ocasião.
+
+100% algodão egípcio premium
+
+Design inspirado na cultura japonesa
+
+Bordado SUSANOO e número 9 nas mangas
+
+Gola estruturada com abotoamento discreto
+
+Cor preta com detalhes brancos contrastantes">
                     <div class="card-image"><img src="../assets/img/Camisa Polo Susanoo(Preta).png" alt="Camisa Polo Preta"><div class="card-overlay"><button class="btn-quick-view">Ver Detalhes</button></div></div>
-                    <div class="card-content"><h3>Camisa Polo Preta - COLLECTION SUBLIME</h3><p class="product-desc">Design minimalista e corte preciso, com inspiração japonesa.</p><p class="price">R$ 159,90</p><button class="btn btn-add-cart">Adicionar ao Carrinho</button></div>
+                    <div class="card-content"><h3>Camisa Polo Preta - COLLECTION SUBLIME</h3><p class="product-desc">Feita em algodão egípcio premium. Elegância japonesa moderna.</p><p class="price">R$ 159,90</p><button class="btn btn-add-cart">Adicionar ao Carrinho</button></div>
                 </div>
                 <div class="product-card" data-category="camisas"
                     data-name="Camisa Polo Off-White" data-price="149.90" data-img="../assets/img/Camisa Off-White SUBLIME.png"
                     data-imgs="../assets/img/Camisa Off-White SUBLIME.png|../assets/img/Camisa Branca SUBLIME.png" data-sizes="P|M|G|GG|XG"
-                    data-longdesc="Camisa Polo Off-White: Tecido leve, toque suave e visual sofisticado.">
+                    data-longdesc="Feita em algodão egípcio premium, a Camisa Polo Susanoo Off-White combina conforto, força e sofisticação minimalista. Inspirada na elegância japonesa moderna, traz bordados exclusivos, corte preciso e um toque suave que valoriza qualquer ocasião.
+
+100% algodão egípcio premium
+
+Design inspirado na cultura japonesa
+
+Bordado SUSANOO e número 9 nas mangas
+
+Gola estruturada com abotoamento discreto
+
+Cor preta com detalhes brancos contrastantes">
                     <div class="card-image"><img src="../assets/img/Camisa Off-White SUBLIME.png" alt="Camisa Polo Off-White"><div class="card-overlay"><button class="btn-quick-view">Ver Detalhes</button></div></div>
-                    <div class="card-content"><h3>Camisa Polo Off-White - COLLECTION SUBLIME</h3><p class="product-desc">Tecido leve, toque suave e visual sofisticado.</p><p class="price">R$ 149,90</p><button class="btn btn-add-cart">Adicionar ao Carrinho</button></div>
+                    <div class="card-content"><h3>Camisa Polo Off-White - COLLECTION SUBLIME</h3><p class="product-desc">Feita em algodão egípcio premium. Elegância japonesa moderna.</p><p class="price">R$ 149,90</p><button class="btn btn-add-cart">Adicionar ao Carrinho</button></div>
                 </div>
                 <div class="product-card" data-category="camisas"
                     data-name="Camisa Polo Branca" data-price="129.90" data-img="../assets/img/Camisa Branca SUBLIME.png"
                     data-imgs="../assets/img/Camisa Branca SUBLIME.png|../assets/img/Camisa Off-White SUBLIME.png" data-sizes="P|M|G|GG|XG"
-                    data-longdesc="Camisa Polo Branca: Elegância pura com inspiração oriental clássica.">
+                    data-longdesc="Feita em algodão egípcio premium, a Camisa Polo Susanoo Branca combina conforto, força e sofisticação minimalista. Inspirada na elegância japonesa moderna, traz bordados exclusivos, corte preciso e um toque suave que valoriza qualquer ocasião.
+
+100% algodão egípcio premium
+
+Design inspirado na cultura japonesa
+
+Bordado SUSANOO e número 9 nas mangas
+
+Gola estruturada com abotoamento discreto
+
+Cor preta com detalhes brancos contrastantes">
                     <div class="card-image"><img src="../assets/img/Camisa Branca SUBLIME.png" alt="Camisa Branca Sublime"><div class="card-overlay"><button class="btn-quick-view">Ver Detalhes</button></div></div>
-                    <div class="card-content"><h3>Camisa Polo Branca - COLLECTION SUBLIME</h3><p class="product-desc">Elegância pura com inspiração oriental clássica.</p><p class="price">R$ 129,90</p><button class="btn btn-add-cart">Adicionar ao Carrinho</button></div>
+                    <div class="card-content"><h3>Camisa Polo Branca - COLLECTION SUBLIME</h3><p class="product-desc">Feita em algodão egípcio premium. Elegância japonesa moderna.</p><p class="price">R$ 129,90</p><button class="btn btn-add-cart">Adicionar ao Carrinho</button></div>
                 </div>
                 <div class="product-card" data-category="camisas"
                     data-name="Camisa Polo Marrom" data-price="149.90" data-img="../assets/img/Camisa Marrom SUBLIME.png"
                     data-imgs="../assets/img/Camisa Marrom SUBLIME.png|../assets/img/Camisa Rosa SUBLIME.png" data-sizes="P|M|G|GG|XG"
-                    data-longdesc="Camisa Polo Marrom: Inspirada nas nuances da terra e tradição oriental.">
+                    data-longdesc="Feita em algodão egípcio premium, a Camisa Polo Susanoo Marrom combina conforto, força e sofisticação minimalista. Inspirada na elegância japonesa moderna, traz bordados exclusivos, corte preciso e um toque suave que valoriza qualquer ocasião.
+
+100% algodão egípcio premium
+
+Design inspirado na cultura japonesa
+
+Bordado SUSANOO e número 9 nas mangas
+
+Gola estruturada com abotoamento discreto
+
+Cor preta com detalhes brancos contrastantes">
                     <div class="card-image"><img src="../assets/img/Camisa Marrom SUBLIME.png" alt="Camisa Polo Marrom"><div class="card-overlay"><button class="btn-quick-view">Ver Detalhes</button></div></div>
-                    <div class="card-content"><h3>Camisa Polo Marrom - COLLECTION SUBLIME</h3><p class="product-desc">Inspirada nas nuances da terra e tradição oriental.</p><p class="price">R$ 149,90</p><button class="btn btn-add-cart">Adicionar ao Carrinho</button></div>
+                    <div class="card-content"><h3>Camisa Polo Marrom - COLLECTION SUBLIME</h3><p class="product-desc">Feita em algodão egípcio premium. Elegância japonesa moderna.</p><p class="price">R$ 149,90</p><button class="btn btn-add-cart">Adicionar ao Carrinho</button></div>
                 </div>
                 <div class="product-card" data-category="camisas"
                     data-name="Camisa Polo Rosa" data-price="129.90" data-img="../assets/img/Camisa Rosa SUBLIME.png"
                     data-imgs="../assets/img/Camisa Rosa SUBLIME.png|../assets/img/Camisa Marrom SUBLIME.png" data-sizes="P|M|G|GG|XG"
-                    data-longdesc="Camisa Polo Rosa: Delicada e expressiva, perfeita para momentos sutis.">
+                    data-longdesc="Feita em algodão egípcio premium, a Camisa Polo Susanoo Rosa combina conforto, força e sofisticação minimalista. Inspirada na elegância japonesa moderna, traz bordados exclusivos, corte preciso e um toque suave que valoriza qualquer ocasião.
+
+100% algodão egípcio premium
+
+Design inspirado na cultura japonesa
+
+Bordado SUSANOO e número 9 nas mangas
+
+Gola estruturada com abotoamento discreto
+
+Cor preta com detalhes brancos contrastantes">
                     <div class="card-image"><img src="../assets/img/Camisa Rosa SUBLIME.png" alt="Camisa Polo Rosa"><div class="card-overlay"><button class="btn-quick-view">Ver Detalhes</button></div></div>
-                    <div class="card-content"><h3>Camisa Polo Rosa - COLLECTION SUBLIME</h3><p class="product-desc">Delicada e expressiva, perfeita para momentos sutis.</p><p class="price">R$ 129,90</p><button class="btn btn-add-cart">Adicionar ao Carrinho</button></div>
+                    <div class="card-content"><h3>Camisa Polo Rosa - COLLECTION SUBLIME</h3><p class="product-desc">Feita em algodão egípcio premium. Elegância japonesa moderna.</p><p class="price">R$ 129,90</p><button class="btn btn-add-cart">Adicionar ao Carrinho</button></div>
                 </div>
             </div>
         </div>
