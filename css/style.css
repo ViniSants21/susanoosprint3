@@ -1469,13 +1469,7 @@ html.light-mode .dropdown-user-name {
 }
 
 /* Estilo para os ícones que são imagens SVG com brilho reduzido */
-.carousel-icon img {
-    width: 50px;
-    height: 50px;
-    
-    /* Efeito neon mais sutil com um único drop-shadow */
-    filter: drop-shadow(0 0 8px var(--primary-purple));
-}
+
 
 /* Você pode manter o efeito de hover ou ajustá-lo também, se desejar */
 .carousel-icon[data-icon="kanji"]:hover {
@@ -1484,9 +1478,7 @@ html.light-mode .dropdown-user-name {
         0 0 20px var(--secondary-purple);
 }
 
-.carousel-icon img:hover {
-    filter: drop-shadow(0 0 12px var(--secondary-purple));
-}
+
 
 
 

@@ -82,26 +82,27 @@
         <!-- Coluna de Conteúdo Central -->
         <div class="banner-center-content">
             <!-- SUBSTITUA O CÓDIGO DA LANTERNA ESQUERDA POR ISTO -->
+<!-- CÓDIGO ATUALIZADO PARA O CARROSSEL ESQUERDO (SÓ LETRAS) -->
 <div class="decorative-crosses crosses-left">
     <div class="icon-carousel">
         <div class="carousel-track">
-            <!-- Lista de Ícones Originais -->
-            <div class="carousel-icon" data-icon="kanji">竜</div> <!-- Dragão -->
-            <div class="carousel-icon"><img src="assets/icons/Japan_icon1.svg" alt="Luminária Japonesa"></div>
-            <div class="carousel-icon" data-icon="kanji">力</div> <!-- Força -->
-            <div class="carousel-icon"><img src="assets/icons/Japan_icon2.svg" alt="Portão Torii"></div>
-            <div class="carousel-icon" data-icon="kanji">魂</div> <!-- Alma -->
-            <div class="carousel-icon"><img src="assets/icons/Japan_icon3.svg" alt="Onda Japonesa"></div>
-            <div class="carousel-icon" data-icon="kanji">侍</div> <!-- Samurai -->
+            <!-- Lista de Caracteres Originais -->
+           <div class="carousel-icon" data-icon="kanji">桜</div> <!-- Sakura -->
+            <div class="carousel-icon" data-icon="kanji">和</div> <!-- Harmonia -->
+            <div class="carousel-icon" data-icon="kanji">〶</div> <!-- Sonho -->
+            <div class="carousel-icon" data-icon="kanji">美</div> <!-- Beleza -->
+            <div class="carousel-icon" data-icon="kanji">㋶</div> <!-- Amor -->
+            <div class="carousel-icon" data-icon="kanji">光</div> <!-- Luz -->
+            <div class="carousel-icon" data-icon="kanji">水</div> <!-- Shinobi / Ninja -->
 
             <!-- Lista Duplicada para o Loop Infinito -->
-            <div class="carousel-icon" data-icon="kanji">竜</div>
-            <div class="carousel-icon"><img src="assets/icons/Japan_icon1.svg" alt="Luminária Japonesa"></div>
-            <div class="carousel-icon" data-icon="kanji">力</div>
-            <div class="carousel-icon"><img src="assets/icons/Japan_icon2.svg" alt="Portão Torii"></div>
-            <div class="carousel-icon" data-icon="kanji">魂</div>
-            <div class="carousel-icon"><img src="assets/icons/Japan_icon3.svg" alt="Onda Japonesa"></div>
-            <div class="carousel-icon" data-icon="kanji">侍</div>
+             <div class="carousel-icon" data-icon="kanji">丧</div>
+            <div class="carousel-icon" data-icon="kanji">㋭</div>
+            <div class="carousel-icon" data-icon="kanji">夢</div>
+            <div class="carousel-icon" data-icon="kanji">⿕</div>
+            <div class="carousel-icon" data-icon="kanji">愛</div>
+            <div class="carousel-icon" data-icon="kanji">光</div>
+            <div class="carousel-icon" data-icon="kanji">⽗</div>
         </div>
     </div>
 </div>
@@ -114,26 +115,27 @@
                 <a href="#" aria-label="X (Twitter)"><i class="fa-brands fa-x-twitter"></i></a>
             </div>
             <!-- SUBSTITUA O CÓDIGO DA LANTERNA DIREITA POR ISTO -->
+<!-- CÓDIGO ATUALIZADO PARA O CARROSSEL DIREITO (SÓ LETRAS) -->
 <div class="decorative-crosses crosses-right">
     <div class="icon-carousel">
         <div class="carousel-track">
-            <!-- Lista de Ícones Originais -->
+            <!-- Lista de Caracteres Originais -->
             <div class="carousel-icon" data-icon="kanji">桜</div> <!-- Sakura -->
-            <div class="carousel-icon"><img src="assets/icons/Japan_icon4.svg" alt="Leque Japonês"></div>
             <div class="carousel-icon" data-icon="kanji">和</div> <!-- Harmonia -->
-            <div class="carousel-icon"><img src="assets/icons/Japan_icon3.svg" alt="Dragão Japonês"></div>
-            <div class="carousel-icon" data-icon="kanji">夢</div> <!-- Sonho -->
-            <div class="carousel-icon"><img src="assets/icons/Japan_icon2.svg" alt="Carpa Koi"></div>
+            <div class="carousel-icon" data-icon="kanji">〶</div> <!-- Sonho -->
             <div class="carousel-icon" data-icon="kanji">美</div> <!-- Beleza -->
+            <div class="carousel-icon" data-icon="kanji">㋶</div> <!-- Amor -->
+            <div class="carousel-icon" data-icon="kanji">光</div> <!-- Luz -->
+            <div class="carousel-icon" data-icon="kanji">水</div> <!-- Água -->
 
             <!-- Lista Duplicada para o Loop Infinito -->
-            <div class="carousel-icon" data-icon="kanji">桜</div>
-            <div class="carousel-icon"><img src="assets/icons/Japan_icon4.svg" alt="Leque Japonês"></div>
-            <div class="carousel-icon" data-icon="kanji">和</div>
-            <div class="carousel-icon"><img src="assets/icons/Japan_icon3.svg" alt="Dragão Japonês"></div>
+            <div class="carousel-icon" data-icon="kanji">丧</div>
+            <div class="carousel-icon" data-icon="kanji">㋭</div>
             <div class="carousel-icon" data-icon="kanji">夢</div>
-            <div class="carousel-icon"><img src="assets/icons/Japan_icon2.svg" alt="Carpa Koi"></div>
-            <div class="carousel-icon" data-icon="kanji">美</div>
+            <div class="carousel-icon" data-icon="kanji">⿕</div>
+            <div class="carousel-icon" data-icon="kanji">愛</div>
+            <div class="carousel-icon" data-icon="kanji">光</div>
+            <div class="carousel-icon" data-icon="kanji">⽗</div>
         </div>
     </div>
 </div>
