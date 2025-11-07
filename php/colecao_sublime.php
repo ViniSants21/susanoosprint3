@@ -112,7 +112,7 @@ if (!function_exists('is_active')) {
             <div class="products-grid">
                 <div class="product-card" data-category="camisas"
                     data-name="Camisa Polo Susanoo Preta" data-price="149.90" data-img="../assets/img/Camisa Polo Susanoo (1).png"
-                    data-imgs="../assets/img/Camisa Polo Susanoo (1).png|../assets/img/susanoo costas polo preta.png|../assets/img/Logo Onda SUSANOO bordada.png|../assets/img/Logo SUSANOO bordada.png" data-sizes="P|M|G|GG|XG"
+                    data-imgs="../assets/img/Camisa Polo Susanoo (1).png|../assets/img/Camisa Costas SUBLIME.png|../assets/img/Logo Onda SUSANOO bordada.png|../assets/img/Logo SUSANOO bordada.png" data-sizes="P|M|G|GG|XG"
                     data-longdesc="Feita em algodão egípcio premium, a Camisa Polo Susanoo combina conforto, força e sofisticação minimalista. Inspirada na elegância japonesa moderna, traz bordados exclusivos, corte preciso e um toque suave que valoriza qualquer ocasião.
 
 100% algodão egípcio premium
