@@ -90,50 +90,29 @@ if (!function_exists('is_active')) {
 <!-- Produtos -->
 <section class="products-section">
     <div class="container">
+        <!-- data-imgs = FOTOS FRENTE E VERSO -->
         <div class="products-grid">
-            <div class="product-card">
-                <div class="card-image">
-                    <img src="../assets/img/Camisa Boxy Susanoo.jpg" alt="Camisa Boxy">
-                    <div class="card-overlay">
-                        <button class="btn-quick-view">Ver Detalhes</button>
-                    </div>
-                </div>
-                <div class="card-content">
-                    <h3>Camiseta Boxy Susanoo Preta</h3>
-                    <p class="product-desc">Camiseta da coleção Essentials cor preto e branco</p>
-                    <p class="price">R$ 109,90</p>
-                    <button class="btn btn-add-cart">Adicionar ao Carrinho</button>
-                </div>
+            <div class="product-card" data-category="camisas"
+                data-name="Camiseta Boxy Susanoo Preta" data-price="109.90" data-img="../assets/img/Camisa Boxy Susanoo.jpg"
+                data-imgs="../assets/img/Camisa Boxy Susanoo.jpg|../assets/img/camisasusanoo.png" data-sizes="P|M|G|GG|XG"
+                data-longdesc="Camiseta Boxy Susanoo Preta: Modelagem boxy, algodão premium, estampa minimalista, perfeita para o dia a dia.">
+                <div class="card-image"><img src="../assets/img/Camisa Boxy Susanoo.jpg" alt="Camisa Boxy"><div class="card-overlay"><button class="btn-quick-view">Ver Detalhes</button></div></div>
+                <div class="card-content"><h3>Camiseta Boxy Susanoo Preta</h3><p class="product-desc">Camiseta da coleção Essentials cor preto e branco</p><p class="price">R$ 109,90</p><button class="btn btn-add-cart">Adicionar ao Carrinho</button></div>
             </div>
-
-            <div class="product-card">
-                <div class="card-image">
-                    <img src="../assets/img/camisasusanoo.png" alt="Camisa Essential">
-                    <div class="card-overlay">
-                        <button class="btn-quick-view">Ver Detalhes</button>
-                    </div>
-                </div>
-                <div class="card-content">
-                    <h3>Camiseta Regular Susanoo Branca</h3>
-                    <p class="product-desc">Camiseta da coleção Essentials cor branco e preto</p>
-                    <p class="price">R$ 109,90</p>
-                    <button class="btn btn-add-cart">Adicionar ao Carrinho</button>
-                </div>
+            <!-- data-imgs = FOTOS FRENTE E VERSO -->
+            <div class="product-card" data-category="camisas"
+                data-name="Camiseta Regular Susanoo Branca" data-price="109.90" data-img="../assets/img/camisasusanoo.png"
+                data-imgs="../assets/img/camisasusanoo.png|../assets/img/Camisa Boxy Susanoo.jpg" data-sizes="P|M|G|GG|XG"
+                data-longdesc="Camiseta Regular Susanoo Branca: Algodão macio, caimento tradicional, detalhes exclusivos Susanoo.">
+                <div class="card-image"><img src="../assets/img/camisasusanoo.png" alt="Camisa Essential"><div class="card-overlay"><button class="btn-quick-view">Ver Detalhes</button></div></div>
+                <div class="card-content"><h3>Camiseta Regular Susanoo Branca</h3><p class="product-desc">Camiseta da coleção Essentials cor branco e preto</p><p class="price">R$ 109,90</p><button class="btn btn-add-cart">Adicionar ao Carrinho</button></div>
             </div>
-
-            <div class="product-card">
-                <div class="card-image">
-                    <img src="../assets/img/Moletom_preto.jpeg" alt="Moletom Essential">
-                    <div class="card-overlay">
-                        <button class="btn-quick-view">Ver Detalhes</button>
-                    </div>
-                </div>
-                <div class="card-content">
-                    <h3>Moletom Essentials Susanoo Preto</h3>
-                    <p class="product-desc">Moletom da coleção Essentials preto e branco</p>
-                    <p class="price">R$ 149,90</p>
-                    <button class="btn btn-add-cart">Adicionar ao Carrinho</button>
-                </div>
+            <div class="product-card" data-category="moletons"
+                data-name="Moletom Essentials Susanoo Preto" data-price="149.90" data-img="../assets/img/Moletom_preto.jpeg"
+                data-imgs="../assets/img/Moletom_preto.jpeg" data-sizes="P|M|G|GG|XG"
+                data-longdesc="Moletom Essentials Susanoo Preto: Moletom felpado, capuz ajustável, conforto e estilo para o inverno.">
+                <div class="card-image"><img src="../assets/img/Moletom_preto.jpeg" alt="Moletom Essential"><div class="card-overlay"><button class="btn-quick-view">Ver Detalhes</button></div></div>
+                <div class="card-content"><h3>Moletom Essentials Susanoo Preto</h3><p class="product-desc">Moletom da coleção Essentials preto e branco</p><p class="price">R$ 149,90</p><button class="btn btn-add-cart">Adicionar ao Carrinho</button></div>
             </div>
         </div>
     </div>

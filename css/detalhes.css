@@ -62,6 +62,7 @@ body.detalhes-page{
   align-items:flex-start; /* alinhamento topo para casar com título */
   justify-content:center; 
   overflow:hidden; 
+  margin-top: -85px;
 }
 .image-figure{
   width:100%;
