@@ -8,6 +8,12 @@
     <link rel="stylesheet" href="../css/configuracoes-style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script>(function(){const theme=localStorage.getItem('theme');if(theme==='light'){document.documentElement.classList.add('light-mode');}})();</script>
+    <style>
+        .nav-search{display:flex;align-items:center;gap:.5rem;}
+        .nav-search input[type="text"]{padding:.45rem .75rem;border-radius:24px;border:1px solid rgba(0,0,0,.08);background:transparent;color:inherit;min-width:160px}
+        .nav-search .nav-search-btn{border:none;background:transparent;padding:.35rem;border-radius:50%;cursor:pointer;color:inherit;display:inline-flex;align-items:center;justify-content:center}
+        .nav-search .nav-search-btn .fa-search{font-size:0.95rem}
+    </style>
 </head>
 <body class="settings-page-body">
 
