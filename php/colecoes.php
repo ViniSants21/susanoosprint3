@@ -25,27 +25,79 @@ if (!function_exists('is_active')) {
         })();
     </script>
     <style>
-        /* --- Regras existentes --- */
+        /* --- Regras Gerais --- */
         .nav-search{display:flex;align-items:center;gap:.5rem;}
         .nav-search input[type="text"]{padding:.45rem .75rem;border-radius:24px;border:1px solid rgba(255,255,255,.08);background:transparent;color:inherit;min-width:160px}
         .nav-search .nav-search-btn{border:none;background:transparent;padding:.35rem;border-radius:50%;cursor:pointer;color:inherit;display:inline-flex;align-items:center;justify-content:center}
         .nav-search .nav-search-btn .fa-search{font-size:0.95rem}
         
+        /* --- Animações --- */
         @keyframes draw-line {
             to { transform: scaleX(1); }
         }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
+        /* --- Estilo da Página --- */
         .collections-page {
-            /* AJUSTE DE ESPAÇAMENTO: Reduzido o padding superior */
             padding: 2rem 2rem 60px;
             background-color: var(--bg-primary);
             background-image: radial-gradient(ellipse at top, rgba(139, 92, 246, 0.05) 0%, transparent 50%);
         }
+        
+        /* --- Banner Promocional --- */
+        .promo-banner-section {
+            width: 100vw;
+            position: relative;
+            left: 50%;
+            right: 50%;
+            margin-left: -50vw;
+            margin-right: -50vw;
+            margin-top: -11px;
+            height: 600px; 
+            margin-bottom: -50px; /* Sobrepõe o conteúdo principal levemente */
+            overflow: hidden;
+        }
+        .promo-banner-link {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        .promo-banner-image {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: cover;
+            object-position: center;
+        }
 
+        /* 
+        ================================================================
+        SEÇÃO DAS COLEÇÕES - CÓDIGO CORRIGIDO E CENTRALIZADO
+        ================================================================
+        */
+
+        /* Usamos flexbox para centralizar todo o conteúdo da página */
+        main.collections-page .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Centraliza o header e o grid */
+        }
+        
+        /* Cabeçalho da Seção */
         .section-header {
             text-align: center;
-            /* AJUSTE DE ESPAÇAMENTO: Reduzido de 5rem para 3rem */
             margin-bottom: 3rem;
+            width: 100%;
+            max-width: 800px; /* Limita a largura do texto */
         }
 
         .section-title {
@@ -56,6 +108,9 @@ if (!function_exists('is_active')) {
             position: relative;
             display: inline-block;
             padding-bottom: 15px;
+            /* Animação */
+            opacity: 0;
+            animation: fadeInUp 0.8s ease-out forwards;
         }
 
         .section-title::after {
@@ -68,8 +123,7 @@ if (!function_exists('is_active')) {
             background: linear-gradient(90deg, var(--primary-purple), var(--secondary-purple));
             transform: scaleX(0);
             transform-origin: center;
-            animation: draw-line 1s ease-out forwards;
-            animation-delay: 0.3s;
+            animation: draw-line 1s ease-out 0.8s forwards; /* Atraso para sincronizar */
         }
 
         .section-subtitle {
@@ -78,63 +132,25 @@ if (!function_exists('is_active')) {
             max-width: 650px;
             margin: 0 auto;
             line-height: 1.7;
+            /* Animação */
+            opacity: 0;
+            animation: fadeInUp 0.8s ease-out 0.3s forwards;
         }
 
-        /* --- SEÇÃO DO BANNER MODIFICADA --- */
-        .promo-banner-section {
-            /* AJUSTE: Largura total da tela */
-            width: 100vw;
-            position: relative;
-            left: 50%;
-            right: 50%;
-            margin-left: -50vw;
-            margin-right: -50vw;
-            
-            /* AJUSTE: Altura fixa menor para ficar mais panorâmico */
-            height: 350px; 
-            
-            /* AJUSTE: Reduzido o espaço abaixo do banner */
-            margin-bottom: 2rem;
-            overflow: hidden;
-            margin-top: 80px; /* Espaço para a navbar fixa */
-        }
-
-        .promo-banner-link {
-            display: block;
-            width: 100%;
-            height: 100%;
-            border-radius: 0; /* Remove borda arredondada para banner full-width */
-            box-shadow: var(--shadow-soft);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .promo-banner-link:hover {
-            transform: scale(1.01); /* Zoom muito leve no hover */
-            box-shadow: var(--shadow-glow);
-        }
-
-        .promo-banner-image {
-            width: 100%;
-            height: 100%;
-            display: block;
-            /* CRUCIAL: Faz a imagem cobrir a área sem distorcer */
-            object-fit: cover;
-            object-position: center; /* Centraliza a imagem */
-        }
-        /* --- Fim da Seção do Banner --- */
-
-        /* Grid para os Cards de Coleção - 2x2 */
+        /* Grid dos Cards de Coleção */
         .collections-grid-container {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(2, 1fr); /* 2 colunas flexíveis */
             gap: 2.5rem;
-            max-width: 1200px;
-            margin: 0 auto;
+            width: 100%;
+            max-width: 1500px; /* Largura máxima para o grid */
         }
 
+        /* Estilo do Card Individual */
         .collection-card-item {
             position: relative;
             height: 550px;
+            /* REMOVIDO: width: 700px; */
             border-radius: 20px;
             overflow: hidden;
             text-decoration: none;
@@ -142,12 +158,7 @@ if (!function_exists('is_active')) {
             display: block;
             border: 2px solid transparent;
             box-shadow: var(--shadow-soft);
-            transition: border-color 0.4s ease, box-shadow 0.4s ease;
-        }
-
-        .collection-card-item:hover {
-            box-shadow: var(--shadow-glow);
-            border-color: var(--primary-purple);
+            transition: border-color 0.4s ease, box-shadow 0.4s ease, transform 0.4s ease;
         }
 
         .collection-card-item::before {
@@ -156,13 +167,9 @@ if (!function_exists('is_active')) {
             inset: 0;
             background-size: cover;
             background-position: center;
-            transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94), filter 0.5s ease;
         }
 
-        .collection-card-item:hover::before {
-            transform: scale(1.1);
-        }
-        
         .collection-card-item::after {
             content: '';
             position: absolute;
@@ -170,11 +177,19 @@ if (!function_exists('is_active')) {
             background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.2) 50%, transparent 100%);
         }
 
-        #colecao-essencial::before { background-image: url('../assets/img/ban1.png'); }
-        #colecao-sublime::before   { background-image: url('../assets/img/ban2.png'); }
-        #colecao-verao::before     { background-image: url('../assets/img/ban3.png'); }
-        #colecao-inverno::before   { background-image: url('../assets/img/ban4.png'); }
+        /* Efeitos de Hover no Card */
+        .collection-card-item:hover {
+            box-shadow: var(--shadow-glow);
+            border-color: rgba(139, 92, 246, 0.7);
+            transform: translateY(-8px);
+        }
 
+        .collection-card-item:hover::before {
+            transform: scale(1.1) rotate(1deg);
+            filter: brightness(1.1);
+        }
+
+        /* Conteúdo do Card */
         .collection-card-content {
             position: absolute;
             bottom: 0;
@@ -189,7 +204,7 @@ if (!function_exists('is_active')) {
         .collection-card-item:hover .collection-card-content {
             transform: translateY(0);
         }
-        
+
         .collection-card-title {
             font-family: var(--font-display);
             font-size: 2.5rem;
@@ -200,12 +215,14 @@ if (!function_exists('is_active')) {
 
         .collection-card-desc, .btn-collection {
             opacity: 0;
-            transition: opacity 0.4s ease 0.1s;
+            transform: translateY(10px);
+            transition: opacity 0.4s ease 0.2s, transform 0.4s ease 0.2s;
         }
 
         .collection-card-item:hover .collection-card-desc,
         .collection-card-item:hover .btn-collection {
             opacity: 1;
+            transform: translateY(0);
         }
 
         .collection-card-desc {
@@ -215,6 +232,13 @@ if (!function_exists('is_active')) {
             color: var(--text-secondary);
         }
 
+        /* Imagens de fundo */
+        #colecao-essencial::before { background-image: url('../assets/img/ban1.png'); }
+        #colecao-sublime::before   { background-image: url('../assets/img/Susanoologo_sublime.png'); }
+        #colecao-verao::before     { background-image: url('../assets/img/inverno shibuya (1).png'); }
+        #colecao-inverno::before   { background-image: url('../assets/img/inverno shibuya.png'); }
+
+        /* Botões */
         .btn-collection { padding: 0.8rem 1.8rem; border-radius: 50px; font-weight: 600; display: inline-block; }
         .btn-outline { background: transparent; color: #fff; border: 2px solid #fff; }
         .btn-outline:hover { background: #fff; color: #000; }
@@ -222,6 +246,7 @@ if (!function_exists('is_active')) {
         .btn-secondary-dark { background: var(--dark-purple); color: #c4b5fd; border: 2px solid #c4b5fd; }
         .btn-secondary-dark:hover { background: #c4b5fd; color: var(--dark-purple); }
 
+        /* --- Responsividade --- */
         @media (max-width: 992px) {
             .collections-grid-container {
                 grid-template-columns: 1fr;
@@ -231,14 +256,14 @@ if (!function_exists('is_active')) {
                 height: 450px; 
             }
             .promo-banner-section {
-                height: 250px; /* Altura menor para celulares */
+                height: 350px;
             }
         }
     </style>
 </head>
 <body>
 
-<!-- Navbar Correta -->
+<!-- Navbar -->
 <nav class="navbar scrolled" id="navbar">
     <div class="nav-container">
         <div class="nav-search">
@@ -278,14 +303,14 @@ if (!function_exists('is_active')) {
     </div>
 </nav>
 
-<!-- Banner fora do Main para ocupar largura total -->
+<!-- Banner -->
 <section class="promo-banner-section">
-    <a href="sua-pagina-de-destino.php" class="promo-banner-link" aria-label="Ver promoção especial">
-        <img src="../assets/img/Colecoesss.png" alt="Banner promocional da nova coleção" class="promo-banner-image">
+    <a href="#" class="promo-banner-link" aria-label="Ver promoção especial">
+        <img src="../assets/img/colec.jpg" alt="Banner promocional da nova coleção" class="promo-banner-image">
     </a>
 </section>
 
-<!-- Main Content -->
+<!-- Conteúdo Principal -->
 <main class="collections-page">
     <div class="container">
         <header class="section-header">
@@ -297,7 +322,7 @@ if (!function_exists('is_active')) {
             <!-- Card Coleção Essencial -->
             <a href="colecao_essencial.php" id="colecao-essencial" class="collection-card-item">
                 <div class="collection-card-content">
-                    <h2 class="collection-card-title">Essencial</h2>
+                    <h2 class="collection-card-title">Essentials</h2>
                     <p class="collection-card-desc">Peças atemporais e versáteis que formam a base de um guarda-roupa poderoso e elegante.</p>
                     <span class="btn-collection btn-outline">Explorar a Coleção</span>
                 </div>
@@ -333,13 +358,31 @@ if (!function_exists('is_active')) {
     </div>
 </main>
 
-<!-- Footer (mantido igual, mas inclua o seu código de footer aqui) -->
+<!-- Footer -->
 <footer class="footer">
-    <!-- ... seu código do footer ... -->
-</footer>
-
-<button id="backToTop" class="back-to-top"><span>↑</span></button>
-
-<script src="../js/script.js"></script>
-</body>
-</html>
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-section">
+                <div class="footer-logo"><h3>須佐能乎</h3><span>SUSANOO</span></div>
+                <p>Desperte seu poder interior com estilo único e elegância oriental.</p>
+                <div class="social-links">
+                    <a href="#" class="social-link">Instagram</a>
+                    <a href="#" class="social-link">Facebook</a>
+                    <a href="#" class="social-link">X</a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h4>Navegação</h4>
+                <ul>
+                    <li><a href="index.php">Home</a></li>
+                    <li><a href="php/produtos.php">Produtos</a></li>
+                    <li><a href="php/colecoes.php">Coleções</a></li>
+                    <li><a href="php/sobre.php">Sobre Nós</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Atendimento</h4>
+                <ul>
+                    <li><a href="php/contato.php">Contato</a></li>
+                    <li><a href="#">FAQ</a></li>
+                    <li><a href
