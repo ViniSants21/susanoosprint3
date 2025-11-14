@@ -53,15 +53,16 @@ if (!function_exists('is_active')) {
             </ul>
             <div class="nav-icons">
                 <div class="profile-dropdown-wrapper">
-                    <a href="login.php" class="nav-icon-link" aria-label="Login"><i class="fas fa-user"></i></a>
+                    <a href="#" class="nav-icon-link" aria-label="Login" style="pointer-events: none;"><i class="fas fa-user"></i></a>
                     <div class="profile-dropdown-menu">
                         <div class="dropdown-header">
                             <img src="../assets/img/avatar.png" alt="Avatar" class="dropdown-avatar">
                             <div><div class="dropdown-user-name">Seu Nome</div><div class="dropdown-user-email">seu@email.com</div></div>
                         </div>
                         <ul class="dropdown-links">
-                            <li class="dropdown-link-item"><a href="perfil.php"><i class="fas fa-id-card"></i> Visualizar Perfil</a></li>
-                            <li class="dropdown-link-item"><a href="configuracoes.php"><i class="fas fa-cog"></i> Configurações</a></li>
+                            <li class="dropdown-link-item"><a href="php/perfil.php"><i class="fas fa-id-card"></i> Visualizar Perfil</a></li>
+                            <li class="dropdown-link-item"><a href="php/configuracoes.php"><i class="fas fa-cog"></i> Configurações</a></li>
+                            <li class="dropdown-link-item"><a href="php/login.php"><i class="fas fa-sign-in-alt"></i> Logar</a></li>
                         </ul>
                     </div>
                 </div>

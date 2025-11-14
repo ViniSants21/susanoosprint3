@@ -63,7 +63,7 @@ if (!function_exists('is_active')) {
             margin-right: -50vw;
             margin-top: -11px;
             height: 600px; 
-            margin-bottom: -50px; /* Sobrepõe o conteúdo principal levemente */
+            margin-bottom: -84px; /* Sobrepõe o conteúdo principal levemente */
             overflow: hidden;
         }
         .promo-banner-link {
@@ -142,8 +142,8 @@ if (!function_exists('is_active')) {
             display: grid;
             grid-template-columns: repeat(2, 1fr); /* 2 colunas flexíveis */
             gap: 2.5rem;
-            width: 100%;
-            max-width: 1500px; /* Largura máxima para o grid */
+            width: 120%;
+            max-width: 1800px; /* Largura máxima para o grid */
         }
 
         /* Estilo do Card Individual */
@@ -233,9 +233,9 @@ if (!function_exists('is_active')) {
         }
 
         /* Imagens de fundo */
-        #colecao-essencial::before { background-image: url('../assets/img/ban1.png'); }
-        #colecao-sublime::before   { background-image: url('../assets/img/Susanoologo_sublime.png'); }
-        #colecao-verao::before     { background-image: url('../assets/img/inverno shibuya (1).png'); }
+        #colecao-essencial::before { background-image: url('../assets/img/Ban1_recorte.png'); }
+        #colecao-sublime::before   { background-image: url('../assets/img/Collection_sublime.png'); }
+        #colecao-verao::before     { background-image: url('../assets/img/Ban2_recorte.png'); }
         #colecao-inverno::before   { background-image: url('../assets/img/inverno shibuya.png'); }
 
         /* Botões */
@@ -281,18 +281,16 @@ if (!function_exists('is_active')) {
             </ul>
             <div class="nav-icons">
                 <div class="profile-dropdown-wrapper">
-                    <a href="login.php" class="nav-icon-link" aria-label="Login"><i class="fas fa-user"></i></a>
+                    <a href="#" class="nav-icon-link" aria-label="Login" style="pointer-events: none;"><i class="fas fa-user"></i></a>
                     <div class="profile-dropdown-menu">
                         <div class="dropdown-header">
                             <img src="../assets/img/avatar.png" alt="Avatar" class="dropdown-avatar">
-                            <div>
-                                <div class="dropdown-user-name">Seu Nome</div>
-                                <div class="dropdown-user-email">seu@email.com</div>
-                            </div>
+                            <div><div class="dropdown-user-name">Seu Nome</div><div class="dropdown-user-email">seu@email.com</div></div>
                         </div>
                         <ul class="dropdown-links">
-                            <li class="dropdown-link-item"><a href="perfil.php"><i class="fas fa-id-card"></i> Visualizar Perfil</a></li>
-                            <li class="dropdown-link-item"><a href="configuracoes.php"><i class="fas fa-cog"></i> Configurações</a></li>
+                            <li class="dropdown-link-item"><a href="php/perfil.php"><i class="fas fa-id-card"></i> Visualizar Perfil</a></li>
+                            <li class="dropdown-link-item"><a href="php/configuracoes.php"><i class="fas fa-cog"></i> Configurações</a></li>
+                            <li class="dropdown-link-item"><a href="php/login.php"><i class="fas fa-sign-in-alt"></i> Logar</a></li>
                         </ul>
                     </div>
                 </div>
@@ -385,4 +383,32 @@ if (!function_exists('is_active')) {
                 <ul>
                     <li><a href="php/contato.php">Contato</a></li>
                     <li><a href="#">FAQ</a></li>
-                    <li><a href
+                    <li><a href="#">FAQ</a></li>
+                        <li><a href="#">Trocas e Devoluções</a></li>
+                        <li><a href="#">Política de Privacidade</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Newsletter</h4>
+                    <p>Receba novidades e ofertas exclusivas</p>
+                    <form class="newsletter-form">
+                        <input type="email" placeholder="Seu email" required>
+                        <button type="submit" class="btn btn-primary">Inscrever</button>
+                    </form>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; <?php echo date('Y'); ?> Susanoo. Todos os direitos reservados por Davi de Assis, Kauã souza, Lucas Limas e Vinicius Queiroz.</p>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Botão Voltar ao Topo -->
+    <button id="backToTop" class="back-to-top"><span>↑</span></button>
+
+    <!-- Scripts JavaScript -->
+    <script src="js/cart.js"></script>
+    <script src="js/script.js"></script>
+    <script src="js/theme.js"></script> 
+</body>
+</html>
