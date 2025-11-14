@@ -7,7 +7,7 @@ if (!function_exists('is_active')) {
     }
 }
 ?>
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -321,7 +321,8 @@ if (!function_exists('is_active')) {
                 <div class="collection-card-content">
                     <h2 class="collection-card-title">Essentials</h2>
                     <p class="collection-card-desc">Peças atemporais e versáteis que formam a base de um guarda-roupa poderoso e elegante.</p>
-                    <span class="btn-collection btn-outline">Explorar a Coleção</span>
+                    <!-- ALTERADO AQUI -->
+                    <span class="btn-collection btn-primary">Explorar a Coleção</span>
                 </div>
             </a>
 
@@ -339,7 +340,8 @@ if (!function_exists('is_active')) {
                 <div class="collection-card-content">
                     <h2 class="collection-card-title">Coleção Verão</h2>
                     <p class="collection-card-desc">Sinta a brisa com peças leves, cores vibrantes e cortes fluidos para os dias ensolarados.</p>
-                    <span class="btn-collection btn-secondary-dark">Descobrir a Leveza</span>
+                    <!-- ALTERADO AQUI -->
+                    <span class="btn-collection btn-primary">Descobrir a Leveza</span>
                 </div>
             </a>
 
