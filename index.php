@@ -107,7 +107,7 @@
     </div>
 </div>
             <h2>Susanoo</h2>
-            <p>Esilo que domina</p>
+            <p>Estilo que domina</p>
             <a href="php/produtos.php" class="btn-shop">Compre Agora</a>
             <div class="banner-social-icons">
                 <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
