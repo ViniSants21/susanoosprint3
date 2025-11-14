@@ -52,9 +52,8 @@ if (!function_exists('is_active')) {
                             <div><div class="dropdown-user-name">Seu Nome</div><div class="dropdown-user-email">seu@email.com</div></div>
                         </div>
                         <ul class="dropdown-links">
-                            <li class="dropdown-link-item"><a href="php/perfil.php"><i class="fas fa-id-card"></i> Visualizar Perfil</a></li>
-                            <li class="dropdown-link-item"><a href="php/configuracoes.php"><i class="fas fa-cog"></i> Configurações</a></li>
-                            <li class="dropdown-link-item"><a href="php/login.php"><i class="fas fa-sign-in-alt"></i> Logar</a></li>
+                            <li class="dropdown-link-item"><a href="perfil.php"><i class="fas fa-id-card"></i> Visualizar Perfil</a></li>
+                            <li class="dropdown-link-item"><a href="login.php"><i class="fas fa-sign-in-alt"></i> Logar</a></li>
                         </ul>
                     </div>
                 </div>
