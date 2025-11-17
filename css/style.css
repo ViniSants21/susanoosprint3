@@ -729,20 +729,27 @@ section {
     display: flex;
     gap: 1rem;
     margin-top: 1rem;
+    text-decoration: none;
 }
 
 .social-link {
     padding: 0.5rem 1rem;
     background: rgba(139, 92, 246, 0.2);
     border-radius: 20px;
+    text-decoration: none;
     transition: var(--transition-medium);
 }
 
 .social-link:hover {
     background: var(--primary-purple);
+    text-decoration: none;
     color: var(--text-primary);
 }
 
+.social-links-contact a {
+    text-decoration: none;
+
+}
 .newsletter-form {
     display: flex;
     gap: 0.5rem;
@@ -1478,241 +1485,91 @@ html.light-mode .dropdown-user-name {
         0 0 20px var(--secondary-purple);
 }
 
-
-
-
-
-
-
-
-
-
-/* Responsividade */
-@media (max-width: 1024px) {
-    .new-arrival-banner {
-        min-height: 500px;
-    }
-    
-    .banner-center-content h2 {
-        font-size: 2.5rem;
-    }
-}
-
-@media (max-width: 768px) {
-    .new-arrival-banner {
-        min-height: 400px;
-        grid-template-columns: 1fr;
-        grid-template-rows: repeat(5, 200px);
-    }
-    
-    .banner-center-content {
-        grid-row: 3;
-    }
-    
-    .banner-center-content h2 {
-        font-size: 2rem;
-    }
-    
-    .decorative-crosses {
-        display: none;
-    }
-}
-/* ======================================= */
-/*       AJUSTES DE ESPAÇAMENTO            */
-/* ======================================= */
-
-/* Diminui o espaço entre o banner e a seção hero */
-.new-arrival-banner {
-    margin-bottom: 0; /* Remove margem inferior */
-}
-
-.hero {
-    padding-top: 2rem; /* Reduz o padding superior da seção hero */
-    margin-top: -1rem; /* Puxa a seção hero para mais perto do banner */
-}
-
-/* ======================================= */
-/*       COLECÕES - 3 BANNERS IGUAIS       */
-/* ======================================= */
-
-.collections-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3 colunas iguais */
-    grid-template-rows: 400px; /* Altura fixa igual para todos */
-    gap: 1.5rem;
-}
-
-/* Remove a classe .large que fazia um banner ser maior */
-.collection-card.large {
-    grid-row: span 1; /* Todos ocupam a mesma altura */
-}
-
-.collection-card {
-    position: relative;
-    border-radius: 20px;
-    overflow: hidden;
-    cursor: pointer;
-    transition: all var(--transition-medium);
-    height: 100%; /* Garante que todos tenham a mesma altura */
-}
-
-/* Efeito de hover com ampliação */
-.collection-card:hover {
-    transform: scale(1.05); /* Ampliação no hover */
-    box-shadow: var(--shadow-glow);
-    border-color: var(--primary-purple);
-}
-
-.collection-card img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover; /* Garante que as imagens preencham igualmente */
-    transition: transform var(--transition-slow);
-}
-
-.collection-card:hover img {
-    transform: scale(1.1); /* Zoom na imagem ao passar o mouse */
-}
-
-.collection-overlay {
-    position: absolute;
+/* ...existing code... */
+.size-chart-modal {
+    display: none;
+    position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(45deg, rgba(0,0,0,0.7), rgba(139, 92, 246, 0.4));
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.size-chart-modal.visible {
     display: flex;
-    align-items: flex-end;
+}
+
+.size-chart-content {
+    background: #000;
     padding: 2rem;
-    opacity: 0;
-    transition: all var(--transition-medium);
+    border-radius: 8px;
+    box-shadow: var(--shadow-medium);
+    max-width: 500px;
+    width: 90%;
+    text-align: center;
+    position: relative;
+    color: var(--primary-purple);
 }
 
-.collection-card:hover .collection-overlay {
-    opacity: 1;
+.close-size-chart {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--primary-purple);
+    cursor: pointer;
 }
 
-.collection-content {
-    color: var(--text-primary);
-    transform: translateY(20px);
-    transition: transform var(--transition-medium);
+.size-chart-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
 }
 
-.collection-card:hover .collection-content {
-    transform: translateY(0);
-}
-
-.collection-content h3 {
+.size-chart-table caption {
     font-family: var(--font-display);
     font-size: 1.5rem;
-    margin-bottom: 0.5rem;
-}
-
-.collection-content p {
+    font-weight: 600;
     margin-bottom: 1rem;
-    opacity: 0.9;
+    color: var(--primary-purple);
 }
 
-/* Responsividade para os 3 banners */
-@media (max-width: 1024px) {
-    .collections-grid {
-        grid-template-columns: repeat(2, 1fr);
-        grid-template-rows: 350px 350px;
-    }
+.size-chart-table th,
+.size-chart-table td {
+    padding: 0.8rem;
+    text-align: center;
+    border: 1px solid var(--primary-purple);
 }
 
-@media (max-width: 768px) {
-    .collections-grid {
-        grid-template-columns: 1fr;
-        grid-template-rows: repeat(3, 300px);
-    }
-    
-    /* Ajuste adicional para mobile - reduz mais o espaço */
-    .hero {
-        padding-top: 1rem;
-        margin-top: -2rem;
-    }
-}
-/* ======================================================= */
-/*          ANIMAÇÃO: QUEDA DE PÉTALAS DE SAKURA           */
-/* ======================================================= */
-
-/* 
-  Animação que simula a queda e o giro da pétala.
-  Ela se move para baixo (top), para os lados (translateX) e gira (rotate).
-*/
-@keyframes fall-and-flutter {
-    0% {
-        top: -10%;
-        opacity: 1;
-        transform: translateX(0vw) rotate(0deg);
-    }
-    20% {
-        transform: translateX(-10vw) rotate(45deg);
-    }
-    40% {
-        transform: translateX(10vw) rotate(90deg);
-    }
-    60% {
-        transform: translateX(-5vw) rotate(135deg);
-    }
-    80% {
-        transform: translateX(5vw) rotate(180deg);
-    }
-    100% {
-        top: 110%; /* Move a pétala para fora da tela, para baixo */
-        opacity: 0.5;
-        transform: translateX(-2vw) rotate(225deg);
-    }
+.size-chart-table th {
+    background: #111;
+    color: var(--primary-purple);
+    font-weight: 700;
 }
 
-.featured-products {
-    position: relative;
-    overflow: hidden; /* Importante para as pétalas sumirem fora da seção */
+.size-chart-table td {
+    color: var(--primary-purple);
 }
 
-.sakura-container {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 0;
+.btn-size-chart {
+    background: var(--primary-purple);
+    color: var(--text-primary);
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 25px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition-fast);
+    margin-top: 1rem;
 }
 
-.petal {
-    position: absolute;
-    top: -10%; /* Começa fora da tela, no topo */
-    
-    /* Código do SVG da pétala diretamente no CSS */
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 50'%3E%3Cpath fill='%23C4B5FD' d='M25 0 C20 -5, 5 15, 25 50 C45 15, 30 -5, 25 0 Z'/%3E%3C/svg%3E");
-    background-size: contain;
-    background-repeat: no-repeat;
-    
-    /* Aplica a animação com loop infinito */
-    animation: fall-and-flutter infinite linear;
-}
-
-/* 
-  A MÁGICA DA NATURALIDADE: 
-  Damos a cada pétala um tamanho, posição inicial, velocidade (duração) 
-  e atraso diferentes para que o efeito não pareça robótico.
-*/
-.petal:nth-child(1) { width: 20px; height: 20px; left: 10%; animation-duration: 15s; animation-delay: -5s; }
-.petal:nth-child(2) { width: 15px; height: 15px; left: 20%; animation-duration: 10s; animation-delay: -10s; }
-.petal:nth-child(3) { width: 25px; height: 25px; left: 30%; animation-duration: 20s; animation-delay: -3s; }
-.petal:nth-child(4) { width: 18px; height: 18px; left: 40%; animation-duration: 13s; animation-delay: -13s; }
-.petal:nth-child(5) { width: 22px; height: 22px; left: 50%; animation-duration: 18s; animation-delay: -8s; }
-.petal:nth-child(6) { width: 16px; height: 16px; left: 60%; animation-duration: 12s; animation-delay: -2s; }
-.petal:nth-child(7) { width: 30px; height: 30px; left: 70%; animation-duration: 17s; animation-delay: -17s; }
-.petal:nth-child(8) { width: 15px; height: 15px; left: 80%; animation-duration: 9s; animation-delay: -7s; }
-.petal:nth-child(9) { width: 20px; height: 20px; left: 90%; animation-duration: 16s; animation-delay: -1s; }
-.petal:nth-child(10) { width: 25px; height: 25px; left: 5%; animation-duration: 22s; animation-delay: -15s; }
-.petal:nth-child(11) { width: 18px; height: 18px; left: 85%; animation-duration: 14s; animation-delay: -11s; }
-.petal:nth-child(12) { width: 16px; height: 16px; left: 45%; animation-duration: 19s; animation-delay: -4s; }
-
-/* Garante que o conteúdo dos produtos fique na frente da animação */
-.featured-products .container {
-    position: relative;
-    z-index: 1;
+.btn-size-chart:hover {
+    background: var(--secondary-purple);
+    transform: translateY(-2px);
 }

@@ -71,19 +71,22 @@ if (!function_exists('is_active')) {
 				<li><a href="contato.php" class="nav-link <?php echo is_active('contato.php', $current); ?>">Contato</a></li>
 			</ul>
 			<div class="nav-icons">
-			<div class="profile-dropdown-wrapper">
-			    <a href="#" class="nav-icon-link" aria-label="Login" style="pointer-events: none;"><i class="fas fa-user"></i></a>
-			    <div class="profile-dropdown-menu">
-			        <div class="dropdown-header">
-			            <img src="../assets/img/avatar.png" alt="Avatar" class="dropdown-avatar">
-			            <div><div class="dropdown-user-name">Seu Nome</div><div class="dropdown-user-email">seu@email.com</div></div>
-			        </div>
-	                <ul class="dropdown-links">
-	            	    <li class="dropdown-link-item"><a href="perfil.php"><i class="fas fa-id-card"></i> Visualizar Perfil</a></li>
-	            	    <li class="dropdown-link-item"><a href="login.php"><i class="fas fa-sign-in-alt"></i> Logar</a></li>
-	            	</ul>
-			    </div>
-			</div>
+				<div class="profile-dropdown-wrapper">
+					<a href="login.php" class="nav-icon-link" aria-label="Login"><i class="fas fa-user"></i></a>
+					<div class="profile-dropdown-menu">
+						<div class="dropdown-header">
+							<img src="../assets/img/avatar.png" alt="Avatar" class="dropdown-avatar">
+							<div>
+								<div class="dropdown-user-name">Seu Nome</div>
+								<div class="dropdown-user-email">seu@email.com</div>
+							</div>
+						</div>
+						<ul class="dropdown-links">
+							<li class="dropdown-link-item"><a href="perfil.php"><i class="fas fa-id-card"></i> Visualizar Perfil</a></li>
+							<li class="dropdown-link-item"><a href="configuracoes.php"><i class="fas fa-cog"></i> Configurações</a></li>
+						</ul>
+					</div>
+				</div>
 				<a href="carrinho.php" class="nav-icon-link" aria-label="Carrinho"><i class="fas fa-shopping-bag"></i></a>
 			</div>
 		</div>
@@ -131,8 +134,7 @@ if (!function_exists('is_active')) {
 					<button type="submit" class="btn-cta">Adicionar ao carrinho</button>
 					<button type="button" id="favBtn" class="btn-fav" aria-pressed="false" title="Favoritar">♡</button>
 				</div>	
-
-				<div class="note">Disponível no checkout com parcelamento</div>
+				<button type="button" class="btn-size-chart" id="openSizeChart">Ver Tabela de Tamanhos</button>
 
 				<section class="description">
 					<h3>Descrição completa</h3>
@@ -142,6 +144,49 @@ if (!function_exists('is_active')) {
 		</aside>
 	</div>
 </main>
+
+<!-- Modal para Tabela de Tamanhos -->
+<div class="size-chart-modal" id="sizeChartModal">
+    <div class="size-chart-content">
+        <button class="close-size-chart" id="closeSizeChart">&times;</button>
+        <table class="size-chart-table" id="shirtSizeChart">
+            <caption>Tabela de Tamanhos - Camisas</caption>
+            <thead>
+                <tr>
+                    <th>Tamanho</th>
+                    <th>Peito (cm)</th>
+                    <th>Cintura (cm)</th>
+                    <th>Comprimento (cm)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>P</td><td>88-92</td><td>76-80</td><td>65</td></tr>
+                <tr><td>M</td><td>93-97</td><td>81-85</td><td>68</td></tr>
+                <tr><td>G</td><td>98-102</td><td>86-90</td><td>71</td></tr>
+                <tr><td>GG</td><td>103-107</td><td>91-95</td><td>74</td></tr>
+                <tr><td>XG</td><td>108-112</td><td>96-100</td><td>77</td></tr>
+            </tbody>
+        </table>
+        <table class="size-chart-table" id="pantsSizeChart">
+            <caption>Tabela de Tamanhos - Calças</caption>
+            <thead>
+                <tr>
+                    <th>Tamanho</th>
+                    <th>Cintura (cm)</th>
+                    <th>Quadril (cm)</th>
+                    <th>Comprimento (cm)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>P</td><td>70-74</td><td>88-92</td><td>100</td></tr>
+                <tr><td>M</td><td>75-79</td><td>93-97</td><td>103</td></tr>
+                <tr><td>G</td><td>80-84</td><td>98-102</td><td>106</td></tr>
+                <tr><td>GG</td><td>85-89</td><td>103-107</td><td>109</td></tr>
+                <tr><td>XG</td><td>90-94</td><td>108-112</td><td>112</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
 
 <!-- Footer -->
 <footer class="footer">
@@ -218,6 +263,59 @@ if (!function_exists('is_active')) {
   60% { transform: scale(0.9); }
   100% { transform: scale(1); }
 }
+
+/* Estilos para o modal da tabela de tamanhos */
+.size-chart-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+}
+
+.size-chart-content {
+  background: #1e1e2e;
+  padding: 2rem;
+  border-radius: 8px;
+  position: relative;
+  max-width: 90%;
+  margin: 0 auto;
+  color: #e0e0e0;
+}
+
+.size-chart-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+.size-chart-table th,
+.size-chart-table td {
+  padding: 0.75rem;
+  text-align: center;
+  border: 1px solid #444;
+}
+
+.size-chart-table th {
+  background: #333;
+  color: #f0f0f0;
+}
+
+.close-size-chart {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  color: #e63946;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
 </style>
 <script>
 // Corrige adicionar ao carrinho, favoritar e troca de imagem
@@ -289,6 +387,30 @@ document.addEventListener('DOMContentLoaded', function() {
 			});
 		});
 	}
+
+	// --- Abrir e fechar modal da tabela de tamanhos ---
+	const sizeChartModal = document.getElementById('sizeChartModal');
+	const openSizeChartBtn = document.getElementById('openSizeChart');
+	const closeSizeChartBtn = document.getElementById('closeSizeChart');
+
+	if (openSizeChartBtn && sizeChartModal) {
+		openSizeChartBtn.addEventListener('click', function() {
+			sizeChartModal.style.display = 'flex';
+		});
+	}
+
+	if (closeSizeChartBtn && sizeChartModal) {
+		closeSizeChartBtn.addEventListener('click', function() {
+			sizeChartModal.style.display = 'none';
+		});
+	}
+
+	// Fechar modal ao clicar fora do conteúdo
+	window.addEventListener('click', function(event) {
+		if (event.target === sizeChartModal) {
+			sizeChartModal.style.display = 'none';
+		}
+	});
 });
 </script>
 </html>

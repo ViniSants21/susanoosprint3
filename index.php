@@ -51,18 +51,18 @@
                 </ul>
                 <div class="nav-icons">
                     <div class="profile-dropdown-wrapper">
-                    <a href="#" class="nav-icon-link" aria-label="Login" style="pointer-events: none;"><i class="fas fa-user"></i></a>
-                    <div class="profile-dropdown-menu">
-                        <div class="dropdown-header">
-                            <img src="assets/img/avatar.png" alt="Avatar" class="dropdown-avatar">
-                            <div><div class="dropdown-user-name">Seu Nome</div><div class="dropdown-user-email">seu@email.com</div></div>
+                        <a href="php/login.php" class="nav-icon-link" aria-label="Login"><i class="fas fa-user"></i></a>
+                        <div class="profile-dropdown-menu">
+                            <div class="dropdown-header">
+                                <img src="assets/img/avatar.png" alt="Avatar" class="dropdown-avatar">
+                                <div><div class="dropdown-user-name">Seu Nome</div><div class="dropdown-user-email">seu@email.com</div></div>
+                            </div>
+                            <ul class="dropdown-links">
+                                <li class="dropdown-link-item"><a href="php/perfil.php"><i class="fas fa-id-card"></i> Visualizar Perfil</a></li>
+                                <li class="dropdown-link-item"><a href="php/configuracoes.php"><i class="fas fa-cog"></i> Configurações</a></li>
+                            </ul>
                         </div>
-                        <ul class="dropdown-links">
-                            <li class="dropdown-link-item"><a href="php/perfil.php"><i class="fas fa-id-card"></i> Visualizar Perfil</a></li>
-                            <li class="dropdown-link-item"><a href="php/login.php"><i class="fas fa-sign-in-alt"></i> Logar</a></li>
-                        </ul>
                     </div>
-                </div>
                     <a href="php/carrinho.php" class="nav-icon-link" aria-label="Carrinho"><i class="fas fa-shopping-bag"></i></a>
                 </div>
             </div>
@@ -107,7 +107,7 @@
     </div>
 </div>
             <h2>Susanoo</h2>
-            <p>Estilo que domina</p>
+            <p>Esilo que domina</p>
             <a href="php/produtos.php" class="btn-shop">Compre Agora</a>
             <div class="banner-social-icons">
                 <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>

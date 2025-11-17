@@ -377,4 +377,38 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Console easter egg
     console.log("Susanoo Site Loaded Successfully!");
+
+    // --- LÓGICA DO MODAL DA TABELA DE TAMANHOS ---
+    const openSizeChartButton = document.getElementById('openSizeChart');
+    const closeSizeChartButton = document.getElementById('closeSizeChart');
+    const sizeChartModal = document.getElementById('sizeChartModal');
+    const shirtSizeChart = document.getElementById('shirtSizeChart');
+    const pantsSizeChart = document.getElementById('pantsSizeChart');
+
+    if (openSizeChartButton && closeSizeChartButton && sizeChartModal) {
+        openSizeChartButton.addEventListener('click', () => {
+            const productCategory = document.querySelector('input[name="product_category"]').value;
+            if (productCategory === 'camisas') {
+                shirtSizeChart.style.display = 'table';
+                pantsSizeChart.style.display = 'none';
+            } else if (productCategory === 'calcas') {
+                shirtSizeChart.style.display = 'none';
+                pantsSizeChart.style.display = 'table';
+            } else {
+                shirtSizeChart.style.display = 'none';
+                pantsSizeChart.style.display = 'none';
+            }
+            sizeChartModal.classList.add('visible');
+        });
+
+        closeSizeChartButton.addEventListener('click', () => {
+            sizeChartModal.classList.remove('visible');
+        });
+
+        window.addEventListener('click', (e) => {
+            if (e.target === sizeChartModal) {
+                sizeChartModal.classList.remove('visible');
+            }
+        });
+    }
 });
