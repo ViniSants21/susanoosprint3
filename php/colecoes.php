@@ -312,7 +312,7 @@ if (!function_exists('is_active')) {
     <div class="container">
         <header class="section-header">
             <h1 class="section-title">Nossas Coleções</h1>
-            <p class="section-subtitle">Mergulhe em universos de estilo únicos, criados para cada momento. Cada peça é uma nova forma de expressar seu poder interior.</p>
+            <p class="section-subtitle">Mergulhe em universos de estilos únicos, criados para cada momento. Cada peça é uma nova forma de expressar seu poder interior.</p>
         </header>
 
         <div class="collections-grid-container">
