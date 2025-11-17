@@ -33,6 +33,31 @@
             color:inherit; display:inline-flex; align-items:center; justify-content:center;
         }
         .nav-search .nav-search-btn .fa-search { font-size:0.95rem; }
+         /* --- Banner Promocional --- */
+        .promo-banner-section {
+            width: 100vw;
+            position: relative;
+            left: 50%;
+            right: 50%;
+            margin-left: -50vw;
+            margin-right: -50vw;
+            margin-top: -11px;
+            height: 500px; 
+            margin-bottom: -180px; /* Sobrepõe o conteúdo principal levemente */
+            overflow: hidden;
+        }
+        .promo-banner-link {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        .promo-banner-image {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: cover;
+            object-position: center;
+        }
     </style>
 </head>
 
@@ -93,6 +118,14 @@ if (!function_exists('is_active')) {
             <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
         </div>
     </nav>
+
+    <!-- Banner -->
+<section class="promo-banner-section">
+    <a href="#" class="promo-banner-link" aria-label="Ver promoção especial">
+        <img src="../assets/img/sublimec.png" alt="Banner promocional da nova coleção" class="promo-banner-image">
+    </a>
+
+</section>
 
     <!-- Cabeçalho -->
     <section class="page-header">

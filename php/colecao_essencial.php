@@ -20,6 +20,33 @@
         .nav-search input[type="text"]{padding:.45rem .75rem;border-radius:24px;border:1px solid rgba(0,0,0,.08);background:transparent;color:inherit;min-width:160px}
         .nav-search .nav-search-btn{border:none;background:transparent;padding:.35rem;border-radius:50%;cursor:pointer;color:inherit;display:inline-flex;align-items:center;justify-content:center}
         .nav-search .nav-search-btn .fa-search{font-size:0.95rem}
+
+         /* --- Banner Promocional --- */
+        .promo-banner-section {
+            width: 100vw;
+            position: relative;
+            left: 50%;
+            right: 50%;
+            margin-left: -50vw;
+            margin-right: -50vw;
+            margin-top: -11px;
+            height: 500px; 
+            margin-bottom: -180px; /* Sobrepõe o conteúdo principal levemente */
+            overflow: hidden;
+        }
+        .promo-banner-link {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        .promo-banner-image {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: cover;
+            object-position: center;
+        }
+
     </style>
 </head>
 
@@ -81,6 +108,14 @@ if (!function_exists('is_active')) {
         <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
     </div>
 </nav>
+
+<!-- Banner -->
+<section class="promo-banner-section">
+    <a href="#" class="promo-banner-link" aria-label="Ver promoção especial">
+        <img src="../assets/img/essentials.png" alt="Banner promocional da nova coleção" class="promo-banner-image">
+    </a>
+</section>
+
 
 <!-- Cabeçalho -->
 <section class="page-header">

@@ -1,10 +1,10 @@
 # 須佐能乎 SUSANOO - Website Oficial
 
-Site oficial da marca Susanoo, inspirado no design da Nike com identidade oriental única.
+Site oficial da marca Susanoo, inspirado no estilo japonês identidade oriental única.
 
 ## ✨ Características
 
-- **Design Inspirado na Nike**: Layout moderno e profissional
+- **Design Inspirado no Estilo Japonês**: Layout moderno e profissional
 - **Identidade Oriental**: Elementos visuais japoneses elegantes
 - **Paleta Roxa/Lilás**: Cores modernas e sofisticadas
 - **Totalmente Responsivo**: Funciona perfeitamente em todos os dispositivos
@@ -50,7 +50,7 @@ susanoo-website/
 Edite o arquivo `php/contact.php`:
 
 ```php
-$to = "seu@email.com"; // Altere para seu email
+$to = "contatosusanoo@susanoo.com"; 
 ```
 
 ### Recursos do Formulário:
@@ -115,9 +115,8 @@ $to = "seu@email.com"; // Altere para seu email
 
 ### Efeitos Orientais:
 - 🎌 Círculos decorativos rotativos
-- 🎌 Gradientes inspirados no pôr do sol japonês
 - 🎌 Tipografia com referências orientais
-- 🎌 Ícones de valores em kanji
+- 🎌 Ícones de kanji
 - 🎌 Elementos flutuantes suaves
 
 ## 📱 Responsividade
@@ -133,8 +132,8 @@ Breakpoints:
 Altere as variáveis CSS em `style.css`:
 ```css
 :root {
-    --primary-purple: #SuaCor;
-    --secondary-purple: #SuaCor;
+    --primary-purple: #7C3AED;
+    --secondary-purple: #A78BFA;
     /* ... */
 }
 ```
@@ -175,11 +174,9 @@ Fontes utilizadas:
 ## 📞 Suporte
 
 Para dúvidas ou customizações:
-- Email: contato@susanoo.com.br
+- Email: susanoocontato@susanoo.com.br
 - Site: [www.susanoo.com.br](http://www.susanoo.com.br)
 
 ---
 
 **須佐能乎 SUSANOO** - Onde a tradição oriental encontra o design moderno.
-
-*Desenvolvido com ❤️ e inspiração japonesa*

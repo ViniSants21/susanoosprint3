@@ -21,6 +21,12 @@
         @media (prefers-color-scheme: dark){
             .nav-search input[type="text"]{border:1px solid rgba(255,255,255,.08)}
         }
+        
+        /* CORREÇÃO: Estilos para remover sublinhado dos links de redes sociais */
+        .social-links a, /* Para os links de texto no footer */
+        .social-links-contact a { /* Para os ícones na seção de contato */
+            text-decoration: none;
+        }
     </style>
  
     <!-- Remover o CSS do SweetAlert2 -->
@@ -120,28 +126,28 @@
                             <span class="info-icon"><i class="fas fa-envelope"></i></span>
                             <div class="info-text">
                                 <strong>E-mail</strong>
-                                <a href="mailto:contato@susanoo.com">contato@susanoo.com</a>
+                                <a href="mailto:contato@susanoo.com">contatosusanoo@susanoo.com</a>
                             </div>
                         </li>
                         <li>
                             <span class="info-icon"><i class="fas fa-phone-alt"></i></span>
                             <div class="info-text">
                                 <strong>Telefone</strong>
-                                <a href="tel:+5511999998888">+55 (11) 99999-8888</a>
+                                <a href="tel:+5512999998888">+55 (12) 99703-5066</a>
                             </div>
                         </li>
                         <li>
                             <span class="info-icon"><i class="fas fa-map-marker-alt"></i></span>
                             <div class="info-text">
                                 <strong>Endereço</strong>
-                                <p>Rua da Harmonia, 123, São Paulo - SP</p>
+                                <p>Av. Monsenhor Theodomiro Lobo, 100 - Parque Res. Maria Elmira, Caçapava - SP</p>
                             </div>
                         </li>
                     </ul>
                     <div class="social-links-contact">
                         <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
                         <a href="#" title="Facebook"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" title="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" title="X (Twitter)"><i class="fab fa-x-twitter"></i></a> 
                     </div>
                 </div>
             </div>
