@@ -86,13 +86,9 @@ if (!function_exists('is_active')) {
 
                         <div class="profile-dropdown-menu">
                             <ul class="dropdown-links">
-                                <li class="dropdown-link-item">
-                                <a href="php/registro.php"><i class="fas fa-user-plus"></i> Registrar</a>
-                                </li>
-                                <li class="dropdown-link-item">
-                                    <a href="php/login.php"><i class="fas fa-sign-in-alt"></i> Login</a>
-                                </li>
-                            </ul>
+                            <li class="dropdown-link-item"><a href="registro.php"><i class="fas fa-user-plus"></i> Registrar</a></li>
+                            <li class="dropdown-link-item"><a href="login.php"><i class="fas fa-sign-in-alt"></i> Logar</a></li>
+                        </ul>
                         </div>
 
 
