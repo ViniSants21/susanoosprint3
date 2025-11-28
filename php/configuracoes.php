@@ -45,18 +45,53 @@ if (!function_exists('is_active')) {
                 </ul>
                 <div class="nav-icons">
                     <div class="profile-dropdown-wrapper">
-                        <a href="#" class="nav-icon-link" aria-label="Login" style="pointer-events: none;"><i class="fas fa-user"></i></a>
+                        <?php if (!isset($_SESSION)) { session_start(); } ?>
+                        <?php if (!isset($_SESSION['user_id'])): ?>
+                    <!-- USUÁRIO DESLOGADO -->
+                        <a href="php/login.php" class="nav-icon-link" aria-label="Login">
+                        <i class="fas fa-user"></i>
+                        </a>
+
+
                         <div class="profile-dropdown-menu">
-                            <div class="dropdown-header">
-                                <img src="../assets/img/avatar.png" alt="Avatar" class="dropdown-avatar">
-                                <div><div class="dropdown-user-name">Seu Nome</div><div class="dropdown-user-email">seu@email.com</div></div>
-                            </div>
                             <ul class="dropdown-links">
-                                <li class="dropdown-link-item"><a href="perfil.php"><i class="fas fa-id-card"></i> Visualizar Perfil</a></li>
-                                <li class="dropdown-link-item"><a href="login.php"><i class="fas fa-sign-in-alt"></i> Logar</a></li>
+                                <li class="dropdown-link-item">
+                                <a href="php/registro.php"><i class="fas fa-user-plus"></i> Registrar</a>
+                                </li>
+                                <li class="dropdown-link-item">
+                                    <a href="php/login.php"><i class="fas fa-sign-in-alt"></i> Login</a>
+                                </li>
                             </ul>
                         </div>
-                    </div>
+
+
+                    <?php else: ?>
+                    <!-- USUÁRIO LOGADO -->
+                    <a href="#" class="nav-icon-link" aria-label="Perfil">
+                    <img src="<?php echo $_SESSION['foto']; ?>"
+                    class="dropdown-avatar"
+                    style="width:28px; height:28px; border-radius:50%; object-fit:cover;">
+                    </a>
+
+
+<div class="profile-dropdown-menu">
+<div class="dropdown-header">
+<img src="<?php echo $_SESSION['foto']; ?>" alt="Avatar" class="dropdown-avatar">
+<div>
+<div class="dropdown-user-name"><?php echo $_SESSION['nome']; ?></div>
+<div class="dropdown-user-email"><?php echo $_SESSION['email']; ?></div>
+</div>
+</div>
+
+
+<ul class="dropdown-links">
+<li class="dropdown-link-item"><a href="php/perfil.php"><i class="fas fa-id-card"></i> Visualizar Perfil</a></li>
+<li class="dropdown-link-item"><a href="php/configuracoes.php"><i class="fas fa-cog"></i> Configurações</a></li>
+<li class="dropdown-link-item"><a href="../php/logout.php"><i class="fas fa-sign-out-alt"></i> Sair</a></li>
+</ul>
+</div>
+<?php endif; ?>
+</div>
                     <a href="carrinho.php" class="nav-icon-link" aria-label="Carrinho"><i class="fas fa-shopping-bag"></i></a>
                 </div>
             </div>
@@ -109,22 +144,7 @@ if (!function_exists('is_active')) {
                         </div>
                     </section>
 
-                    <!-- Seção de Privacidade -->
-                    <section class="settings-panel active">
-                        <h2>Privacidade</h2>
-                        <div class="form-group-settings">
-                            <label class="checkbox-label">
-                                <input type="checkbox">
-                                <span>Manter meu perfil privado</span>
-                            </label>
-                        </div>
-                        <div class="form-group-settings">
-                            <label class="checkbox-label">
-                                <input type="checkbox" checked>
-                                <span>Permitir que outros usuários me encontrem</span>
-                            </label>
-                        </div>
-                    </section>
+                  
 
                     <!-- Zona de Perigo -->
                     <section class="settings-panel active danger-zone">

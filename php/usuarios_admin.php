@@ -1,3 +1,40 @@
+<?php
+require_once __DIR__ . '/conexao.php';
+
+// Handle deletion request via GET parameter delete_id (simple approach)
+if (isset($_GET['delete_id'])) {
+    $delete_id = intval($_GET['delete_id']);
+    if ($delete_id > 0) {
+        $stmtDel = $conn->prepare("DELETE FROM users WHERE id = ?");
+        if ($stmtDel) {
+            $stmtDel->bind_param('i', $delete_id);
+            if ($stmtDel->execute()) {
+                $stmtDel->close();
+                header('Location: usuarios_admin.php?msg=deleted');
+                exit;
+            } else {
+                $stmtDel->close();
+                $error_msg = 'Erro ao excluir usuário.';
+            }
+        } else {
+            $error_msg = 'Erro na preparação da query de exclusão.';
+        }
+    } else {
+        $error_msg = 'ID inválido.';
+    }
+}
+
+// Fetch users
+$users = [];
+$sql = "SELECT id, nome, email, foto, created_at FROM users ORDER BY created_at DESC";
+$res = $conn->query($sql);
+if ($res) {
+    while ($row = $res->fetch_assoc()) {
+        $users[] = $row;
+    }
+    $res->free();
+}
+?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -15,6 +52,7 @@
         })();
     </script>
     <style>
+        /* Copiado do estilo usado em produtos_admin.php para manter consistência visual */
         /* ===== ESTILOS DO PAINEL ADMIN ===== */
         .admin-dashboard {
             background-color: var(--bg-primary);
@@ -124,7 +162,7 @@
             gap: 1rem;
         }
         
-        /* Usuários */
+        /* Usuários (ajustes específicos) */
         .products-header {
             display: flex;
             justify-content: space-between;
@@ -182,6 +220,7 @@
             padding: 1.2rem 1rem;
             border-bottom: 1px solid var(--border-color);
             color: var(--text-secondary);
+            vertical-align: middle;
         }
         
         .data-table tr:last-child td {
@@ -190,45 +229,6 @@
         
         .data-table tr:hover {
             background: rgba(139, 92, 246, 0.02);
-        }
-        
-        .status-badge {
-            padding: 0.4rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-        
-        .status-active {
-            background: rgba(16, 185, 129, 0.2);
-            color: var(--success);
-        }
-        
-        .status-inactive {
-            background: rgba(239, 68, 68, 0.2);
-            color: var(--error);
-        }
-        
-        .role-badge {
-            padding: 0.3rem 0.8rem;
-            border-radius: 15px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-        
-        .role-admin {
-            background: rgba(139, 92, 246, 0.2);
-            color: var(--primary-purple);
-        }
-        
-        .role-user {
-            background: rgba(16, 185, 129, 0.2);
-            color: var(--success);
-        }
-        
-        .role-moderator {
-            background: rgba(245, 158, 11, 0.2);
-            color: var(--warning);
         }
         
         .action-buttons {
@@ -250,4 +250,159 @@
         }
         
         .btn-edit {
-            background:
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+        }
+        
+        .btn-delete {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--error);
+        }
+        
+        .btn-view {
+            background: rgba(139, 92, 246, 0.1);
+            color: var(--primary-purple);
+        }
+        
+        .btn-edit:hover { background: #3b82f6; color: white; }
+        .btn-delete:hover { background: var(--error); color: white; }
+        .btn-view:hover { background: var(--primary-purple); color: white; }
+
+        .user-info { display:flex; align-items:center }
+        .user-avatar { width:50px; height:50px; border-radius:10px; object-fit:cover; margin-right:1rem }
+        .user-details h4 { margin:0 0 0.2rem 0; color:var(--text-primary) }
+        .user-details span { font-size:0.85rem; color:var(--text-muted) }
+
+        @media (max-width: 1024px) {
+            .admin-container { flex-direction: column }
+            .admin-sidebar { width:100%; margin-right:0; margin-bottom:2rem; position:static }
+        }
+    </style>
+</head>
+<body class="admin-dashboard">
+
+<!-- Navbar (mesmo do produtos_admin.php) -->
+<nav class="navbar scrolled" id="navbar">
+    <div class="nav-container">
+        <div class="nav-search">
+            <input type="text" placeholder="Pesquisar...">
+        </div>
+        <div class="nav-logo">
+            <img src="../assets/logo.png" alt="Susanoo">
+        </div>
+        <div class="nav-right-group">
+            <ul class="nav-menu">
+                <li><a href="../index.php" class="nav-link">Início</a></li>
+                <li><a href="../produtos.php" class="nav-link">Produtos</a></li>
+                <li><a href="../sobre.php" class="nav-link">Sobre</a></li>
+                <li><a href="../contato.php" class="nav-link">Contato</a></li>
+            </ul>
+            <div class="nav-icons">
+                <a href="#" class="nav-icon-link"><i class="fas fa-shopping-cart"></i></a>
+                <a href="#" class="nav-icon-link"><i class="fas fa-user"></i></a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="admin-container">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+        <div class="admin-logo">
+            <h2>Susanoo Admin</h2>
+            <span>Painel de Controle</span>
+        </div>
+        <ul class="admin-nav">
+            <li><a href="admin.php"><i class="fas fa-chart-pie"></i> Dashboard</a></li>
+            <li><a href="produtos_admin.php"><i class="fas fa-box"></i> Produtos</a></li>
+            <li><a href="usuarios_admin.php" class="active"><i class="fas fa-users"></i> Usuários</a></li>
+            <li><a href="#"><i class="fas fa-shopping-cart"></i> Pedidos</a></li>
+            <li><a href="#"><i class="fas fa-chart-line"></i> Relatórios</a></li>
+            <li><a href="#"><i class="fas fa-cog"></i> Configurações</a></li>
+            <li><a href="../index.php"><i class="fas fa-sign-out-alt"></i> Voltar ao Site</a></li>
+        </ul>
+    </aside>
+
+    <!-- Conteúdo Principal -->
+    <main class="admin-main">
+        <div class="admin-header">
+            <h1 class="admin-title">Gerenciar Usuários</h1>
+            <div class="admin-actions">
+                <!-- ações futuras -->
+            </div>
+        </div>
+
+        <div class="products-header">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Pesquisar usuários..." id="search-users">
+            </div>
+        </div>
+
+        <div class="data-table">
+            <?php if (!empty(isset($_GET['msg']) && $_GET['msg'] === 'deleted')): ?>
+                <div style="padding:12px;color:green">Usuário excluído com sucesso.</div>
+            <?php endif; ?>
+            <?php if (!empty($error_msg)): ?>
+                <div style="padding:12px;color:#b91c1c"><?php echo htmlspecialchars($error_msg); ?></div>
+            <?php endif; ?>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Usuário</th>
+                        <th>Email</th>
+                        <th>Criado em</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (count($users) === 0): ?>
+                        <tr><td colspan="4">Nenhum usuário encontrado.</td></tr>
+                    <?php else: ?>
+                        <?php foreach ($users as $u): ?>
+                            <?php
+                                $foto = $u['foto'] ? $u['foto'] : '';
+                                $imgSrc = $foto ? '../' . ltrim($foto, '/\\') : '../assets/img/no-avatar.png';
+                            ?>
+                            <tr>
+                                <td>
+                                    <div class="user-info">
+                                        <img src="<?php echo htmlspecialchars($imgSrc); ?>" alt="avatar" class="user-avatar" onerror="this.src='../assets/img/no-avatar.png'">
+                                        <div class="user-details">
+                                            <h4><?php echo htmlspecialchars($u['nome']); ?></h4>
+                                            <span>ID: <?php echo intval($u['id']); ?></span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><?php echo htmlspecialchars($u['email']); ?></td>
+                                <td><?php echo htmlspecialchars($u['created_at']); ?></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <a href="mailto:<?php echo htmlspecialchars($u['email']); ?>" class="btn-icon btn-view" title="Enviar email"><i class="fas fa-envelope"></i></a>
+                                        <a href="?delete_id=<?php echo intval($u['id']); ?>" onclick="return confirm('Confirmar exclusão deste usuário?');" class="btn-icon btn-delete" title="Excluir"><i class="fas fa-trash"></i></a>
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </main>
+</div>
+
+<script src="../js/script.js"></script>
+<script>
+    // Pesquisa client-side rápida
+    document.getElementById('search-users').addEventListener('input', function(){
+        const q = this.value.toLowerCase();
+        document.querySelectorAll('.data-table tbody tr').forEach(row => {
+            const name = row.querySelector('.user-details h4') ? row.querySelector('.user-details h4').textContent.toLowerCase() : '';
+            const email = row.cells[1] ? row.cells[1].textContent.toLowerCase() : '';
+            if (name.includes(q) || email.includes(q)) row.style.display = '';
+            else row.style.display = 'none';
+        });
+    });
+</script>
+</body>
+</html>

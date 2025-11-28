@@ -1,3 +1,40 @@
+<?php
+session_start();
+require 'conexao.php';
+
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+$email = $_POST['email'];
+$senha = $_POST['senha'];
+
+
+$stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
+$stmt->bind_param("s", $email);
+$stmt->execute();
+$result = $stmt->get_result();
+
+
+if ($result->num_rows === 1) {
+$user = $result->fetch_assoc();
+
+
+if (password_verify($senha, $user['senha'])) {
+$_SESSION['user_id'] = $user['id'];
+$_SESSION['nome'] = $user['nome'];
+$_SESSION['email'] = $user['email'];
+$_SESSION['foto'] = $user['foto'];
+
+
+header("Location: ../index.php");
+exit;
+} else {
+echo "<p style='color:red'>Senha incorreta</p>";
+}
+} else {
+echo "<p style='color:red'>Email não encontrado</p>";
+}
+}
+?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -114,32 +151,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const reader = new FileReader();
             reader.onload = function(ev) { avatarPreview.src = ev.target.result; };
             reader.readAsDataURL(f);
-        });
-    }
-
-    // Lógica do "Login Mágico" do Admin
-    const form = document.querySelector('.login-form');
-    if (form) {
-        form.addEventListener('submit', function(e) {
-            e.preventDefault(); // Impede o envio real do formulário
-            const emailInput = form.querySelector('input[name="email"]');
-            const passwordInput = form.querySelector('input[name="password"]');
-
-            if (emailInput && passwordInput) {
-                const email = emailInput.value;
-                const password = passwordInput.value;
-
-                if (email === 'admin@susanoo.com' && password === 'admin123') {
-                    localStorage.setItem('userRole', 'admin'); // Salva o status de admin
-                    window.location.href = 'admin.php'; // Redireciona para o dashboard
-                } else {
-                    // Lógica para usuário normal (será implementada com o backend)
-                    alert('Login de usuário normal! (Funcionalidade a ser implementada)');
-                    // Exemplo: Salvar login de usuário normal
-                    // localStorage.setItem('userRole', 'customer');
-                    // window.location.href = 'perfil.php'; 
-                }
-            }
         });
     }
 });

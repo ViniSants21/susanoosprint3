@@ -1,3 +1,190 @@
+<?php
+// Processamento de produtos: conectar, inserir, atualizar, excluir
+require_once 'conexao.php';
+
+function find_products_table($conn) {
+    $candidates = ['products', 'produtos', 'produts'];
+    foreach ($candidates as $t) {
+        $res = $conn->query("SHOW TABLES LIKE '" . $conn->real_escape_string($t) . "'");
+        if ($res && $res->num_rows > 0) return $t;
+    }
+    // fallback
+    return 'products';
+}
+
+$table = find_products_table($conn);
+
+// Handle POST actions (save = insert/update, delete)
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $action = $_POST['action'] ?? '';
+
+    if ($action === 'save') {
+        $id = !empty($_POST['product_id']) ? intval($_POST['product_id']) : null;
+        $name = $_POST['product-name'] ?? '';
+        $sku = $_POST['product-sku'] ?? '';
+        $category = $_POST['product-category'] ?? '';
+        $status = $_POST['product-status'] ?? 'ativo';
+        $price = isset($_POST['product-price']) ? floatval($_POST['product-price']) : 0;
+        $stock = isset($_POST['product-stock']) ? intval($_POST['product-stock']) : 0;
+        $description = $_POST['product-description'] ?? '';
+
+        // Tratamento de upload de imagem (mais robusto e com log)
+        $imagePath = null;
+        if (isset($_FILES['product-image'])) {
+            $file = $_FILES['product-image'];
+            if ($file['error'] === UPLOAD_ERR_OK && !empty($file['tmp_name'])) {
+                $uploadDir = __DIR__ . '/../assets/img/products/';
+                if (!is_dir($uploadDir)) {
+                    mkdir($uploadDir, 0755, true);
+                }
+                $tmp = $file['tmp_name'];
+                $orig = basename($file['name']);
+                $ext = pathinfo($orig, PATHINFO_EXTENSION);
+                $filename = time() . '_' . bin2hex(random_bytes(6)) . ($ext ? ".{$ext}" : '');
+                $dest = $uploadDir . $filename;
+
+                // tentativa principal
+                $moved = @move_uploaded_file($tmp, $dest);
+                if (!$moved) {
+                    // fallback para copy se move_uploaded_file falhar
+                    $copied = @copy($tmp, $dest);
+                    if ($copied) {
+                        $moved = true;
+                        // tentar remover arquivo temporário
+                        @unlink($tmp);
+                    }
+                }
+
+                if ($moved && file_exists($dest)) {
+                    // salvar caminho relativo usado nas views
+                    $imagePath = 'assets/img/products/' . $filename;
+                } else {
+                    // registrar erro para diagnóstico
+                    $err = isset($file['error']) ? $file['error'] : 'unknown';
+                    $log = sprintf("[%s] Upload failed. error=%s tmp=%s dest=%s\n", date('Y-m-d H:i:s'), $err, $tmp, $dest);
+                    @file_put_contents(__DIR__ . '/../assets/img/upload_errors.log', $log, FILE_APPEND);
+                }
+            } elseif (isset($file['error']) && $file['error'] !== UPLOAD_ERR_NO_FILE) {
+                // registrar outros erros (ex: UPLOAD_ERR_INI_SIZE)
+                $log = sprintf("[%s] Upload error code: %s name=%s tmp=%s\n", date('Y-m-d H:i:s'), $file['error'], $file['name'] ?? '', $file['tmp_name'] ?? '');
+                @file_put_contents(__DIR__ . '/../assets/img/upload_errors.log', $log, FILE_APPEND);
+            }
+        }
+
+        // Descobrir colunas existentes na tabela para evitar erros quando colunas faltam
+        $tableCols = [];
+        $resCols = $conn->query("SHOW COLUMNS FROM `$table`");
+        if ($resCols) {
+            while ($c = $resCols->fetch_assoc()) {
+                $tableCols[] = $c['Field'];
+            }
+            $resCols->free();
+        }
+
+        // Mapeamento de campos possíveis e tipos para bind_param
+        // Suporta tanto 'description' quanto 'descricao' como coluna de descrição
+        $allowed = [
+            'name' => 's', 'sku' => 's', 'category' => 's', 'status' => 's',
+            'price' => 'd', 'stock' => 'i', 'description' => 's', 'descricao' => 's', 'image' => 's'
+        ];
+
+        $fields = [];
+        $values = [];
+        $types = '';
+        foreach ($allowed as $col => $typeChar) {
+            if (in_array($col, $tableCols)) {
+                // Não sobrescrever a imagem existente em UPDATE quando nenhum arquivo novo foi enviado
+                if ($col === 'image' && $id && $imagePath === null) {
+                    continue;
+                }
+                $fields[] = $col;
+                $types .= $typeChar;
+                switch ($col) {
+                    case 'name': $values[] = $name; break;
+                    case 'sku': $values[] = $sku; break;
+                    case 'category': $values[] = $category; break;
+                    case 'status': $values[] = $status; break;
+                    case 'price': $values[] = $price; break;
+                    case 'stock': $values[] = $stock; break;
+                    case 'description': $values[] = $description; break;
+                    case 'descricao': $values[] = $description; break;
+                    case 'image': $values[] = $imagePath; break;
+                    default: $values[] = null; break;
+                }
+            }
+        }
+
+        if (empty($fields)) {
+            // Nenhuma coluna mapeada disponível — abortar com mensagem simples
+            header('Location: produtos_admin.php');
+            exit;
+        }
+
+        if ($id) {
+            // UPDATE dinâmico
+            $setParts = [];
+            foreach ($fields as $f) { $setParts[] = "`$f` = ?"; }
+            $sql = "UPDATE `$table` SET " . implode(', ', $setParts) . ", updated_at = NOW() WHERE id = ?";
+            $stmt = $conn->prepare($sql);
+            if ($stmt) {
+                // preparar parâmetros por referência
+                $bindTypes = $types . 'i';
+                $refs = [];
+                $refs[] = &$bindTypes;
+                for ($i = 0; $i < count($values); $i++) { $refs[] = &$values[$i]; }
+                $refs[] = &$id;
+                call_user_func_array(array($stmt, 'bind_param'), $refs);
+                $stmt->execute();
+                // log resultado para diagnóstico de imagem
+                $logLine = sprintf("[%s] UPDATE id=%s imagePath=%s affected=%s err=%s\n", date('Y-m-d H:i:s'), $id, $imagePath ?? 'NULL', $stmt->affected_rows, $stmt->error);
+                @file_put_contents(__DIR__ . '/../assets/img/upload_debug.log', $logLine, FILE_APPEND);
+                $stmt->close();
+            }
+        } else {
+            // INSERT dinâmico
+            $placeholders = implode(', ', array_fill(0, count($fields), '?'));
+            $colsSql = implode(', ', array_map(function($c){ return "`$c`"; }, $fields));
+            $sql = "INSERT INTO `$table` ($colsSql) VALUES ($placeholders)";
+            $stmt = $conn->prepare($sql);
+            if ($stmt) {
+                $bindTypes = $types;
+                $refs = [];
+                $refs[] = &$bindTypes;
+                for ($i = 0; $i < count($values); $i++) { $refs[] = &$values[$i]; }
+                call_user_func_array(array($stmt, 'bind_param'), $refs);
+                $stmt->execute();
+                // log resultado para diagnóstico
+                $insertId = $conn->insert_id;
+                $logLine = sprintf("[%s] INSERT id=%s imagePath=%s affected=%s err=%s\n", date('Y-m-d H:i:s'), $insertId, $imagePath ?? 'NULL', $stmt->affected_rows, $stmt->error);
+                @file_put_contents(__DIR__ . '/../assets/img/upload_debug.log', $logLine, FILE_APPEND);
+                $stmt->close();
+            }
+        }
+
+        header('Location: produtos_admin.php');
+        exit;
+    }
+
+    if ($action === 'delete') {
+        $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
+        if ($id) {
+            $stmt = $conn->prepare("DELETE FROM `$table` WHERE id = ?");
+            $stmt->bind_param('i', $id);
+            $stmt->execute();
+            $stmt->close();
+            // respond for fetch
+            echo json_encode(['success' => true]);
+            exit;
+        }
+        echo json_encode(['success' => false, 'error' => 'ID inválido']);
+        exit;
+    }
+}
+
+// Fetch products for table rendering
+$products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
+
+?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -528,98 +715,40 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>
-                            <div class="user-info">
-                                <img src="../assets/img/IMG3.png" alt="Camisa Brazil" class="user-avatar">
-                                <div class="user-details">
-                                    <h4>Camisa Brazil</h4>
-                                    <span>SKU: CB-001</span>
+                <?php if ($products_result && $products_result->num_rows > 0): ?>
+                    <?php while ($row = $products_result->fetch_assoc()): ?>
+                        <?php $statusClass = (strtolower($row['status']) === 'ativo') ? 'status-active' : 'status-inactive'; ?>
+                        <?php $price = number_format($row['price'], 2, ',', '.'); ?>
+                        <tr data-id="<?php echo $row['id']; ?>" data-image="<?php echo isset($row['image']) ? htmlspecialchars($row['image']) : ''; ?>" data-description="<?php echo isset($row['description']) ? htmlspecialchars($row['description']) : (isset($row['descricao']) ? htmlspecialchars($row['descricao']) : ''); ?>">
+                                <td>
+                                    <div class="user-info">
+                                        <?php $imgSrc = !empty($row['image']) ? '../' . $row['image'] : '../assets/img/placeholder.png'; ?>
+                                        <img src="<?php echo $imgSrc; ?>" alt="<?php echo htmlspecialchars($row['name']); ?>" class="user-avatar">
+                                        <div class="user-details">
+                                            <h4><?php echo htmlspecialchars($row['name']); ?></h4>
+                                            <span>SKU: <?php echo isset($row['sku']) ? htmlspecialchars($row['sku']) : '-'; ?></span>
+                                            <?php $descToShow = isset($row['description']) && $row['description'] !== '' ? $row['description'] : (isset($row['descricao']) ? $row['descricao'] : ''); ?>
+                                            <p class="small-desc" style="margin:4px 0 0 0; color:var(--text-muted); font-size:0.85rem;"><?php echo $descToShow !== '' ? htmlspecialchars(mb_strimwidth($descToShow, 0, 120, '...')) : ''; ?></p>
+                                        </div>
+                                    </div>
+                                </td>
+                            <td><?php echo htmlspecialchars($row['category']); ?></td>
+                            <td><span class="status-badge <?php echo $statusClass; ?>"><?php echo htmlspecialchars($row['status']); ?></span></td>
+                            <td>R$ <?php echo $price; ?></td>
+                            <td><?php echo intval($row['stock']); ?></td>
+                            <td>—</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button data-id="<?php echo $row['id']; ?>" class="btn-icon btn-view" title="Visualizar"><i class="fas fa-eye"></i></button>
+                                    <button data-id="<?php echo $row['id']; ?>" class="btn-icon btn-edit" title="Editar"><i class="fas fa-edit"></i></button>
+                                    <button data-id="<?php echo $row['id']; ?>" class="btn-icon btn-delete" title="Excluir"><i class="fas fa-trash"></i></button>
                                 </div>
-                            </div>
-                        </td>
-                        <td>Camisetas</td>
-                        <td><span class="status-badge status-active">Ativo</span></td>
-                        <td>R$ 99,90</td>
-                        <td>150</td>
-                        <td>128</td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn-icon btn-view" title="Visualizar"><i class="fas fa-eye"></i></button>
-                                <button class="btn-icon btn-edit" title="Editar"><i class="fas fa-edit"></i></button>
-                                <button class="btn-icon btn-delete" title="Excluir"><i class="fas fa-trash"></i></button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div class="user-info">
-                                <img src="../assets/img/Imagem2.png" alt="Moletom Sakura" class="user-avatar">
-                                <div class="user-details">
-                                    <h4>Moletom Sakura</h4>
-                                    <span>SKU: MS-002</span>
-                                </div>
-                            </div>
-                        </td>
-                        <td>Moletons</td>
-                        <td><span class="status-badge status-active">Ativo</span></td>
-                        <td>R$ 249,90</td>
-                        <td>80</td>
-                        <td>94</td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn-icon btn-view" title="Visualizar"><i class="fas fa-eye"></i></button>
-                                <button class="btn-icon btn-edit" title="Editar"><i class="fas fa-edit"></i></button>
-                                <button class="btn-icon btn-delete" title="Excluir"><i class="fas fa-trash"></i></button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div class="user-info">
-                                <img src="../assets/img/IMG5.png" alt="Boné AMATERASU" class="user-avatar">
-                                <div class="user-details">
-                                    <h4>Boné AMATERASU</h4>
-                                    <span>SKU: BA-003</span>
-                                </div>
-                            </div>
-                        </td>
-                        <td>Acessórios</td>
-                        <td><span class="status-badge status-inactive">Inativo</span></td>
-                        <td>R$ 69,90</td>
-                        <td>0</td>
-                        <td>76</td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn-icon btn-view" title="Visualizar"><i class="fas fa-eye"></i></button>
-                                <button class="btn-icon btn-edit" title="Editar"><i class="fas fa-edit"></i></button>
-                                <button class="btn-icon btn-delete" title="Excluir"><i class="fas fa-trash"></i></button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div class="user-info">
-                                <img src="../assets/img/Imagem.png" alt="Coleção Especial" class="user-avatar">
-                                <div class="user-details">
-                                    <h4>Coleção Especial</h4>
-                                    <span>SKU: CE-004</span>
-                                </div>
-                            </div>
-                        </td>
-                        <td>Coleções</td>
-                        <td><span class="status-badge status-active">Ativo</span></td>
-                        <td>R$ 359,90</td>
-                        <td>25</td>
-                        <td>42</td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn-icon btn-view" title="Visualizar"><i class="fas fa-eye"></i></button>
-                                <button class="btn-icon btn-edit" title="Editar"><i class="fas fa-edit"></i></button>
-                                <button class="btn-icon btn-delete" title="Excluir"><i class="fas fa-trash"></i></button>
-                            </div>
-                        </td>
-                    </tr>
+                            </td>
+                        </tr>
+                    <?php endwhile; ?>
+                <?php else: ?>
+                    <tr><td colspan="7">Nenhum produto encontrado.</td></tr>
+                <?php endif; ?>
                 </tbody>
             </table>
         </div>
@@ -633,31 +762,33 @@
             <h3 class="modal-title" id="modal-title">Adicionar Produto</h3>
             <button class="close-modal">&times;</button>
         </div>
-        <form id="product-form">
+        <form id="product-form" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="action" value="save">
+            <input type="hidden" name="product_id" id="product-id" value="">
             <div class="form-group">
                 <label for="product-image">Imagem do Produto</label>
                 <div class="image-upload" id="image-upload">
                     <i class="fas fa-cloud-upload-alt"></i>
                     <p>Clique para fazer upload da imagem</p>
-                    <input type="file" id="product-image" accept="image/*" style="display: none;">
+                    <input type="file" id="product-image" name="product-image" accept="image/*" style="display: none;">
                 </div>
             </div>
             
             <div class="form-row">
                 <div class="form-group">
                     <label for="product-name">Nome do Produto</label>
-                    <input type="text" id="product-name" required>
+                    <input type="text" id="product-name" name="product-name" required>
                 </div>
                 <div class="form-group">
                     <label for="product-sku">SKU</label>
-                    <input type="text" id="product-sku" required>
+                    <input type="text" id="product-sku" name="product-sku">
                 </div>
             </div>
             
             <div class="form-row">
                 <div class="form-group">
                     <label for="product-category">Categoria</label>
-                    <select id="product-category" required>
+                    <select id="product-category" name="product-category" required>
                         <option value="">Selecione uma categoria</option>
                         <option value="camisetas">Camisetas</option>
                         <option value="moletons">Moletons</option>
@@ -667,7 +798,7 @@
                 </div>
                 <div class="form-group">
                     <label for="product-status">Status</label>
-                    <select id="product-status" required>
+                    <select id="product-status" name="product-status" required>
                         <option value="ativo">Ativo</option>
                         <option value="inativo">Inativo</option>
                     </select>
@@ -677,17 +808,17 @@
             <div class="form-row">
                 <div class="form-group">
                     <label for="product-price">Preço (R$)</label>
-                    <input type="number" id="product-price" step="0.01" required>
+                    <input type="number" id="product-price" name="product-price" step="0.01" required>
                 </div>
                 <div class="form-group">
                     <label for="product-stock">Estoque</label>
-                    <input type="number" id="product-stock" required>
+                    <input type="number" id="product-stock" name="product-stock" required>
                 </div>
             </div>
             
             <div class="form-group">
                 <label for="product-description">Descrição</label>
-                <textarea id="product-description" rows="4"></textarea>
+                <textarea id="product-description" name="product-description" rows="4"></textarea>
             </div>
             
             <div class="admin-actions" style="margin-top: 2rem;">
@@ -713,6 +844,8 @@
         document.getElementById('modal-title').textContent = 'Adicionar Produto';
         document.getElementById('product-form').reset();
     });
+
+    // Fechar modal (listener configurado abaixo)
 
     // Fechar modal
     closeModalBtns.forEach(btn => {
@@ -746,31 +879,31 @@
 
     // Busca de produtos
     const searchInput = document.getElementById('search-products');
-    searchInput.addEventListener('input', filterProducts);
+    if (searchInput) searchInput.addEventListener('input', filterProducts);
 
     // Filtros
     const categoryFilter = document.getElementById('category-filter');
     const statusFilter = document.getElementById('status-filter');
-    
-    categoryFilter.addEventListener('change', filterProducts);
-    statusFilter.addEventListener('change', filterProducts);
+    if (categoryFilter) categoryFilter.addEventListener('change', filterProducts);
+    if (statusFilter) statusFilter.addEventListener('change', filterProducts);
 
     function filterProducts() {
-        const searchTerm = searchInput.value.toLowerCase();
-        const categoryValue = categoryFilter.value;
-        const statusValue = statusFilter.value;
-        
+        const searchTerm = (searchInput?.value || '').toLowerCase();
+        const categoryValue = categoryFilter?.value || '';
+        const statusValue = statusFilter?.value || '';
+
         const rows = document.querySelectorAll('.data-table tbody tr');
-        
+
         rows.forEach(row => {
-            const productName = row.querySelector('.user-details h4').textContent.toLowerCase();
-            const category = row.cells[1].textContent.toLowerCase();
-            const status = row.cells[2].textContent.toLowerCase();
-            
+            const productNameEl = row.querySelector('.user-details h4');
+            const productName = productNameEl ? productNameEl.textContent.toLowerCase() : '';
+            const category = (row.cells[1]?.textContent || '').toLowerCase();
+            const status = (row.cells[2]?.textContent || '').toLowerCase();
+
             const matchesSearch = productName.includes(searchTerm);
             const matchesCategory = !categoryValue || category.includes(categoryValue);
             const matchesStatus = !statusValue || status.includes(statusValue);
-            
+
             if (matchesSearch && matchesCategory && matchesStatus) {
                 row.style.display = '';
             } else {
@@ -779,39 +912,76 @@
         });
     }
 
-    // Ações dos botões
+    // Ações dos botões: editar e excluir
     document.querySelectorAll('.btn-edit').forEach(btn => {
         btn.addEventListener('click', function() {
             const row = this.closest('tr');
+            const id = row.getAttribute('data-id');
             const productName = row.querySelector('.user-details h4').textContent;
-            
+            const category = row.cells[1].textContent.trim();
+            const status = row.cells[2].textContent.trim();
+            const priceText = row.cells[3].textContent.replace('R$', '').replace('.', '').replace(',', '.').trim();
+            const stock = row.cells[4].textContent.trim();
+            const desc = row.getAttribute('data-description') || '';
+            const dataImage = row.getAttribute('data-image') || '';
+
             document.getElementById('modal-title').textContent = `Editar ${productName}`;
+            document.getElementById('product-id').value = id;
+            document.getElementById('product-name').value = productName;
+            document.getElementById('product-sku').value = row.querySelector('.user-details span') ? row.querySelector('.user-details span').textContent.replace('SKU:','').trim() : '';
+            document.getElementById('product-category').value = category;
+            document.getElementById('product-status').value = status.toLowerCase();
+            document.getElementById('product-price').value = parseFloat(priceText) || 0;
+            document.getElementById('product-stock').value = parseInt(stock) || 0;
+            document.getElementById('product-description').value = desc;
+
+            // Mostrar preview do nome do arquivo da imagem (se existir)
+            if (dataImage) {
+                const filename = dataImage.split('/').pop();
+                imageUpload.innerHTML = `\n                    <i class="fas fa-check" style="color: var(--success);"></i>\n                    <p>${filename}</p>\n                    <small>Clique para alterar</small>\n                `;
+            } else {
+                imageUpload.innerHTML = `\n                    <i class="fas fa-cloud-upload-alt"></i>\n                    <p>Clique para fazer upload da imagem</p>\n                    <input type="file" id="product-image" name="product-image" accept="image/*" style="display: none;">\n                `;
+                // rebind productImage after replacing innerHTML
+                const newProductImage = document.getElementById('product-image');
+                if (newProductImage) {
+                    newProductImage.addEventListener('change', (e) => {
+                        if (e.target.files.length > 0) {
+                            const fileName = e.target.files[0].name;
+                            imageUpload.innerHTML = `\n                                <i class="fas fa-check" style="color: var(--success);"></i>\n                                <p>${fileName}</p>\n                                <small>Clique para alterar</small>\n                            `;
+                        }
+                    });
+                }
+            }
+
             modal.classList.add('active');
-            
-            // Aqui você preencheria o formulário com os dados existentes
         });
     });
 
     document.querySelectorAll('.btn-delete').forEach(btn => {
         btn.addEventListener('click', function() {
             const row = this.closest('tr');
+            const id = row.getAttribute('data-id');
             const productName = row.querySelector('.user-details h4').textContent;
-            
-            if (confirm(`Tem certeza que deseja excluir o produto "${productName}"?`)) {
-                row.style.opacity = '0.5';
-                setTimeout(() => {
-                    row.remove();
-                    showNotification('Produto excluído com sucesso!', 'success');
-                }, 500);
-            }
-        });
-    });
 
-    // Submit do formulário
-    document.getElementById('product-form').addEventListener('submit', function(e) {
-        e.preventDefault();
-        modal.classList.remove('active');
-        showNotification('Produto salvo com sucesso!', 'success');
+            if (!id) return;
+            if (!confirm(`Tem certeza que deseja excluir o produto "${productName}"?`)) return;
+
+            const formData = new FormData();
+            formData.append('action', 'delete');
+            formData.append('id', id);
+
+            fetch('produtos_admin.php', { method: 'POST', body: formData })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        row.remove();
+                        showNotification('Produto excluído com sucesso!', 'success');
+                    } else {
+                        showNotification('Erro ao excluir produto.', 'error');
+                    }
+                })
+                .catch(() => showNotification('Erro na requisição.', 'error'));
+        });
     });
 
     // Função de notificação

@@ -27,6 +27,18 @@ if (!function_exists('is_active')) {
         return $base === $current ? 'active' : '';
     }
 }
+// Conexão e busca de produtos
+require_once 'conexao.php';
+function find_products_table($conn) {
+    $candidates = ['products', 'produtos'];
+    foreach ($candidates as $t) {
+        $res = $conn->query("SHOW TABLES LIKE '" . $conn->real_escape_string($t) . "'");
+        if ($res && $res->num_rows > 0) return $t;
+    }
+    return 'products';
+}
+$table = find_products_table($conn);
+$products_res = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
 ?>
 
  <nav class="navbar scrolled" id="navbar">
@@ -46,19 +58,54 @@ if (!function_exists('is_active')) {
                 <li><a href="contato.php" class="nav-link <?php echo is_active('contato.php', $current); ?>">Contato</a></li>
             </ul>
             <div class="nav-icons">
-                <div class="profile-dropdown-wrapper">
-                    <a href="#" class="nav-icon-link" aria-label="Login" style="pointer-events: none;"><i class="fas fa-user"></i></a>
-                    <div class="profile-dropdown-menu">
-                        <div class="dropdown-header">
-                            <img src="../assets/img/avatar.png" alt="Avatar" class="dropdown-avatar">
-                            <div><div class="dropdown-user-name">Seu Nome</div><div class="dropdown-user-email">seu@email.com</div></div>
+                    <div class="profile-dropdown-wrapper">
+                        <?php if (!isset($_SESSION)) { session_start(); } ?>
+                        <?php if (!isset($_SESSION['user_id'])): ?>
+                    <!-- USUÁRIO DESLOGADO -->
+                        <a href="php/login.php" class="nav-icon-link" aria-label="Login">
+                        <i class="fas fa-user"></i>
+                        </a>
+
+
+                        <div class="profile-dropdown-menu">
+                            <ul class="dropdown-links">
+                                <li class="dropdown-link-item">
+                                <a href="php/registro.php"><i class="fas fa-user-plus"></i> Registrar</a>
+                                </li>
+                                <li class="dropdown-link-item">
+                                    <a href="php/login.php"><i class="fas fa-sign-in-alt"></i> Login</a>
+                                </li>
+                            </ul>
                         </div>
-                        <ul class="dropdown-links">
-                            <li class="dropdown-link-item"><a href="perfil.php"><i class="fas fa-id-card"></i> Visualizar Perfil</a></li>
-                            <li class="dropdown-link-item"><a href="login.php"><i class="fas fa-sign-in-alt"></i> Logar</a></li>
-                        </ul>
-                    </div>
-                </div>
+
+
+                    <?php else: ?>
+                    <!-- USUÁRIO LOGADO -->
+                    <a href="#" class="nav-icon-link" aria-label="Perfil">
+                    <img src="<?php echo $_SESSION['foto']; ?>"
+                    class="dropdown-avatar"
+                    style="width:28px; height:28px; border-radius:50%; object-fit:cover;">
+                    </a>
+
+
+<div class="profile-dropdown-menu">
+<div class="dropdown-header">
+<img src="<?php echo $_SESSION['foto']; ?>" alt="Avatar" class="dropdown-avatar">
+<div>
+<div class="dropdown-user-name"><?php echo $_SESSION['nome']; ?></div>
+<div class="dropdown-user-email"><?php echo $_SESSION['email']; ?></div>
+</div>
+</div>
+
+
+<ul class="dropdown-links">
+<li class="dropdown-link-item"><a href="php/perfil.php"><i class="fas fa-id-card"></i> Visualizar Perfil</a></li>
+<li class="dropdown-link-item"><a href="php/configuracoes.php"><i class="fas fa-cog"></i> Configurações</a></li>
+<li class="dropdown-link-item"><a href="../php/logout.php"><i class="fas fa-sign-out-alt"></i> Sair</a></li>
+</ul>
+</div>
+<?php endif; ?>
+</div>
                 <a href="carrinho.php" class="nav-icon-link" aria-label="Carrinho"><i class="fas fa-shopping-bag"></i></a>
             </div>
         </div>
@@ -103,67 +150,45 @@ if (!function_exists('is_active')) {
     </div>
         <div class="container">
             <div class="products-grid">
-                
-                <!-- Camisas -->
-                <div class="product-card" data-category="camisas"
-                     data-name="Camisa Brazil" data-price="99.90" data-img="../assets/img/camisabr.png"
-                     data-imgs="../assets/img/camisabrazil.png|../assets/img/camisabrazilback.png|../assets/img/camisabrazildetail.png|../assets/img/camisabrazilupdetail.png|../assets/img/camisabrazilbackdetail.png" data-sizes="P|M|G|GG|XG"
-                     data-longdesc="Camisa Brazil: Confeccionada em algodão premium, acabamento reforçado nas costuras, modelagem regular que se adapta ao corpo. Ideal para uso diário, possui estampas inspiradas na cultura oriental e tratamento anti-pilling.">
-                    <div class="card-image"><img src="../assets/img/camisabr.png" alt="Camisa Tradicional"><div class="card-overlay"><button class="btn-quick-view">Ver Detalhes</button></div></div>
-                    <div class="card-content"><h3>Camisa Brazil</h3><p class="product-desc">Algodão leve, Historia pesada</p><p class="price">R$ 99,90</p><button class="btn btn-add-cart">Adicionar ao Carrinho</button></div>
-                </div>
-                <div class="product-card" data-category="camisas"
-                     data-name="Camisa Sopro" data-price="99.90" data-img="../assets/img/sopro.png"
-                     data-imgs="../assets/img/sopros.png|../assets/img/sopro2.png" data-sizes="P|M|G|GG|XG"
-                     data-longdesc="Camisa Sopro: Tecido leve com toque seco, estampa serigráfica resistente, gola reforçada. Inspirada no vento, design minimalista com caimento fluido.">
-                    <div class="card-image"><img src="../assets/img/sopro.png" alt="Camisa Kimono"><div class="card-overlay"><button class="btn-quick-view">Ver Detalhes</button></div></div>
-                    <div class="card-content"><h3>Camisa Sopro</h3><p class="product-desc">Rápido como vento, impactante como uma rocha</p><p class="price">R$ 99,90</p><button class="btn btn-add-cart">Adicionar ao Carrinho</button></div>
-                </div>
-                <!-- Moletons -->
-                <div class="product-card" data-category="moletons"
-                     data-name="Moletom Sakura" data-price="249.90" data-img="../assets/img/moletommarrom.png"
-                     data-imgs="../assets/img/moletomsakurafront.png|../assets/img/moletomsakuraback.png" data-sizes="P|M|G|GG|XG"
-                     data-longdesc="Moletom Sakura: Interior felpado, capuz com ajuste, bolsos canguru. Estampa temática de cerejeira com tintas ecológicas, ideal para baixas temperaturas.">
-                    <div class="card-image"><img src="../assets/img/moletommarrom.png" alt="Moletom Sakura"><div class="card-overlay"><button class="btn-quick-view">Ver Detalhes</button></div></div>
-                    <div class="card-content"><h3>Moletom Sakura</h3><p class="product-desc">Forro macio com estampa de cerejeira</p><p class="price">R$ 129,90</p><button class="btn btn-add-cart">Adicionar ao Carrinho</button></div>
-                </div>
-                <div class="product-card" data-category="moletons"
-                     data-name="Moletom Susanoo" data-price="279.90" data-img="../assets/img/moletomroxo.png"
-                     data-imgs="../assets/img/moletomroxo.png|../assets/img/moletomroxoback.png" data-sizes="P|M|G|GG|XG"
-                     data-longdesc="Moletom Susanoo: Corte urbano, logo bordado, material durável e resistente a lavagens. Perfeito para compor looks casuais.">
-                    <div class="card-image"><img src="../assets/img/moletomroxo.png" alt="Moletom Susanoo"><div class="card-overlay"><button class="btn-quick-view">Ver Detalhes</button></div></div>
-                    <div class="card-content"><h3>Moletom Susanoo</h3><p class="product-desc">Moletom com capuz e logo bordado</p><p class="price">R$ 139,90</p><button class="btn btn-add-cart">Adicionar ao Carrinho</button></div>
-                </div>
-                <!-- Calças -->
-                <div class="product-card" data-category="calcas"
-                     data-name="Jorts Hakama" data-price="199.90" data-img="../assets/img/jortscinza.png"
-                     data-imgs="../assets/img/jortscinza.png|../assets/img/jortscinza_back.png" data-sizes="P|M|G|GG|XG"
-                     data-longdesc="Jorts Hakama: Calça com corte inspirado em hakama, bolsos reforçados, tecido com elasticidade leve para conforto. Ideal para looks modernos.">
-                    <div class="card-image"><img src="../assets/img/jortscinza.png" alt="Calça Hakama"><div class="card-overlay"><button class="btn-quick-view">Ver Detalhes</button></div></div>
-                    <div class="card-content"><h3>Jorts Hakama</h3><p class="product-desc">Design ousado em trajes unicos</p><p class="price">R$ 119,90</p><button class="btn btn-add-cart">Adicionar ao Carrinho</button></div>
-                </div>
-                <div class="product-card" data-category="calcas"
-                     data-name="Calça Cargo" data-price="169.90" data-img="../assets/img/calcamodelofem.png"
-                     data-imgs="../assets/img/calcamodelofem.png|../assets/img/calcamodelofem_2.png" data-sizes="P|M|G|GG|XG"
-                     data-longdesc="Calça Cargo: Vários bolsos utilitários, cordão interno na cintura, acabamento resistente. Perfeita para uso urbano e funcional.">
-                    <div class="card-image"><img src="../assets/img/calcamodelofem.png" alt="Calça Jogger"><div class="card-overlay"><button class="btn-quick-view">Ver Detalhes</button></div></div>
-                    <div class="card-content"><h3>Calça Cargo</h3><p class="product-desc">Conforto urbano com acabamento elástico</p><p class="price">R$ 149,90</p><button class="btn btn-add-cart">Adicionar ao Carrinho</button></div>
-                </div>
-                <!-- Acessórios (tamanho Único) -->
-                <div class="product-card" data-category="acessorios"
-                     data-name="Boné AMATERASU" data-price="69.90" data-img="../assets/img/bonebarra.png"
-                     data-imgs="../assets/img/boneamaterasucompleto.png|../assets/img/boneamaterasuback.png" data-sizes="Único"
-                     data-longdesc="Boné AMATERASU: Tecido respirável com aba estruturada e bordado exclusivo. Ajuste traseiro e detalhe interno antissuor.">
-                    <div class="card-image"><img src="../assets/img/bonebarra.png" alt="Boné Amaterasu"><div class="card-overlay"><button class="btn-quick-view">Ver Detalhes</button></div></div>
-                    <div class="card-content"><h3>Boné AMATERASU</h3><p class="product-desc">Chama negra que nunca para</p><p class="price">R$ 69,90</p><button class="btn btn-add-cart">Adicionar ao Carrinho</button></div>
-                </div>
-                <div class="product-card" data-category="acessorios"
-                     data-name="Bandana Oriental" data-price="39.90" data-img="../assets/img/chaveiro.png"
-                     data-imgs="../assets/img/chaveiro.png|../assets/img/yeah.png" data-sizes="Único"
-                     data-longdesc="Chaveiro/Acc: Material metálico com banho resistente, detalhe temático e embalagem presenteável.">
-                    <div class="card-image"><img src="../assets/img/chaveiro.png" alt="Bandana Oriental"><div class="card-overlay"><button class="btn-quick-view">Ver Detalhes</button></div></div>
-                    <div class="card-content"><h3>Pente Oriental</h3><p class="product-desc">Arrume seu cabelo com tradição</p><p class="price">R$ 39,90</p><button class="btn btn-add-cart">Adicionar ao Carrinho</button></div>
-                </div>
+                <?php if ($products_res && $products_res->num_rows > 0): ?>
+                    <?php while ($p = $products_res->fetch_assoc()): ?>
+                        <?php
+                            $p_name = htmlspecialchars($p['name']);
+                            $p_cat = htmlspecialchars($p['category']);
+                            $p_price = number_format($p['price'], 2, ',', '.');
+                            // Use imagem salva no banco quando disponível
+                            $img = '../assets/img/placeholder.png';
+                            if (!empty($p['image'])) {
+                                // Normaliza o caminho salvo no DB — evita duplicar '../'
+                                $raw = $p['image'];
+                                if (strpos($raw, '://') !== false) {
+                                    $img = $raw; // URL absoluta
+                                } elseif (substr($raw, 0, 2) === '..') {
+                                    $img = $raw; // já relativo
+                                } elseif (substr($raw, 0, 1) === '/') {
+                                    $img = '..' . $raw; // /assets/... -> ../assets/...
+                                } else {
+                                    $img = '../' . ltrim($raw, './');
+                                }
+                            } else {
+                                $cat = strtolower($p['category']);
+                                if (strpos($cat, 'camis') !== false) $img = '../assets/img/camisabr.png';
+                                elseif (strpos($cat, 'moleton') !== false || strpos($cat, 'moletons') !== false) $img = '../assets/img/moletomroxo.png';
+                                elseif (strpos($cat, 'cal') !== false) $img = '../assets/img/jortscinza.png';
+                                elseif (strpos($cat, 'acessor') !== false) $img = '../assets/img/bonebarra.png';
+                            }
+                        ?>
+                            <div class="product-card" data-category="<?php echo $p_cat; ?>"
+                                data-name="<?php echo $p_name; ?>" data-price="<?php echo $p['price']; ?>" data-img="<?php echo $img; ?>"
+                                data-imgs="<?php echo $img; ?>" data-sizes="<?php echo isset($p['sizes']) && trim($p['sizes']) !== '' ? htmlspecialchars($p['sizes']) : ''; ?>"
+                                data-longdesc="<?php echo isset($p['description']) ? htmlspecialchars($p['description']) : (isset($p['descricao']) ? htmlspecialchars($p['descricao']) : ''); ?>">
+                            <div class="card-image"><img src="<?php echo $img; ?>" alt="<?php echo $p_name; ?>"><div class="card-overlay"><button class="btn-quick-view">Ver Detalhes</button></div></div>
+                            <div class="card-content"><h3><?php echo $p_name; ?></h3><p class="product-desc"><?php echo isset($p['short_desc']) ? htmlspecialchars($p['short_desc']) : (isset($p['description']) ? htmlspecialchars(mb_strimwidth($p['description'],0,140,'...')) : (isset($p['descricao']) ? htmlspecialchars(mb_strimwidth($p['descricao'],0,140,'...')) : '')); ?></p><p class="price">R$ <?php echo $p_price; ?></p><button class="btn btn-add-cart">Adicionar ao Carrinho</button></div>
+                        </div>
+                    <?php endwhile; ?>
+                <?php else: ?>
+                    <p>Nenhum produto disponível.</p>
+                <?php endif; ?>
             </div>
         </div>
     </section>

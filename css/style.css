@@ -94,7 +94,7 @@ body {
 .nav-logo { position: absolute; left: 50%; transform: translateX(-50%); }
 .nav-logo img { max-height: 70px; width: auto; display: block; object-fit: contain; }
 
-.nav-menu { display: flex; list-style: none; gap: 2rem; }
+.nav-menu { display: flex; list-style: none; gap: 1.5rem; }
 .nav-link { text-decoration: none; color: var(--text-secondary); font-weight: 500; position: relative; transition: var(--transition-medium); }
 .nav-link:hover, .nav-link.active { color: var(--primary-purple); }
 .nav-link::after { content: ''; position: absolute; bottom: -5px; left: 0; width: 0; height: 2px; background: linear-gradient(90deg, var(--primary-purple), var(--secondary-purple)); transition: var(--transition-medium); }
@@ -980,88 +980,132 @@ section {
 
 /* 1. Container que envolve o ícone e o menu */
 .profile-dropdown-wrapper {
-    position: relative; /* Essencial para posicionar o menu abaixo dele */
+    position: relative;
+    display: flex;          /* CRUCIAL: Alinha a foto com o carrinho */
+    align-items: center;    /* CRUCIAL: Centraliza verticalmente */
+    height: 100%;
 }
 
 /* 2. O menu suspenso (inicialmente escondido) */
 .profile-dropdown-menu {
     position: absolute;
-    top: 100%; /* Começa logo abaixo do ícone */
-    right: 0;
-    width: 260px; /* Largura do menu */
-    background: var(--dark-card, #111111);
-    border: 1px solid var(--border-color, #374151);
-    border-radius: 10px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
-    padding: 10px 0;
-    margin-top: 15px; /* Espaço entre o ícone e o menu */
+    top: 150%; /* Empurra um pouco mais para baixo para não grudar na navbar */
+    right: -10px; /* Alinha levemente à direita */
+    width: 260px;
+    background: var(--bg-card, #222); /* Usa a variável do tema */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    padding: 15px;
     z-index: 1100;
 
     /* Animação de entrada */
     opacity: 0;
     visibility: hidden;
     transform: translateY(10px);
-    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
+    transition: all 0.3s ease;
 }
 
-/* 3. Lógica do Hover: Mostra o menu quando o mouse está sobre o container */
+/* Seta (triângulo) no topo do menu para estética */
+.profile-dropdown-menu::before {
+    content: '';
+    position: absolute;
+    top: -6px;
+    right: 20px;
+    width: 12px;
+    height: 12px;
+    background: var(--bg-card, #222);
+    transform: rotate(45deg);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* 3. Lógica do Hover */
 .profile-dropdown-wrapper:hover .profile-dropdown-menu {
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
+    top: 120%; /* Sobe levemente ao aparecer */
 }
 
-/* 4. Estilo do cabeçalho do menu (foto e nome) */
+/* 4. Estilo da Imagem do Avatar (NO NAVBAR) */
+/* Isso corrige o conflito de tamanho que quebrava o layout */
+.nav-icon-link .dropdown-avatar {
+    width: 32px !important; /* Força um tamanho pequeno no navbar */
+    height: 32px !important;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid transparent;
+    transition: border-color 0.3s ease;
+    display: block; /* Remove espaços fantasmas */
+}
+
+.nav-icon-link:hover .dropdown-avatar {
+    border-color: var(--primary-purple);
+}
+
+/* 5. Estilo do cabeçalho do menu (NO DROPDOWN) */
 .dropdown-header {
     display: flex;
     align-items: center;
-    padding: 10px 20px;
-    border-bottom: 1px solid var(--border-color, #374151);
-    margin-bottom: 10px;
+    padding-bottom: 15px;
+    margin-bottom: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.dropdown-avatar {
-    width: 40px;
-    height: 40px;
+/* Avatar grande dentro do menu */
+.dropdown-header .dropdown-avatar {
+    width: 50px; 
+    height: 50px;
     border-radius: 50%;
     object-fit: cover;
     margin-right: 15px;
+    border: 2px solid var(--primary-purple);
 }
 
 .dropdown-user-name {
-    font-weight: 600;
-    color: var(--text-light, #f9fafb);
+    font-weight: 700;
+    color: var(--text-primary);
+    font-size: 1rem;
+    line-height: 1.2;
 }
 .dropdown-user-email {
     font-size: 0.8rem;
-    color: var(--muted, #a1a1aa);
+    color: var(--text-secondary);
+    word-break: break-all;
 }
 
-/* 5. Estilo dos links do menu */
+/* 6. Estilo dos links do menu */
 .dropdown-links {
     list-style: none;
     padding: 0;
     margin: 0;
 }
 
+.dropdown-link-item {
+    margin-bottom: 5px;
+}
+
 .dropdown-link-item a {
     display: flex;
     align-items: center;
-    gap: 15px;
-    padding: 12px 20px;
+    gap: 12px;
+    padding: 10px 12px;
     text-decoration: none;
-    color: var(--text-secondary, #cccccc);
-    font-size: 0.95rem;
-    transition: background-color 0.2s ease, color 0.2s ease;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    border-radius: 8px;
+    transition: all 0.2s ease;
 }
 
 .dropdown-link-item a:hover {
     background-color: rgba(139, 92, 246, 0.1);
-    color: var(--accent1, #8B5CF6);
+    color: var(--primary-purple);
+    transform: translateX(5px);
 }
 
 .dropdown-link-item a i {
-    width: 20px; /* Alinha os ícones */
+    width: 20px;
     text-align: center;
     font-size: 1rem;
 }

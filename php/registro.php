@@ -1,3 +1,32 @@
+<?php
+session_start();
+require 'conexao.php';
+
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+$nome = $_POST['nome'];
+$email = $_POST['email'];
+$senha = password_hash($_POST['senha'], PASSWORD_DEFAULT);
+
+
+// Upload da imagem
+$fotoNome = time() . "_" . basename($_FILES['foto']['name']);
+$fotoCaminho = "uploads/" . $fotoNome;
+
+
+move_uploaded_file($_FILES['foto']['tmp_name'], "../" . $fotoCaminho);
+
+
+// Inserção no banco
+$stmt = $conn->prepare("INSERT INTO users(nome,email,senha,foto) VALUES(?,?,?,?)");
+$stmt->bind_param("ssss", $nome, $email, $senha, $fotoCaminho);
+$stmt->execute();
+
+
+header("Location: login.php");
+exit;
+}
+?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>

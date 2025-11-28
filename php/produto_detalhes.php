@@ -42,7 +42,20 @@ $longdesc_raw = $_GET['longdesc'] ?? '';
 
 $imgs = $imgs_raw ? array_map('htmlspecialchars', explode('|', $imgs_raw)) : [];
 if (empty($imgs) && $img) $imgs[] = $img;
+
 $sizes = $sizes_raw ? array_map('htmlspecialchars', explode('|', $sizes_raw)) : [];
+// If no sizes provided from the product, provide sensible defaults by category
+if (empty($sizes)) {
+	$catLower = strtolower($category);
+	if (strpos($catLower, 'camis') !== false || strpos($catLower, 'camisa') !== false) {
+		$sizes = ['P','M','G','GG'];
+	} elseif (strpos($catLower, 'cal') !== false || strpos($catLower, 'calça') !== false) {
+		$sizes = ['38','40','42','44'];
+	} else {
+		$sizes = ['Único'];
+	}
+}
+
 $longdesc = htmlspecialchars($longdesc_raw);
 
 $current = basename($_SERVER['PHP_SELF']);
@@ -71,22 +84,54 @@ if (!function_exists('is_active')) {
 				<li><a href="contato.php" class="nav-link <?php echo is_active('contato.php', $current); ?>">Contato</a></li>
 			</ul>
 			<div class="nav-icons">
-				<div class="profile-dropdown-wrapper">
-					<a href="login.php" class="nav-icon-link" aria-label="Login"><i class="fas fa-user"></i></a>
-					<div class="profile-dropdown-menu">
-						<div class="dropdown-header">
-							<img src="../assets/img/avatar.png" alt="Avatar" class="dropdown-avatar">
-							<div>
-								<div class="dropdown-user-name">Seu Nome</div>
-								<div class="dropdown-user-email">seu@email.com</div>
-							</div>
-						</div>
-						<ul class="dropdown-links">
-							<li class="dropdown-link-item"><a href="perfil.php"><i class="fas fa-id-card"></i> Visualizar Perfil</a></li>
-							<li class="dropdown-link-item"><a href="configuracoes.php"><i class="fas fa-cog"></i> Configurações</a></li>
-						</ul>
-					</div>
-				</div>
+                    <div class="profile-dropdown-wrapper">
+                        <?php if (!isset($_SESSION)) { session_start(); } ?>
+                        <?php if (!isset($_SESSION['user_id'])): ?>
+                    <!-- USUÁRIO DESLOGADO -->
+                        <a href="php/login.php" class="nav-icon-link" aria-label="Login">
+                        <i class="fas fa-user"></i>
+                        </a>
+
+
+                        <div class="profile-dropdown-menu">
+                            <ul class="dropdown-links">
+                                <li class="dropdown-link-item">
+                                <a href="php/registro.php"><i class="fas fa-user-plus"></i> Registrar</a>
+                                </li>
+                                <li class="dropdown-link-item">
+                                    <a href="php/login.php"><i class="fas fa-sign-in-alt"></i> Login</a>
+                                </li>
+                            </ul>
+                        </div>
+
+
+                    <?php else: ?>
+                    <!-- USUÁRIO LOGADO -->
+                    <a href="#" class="nav-icon-link" aria-label="Perfil">
+                    <img src="<?php echo $_SESSION['foto']; ?>"
+                    class="dropdown-avatar"
+                    style="width:28px; height:28px; border-radius:50%; object-fit:cover;">
+                    </a>
+
+
+<div class="profile-dropdown-menu">
+<div class="dropdown-header">
+<img src="<?php echo $_SESSION['foto']; ?>" alt="Avatar" class="dropdown-avatar">
+<div>
+<div class="dropdown-user-name"><?php echo $_SESSION['nome']; ?></div>
+<div class="dropdown-user-email"><?php echo $_SESSION['email']; ?></div>
+</div>
+</div>
+
+
+<ul class="dropdown-links">
+<li class="dropdown-link-item"><a href="php/perfil.php"><i class="fas fa-id-card"></i> Visualizar Perfil</a></li>
+<li class="dropdown-link-item"><a href="php/configuracoes.php"><i class="fas fa-cog"></i> Configurações</a></li>
+<li class="dropdown-link-item"><a href="php/logout.php"><i class="fas fa-sign-out-alt"></i> Sair</a></li>
+</ul>
+</div>
+<?php endif; ?>
+</div>
 				<a href="carrinho.php" class="nav-icon-link" aria-label="Carrinho"><i class="fas fa-shopping-bag"></i></a>
 			</div>
 		</div>
@@ -119,16 +164,14 @@ if (!function_exists('is_active')) {
 				<?php if ($category): ?><div class="category"><?php echo $category; ?></div><?php endif; ?>
 				<?php if ($price): ?><div class="price"><?php echo $price; ?></div><?php endif; ?>
 
-				<?php if (!empty($sizes)): ?>
 					<div class="sizes" role="radiogroup" aria-label="Tamanhos">
 						<?php foreach ($sizes as $i => $s): ?>
 							<label class="size">
-								<input type="radio" name="size" value="<?php echo $s; ?>" <?php echo count($sizes) === 1 || $i === 0 ? 'checked' : ''; ?>>
+								<input type="radio" name="size" value="<?php echo $s; ?>" <?php echo $i === 0 ? 'checked' : ''; ?>>
 								<span><?php echo $s; ?></span>
 							</label>
 						<?php endforeach; ?>
 					</div>
-				<?php endif; ?>
 
 				<div class="actions">
 					<button type="submit" class="btn-cta">Adicionar ao carrinho</button>
@@ -146,7 +189,7 @@ if (!function_exists('is_active')) {
 </main>
 
 <!-- Modal para Tabela de Tamanhos -->
-<div class="size-chart-modal" id="sizeChartModal">
+<div class="size-chart-modal" id="sizeChartModal" data-category="<?php echo htmlspecialchars(strtolower($category)); ?>">
     <div class="size-chart-content">
         <button class="close-size-chart" id="closeSizeChart">&times;</button>
         <table class="size-chart-table" id="shirtSizeChart">
@@ -395,12 +438,34 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	if (openSizeChartBtn && sizeChartModal) {
 		openSizeChartBtn.addEventListener('click', function() {
+			// Show the table relevant to the product category
+			const cat = (sizeChartModal.dataset.category || '').toLowerCase();
+			const shirt = document.getElementById('shirtSizeChart');
+			const pants = document.getElementById('pantsSizeChart');
+			if (shirt && pants) {
+				shirt.style.display = 'none';
+				pants.style.display = 'none';
+				if (cat.includes('camis') || cat.includes('camisa')) {
+					shirt.style.display = '';
+				} else if (cat.includes('cal')) {
+					pants.style.display = '';
+				} else {
+					// se categoria indefinida, mostra ambas
+					shirt.style.display = '';
+					pants.style.display = '';
+				}
+			}
 			sizeChartModal.style.display = 'flex';
 		});
 	}
 
 	if (closeSizeChartBtn && sizeChartModal) {
 		closeSizeChartBtn.addEventListener('click', function() {
+			// hide modal and its specific tables
+			const shirt = document.getElementById('shirtSizeChart');
+			const pants = document.getElementById('pantsSizeChart');
+			if (shirt) shirt.style.display = 'none';
+			if (pants) pants.style.display = 'none';
 			sizeChartModal.style.display = 'none';
 		});
 	}
@@ -408,6 +473,10 @@ document.addEventListener('DOMContentLoaded', function() {
 	// Fechar modal ao clicar fora do conteúdo
 	window.addEventListener('click', function(event) {
 		if (event.target === sizeChartModal) {
+			const shirt = document.getElementById('shirtSizeChart');
+			const pants = document.getElementById('pantsSizeChart');
+			if (shirt) shirt.style.display = 'none';
+			if (pants) pants.style.display = 'none';
 			sizeChartModal.style.display = 'none';
 		}
 	});

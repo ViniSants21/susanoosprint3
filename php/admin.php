@@ -413,6 +413,17 @@
 </head>
 <body class="admin-dashboard">
 
+<?php
+// Obter contagem de usuários reais do banco
+require_once 'conexao.php';
+$users_count = 0;
+$res_users = $conn->query("SELECT COUNT(*) AS total FROM users");
+if ($res_users) {
+    $row_u = $res_users->fetch_assoc();
+    $users_count = intval($row_u['total']);
+}
+?>
+
 <!-- Navbar -->
 <nav class="navbar scrolled" id="navbar">
     <div class="nav-container">
@@ -463,9 +474,7 @@
                 <button class="btn btn-primary" id="refresh-data">
                     <i class="fas fa-sync-alt"></i> Atualizar Dados
                 </button>
-                <button class="btn btn-secondary" id="export-report">
-                    <i class="fas fa-download"></i> Exportar Relatório
-                </button>
+                
             </div>
         </div>
 
@@ -487,7 +496,7 @@
                     <i class="fas fa-users"></i>
                 </div>
                 <div class="stat-label">Novos Clientes</div>
-                <div class="stat-value">342</div>
+                <div class="stat-value"><?php echo isset($users_count) ? $users_count : 0; ?></div>
                 <div class="stat-change positive">
                     <i class="fas fa-arrow-up"></i> 5.2% vs mês anterior
                 </div>
