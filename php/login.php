@@ -156,5 +156,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 <script src="../js/theme.js"></script>
+<script src="../js/cart.js"></script>
+
 </body>
 </html>
