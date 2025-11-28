@@ -1570,6 +1570,7 @@ html.light-mode .dropdown-user-name {
     cursor: pointer;
 }
 
+
 .size-chart-table {
     width: 100%;
     border-collapse: collapse;
@@ -1616,4 +1617,25 @@ html.light-mode .dropdown-user-name {
 .btn-size-chart:hover {
     background: var(--secondary-purple);
     transform: translateY(-2px);
+}
+.products-section,
+.featured-products {
+    background: #0e0e0e;
+    padding: 60px 0;
+}
+
+.products-section .container,
+.featured-products .container {
+    width: 100%;
+    max-width: 1300px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 2;
+}
+
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* agora são 3 por linha fixos */
+    gap: 25px;
+    margin-top: 30px;
 }
