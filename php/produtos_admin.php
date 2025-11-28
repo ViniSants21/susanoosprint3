@@ -347,7 +347,7 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
                         <option value="camisetas">Camisetas</option>
                         <option value="moletons">Moletons</option>
                         <option value="acessorios">Acessórios</option>
-                        <option value="colecoes">Coleções</option>
+                        <option value="calcas">Calças</option>
                     </select>
                 </div>
                 <div class="form-group">

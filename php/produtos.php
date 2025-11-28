@@ -123,7 +123,7 @@ $products_res = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
         <div class="container">
             <div class="filters">
                 <button class="filter-btn active" data-filter="all">Todos</button>
-                <button class="filter-btn" data-filter="camisas">Camisas</button>
+                <button class="filter-btn" data-filter="camisetas">Camisas</button>
                 <button class="filter-btn" data-filter="moletons">Moletons</button>
                 <button class="filter-btn" data-filter="calcas">Calças</button>
                 <button class="filter-btn" data-filter="acessorios">Acessórios</button>
