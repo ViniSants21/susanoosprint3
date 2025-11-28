@@ -10,34 +10,28 @@ $senha = $_POST['senha'];
 
 $stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
 $stmt->bind_param("s", $email);
-// ... código anterior ...
 $stmt->execute();
 $result = $stmt->get_result();
 
+
 if ($result->num_rows === 1) {
-    $user = $result->fetch_assoc();
+$user = $result->fetch_assoc();
 
-    if (password_verify($senha, $user['senha'])) {
-        // --- LOGIN SUCESSO ---
-        $_SESSION['user_id'] = $user['id'];
-        $_SESSION['nome'] = $user['nome'];
-        $_SESSION['email'] = $user['email'];
-        $_SESSION['foto'] = $user['foto'];
 
-        // Redirecionamento Admin vs Usuário
-        if ($user['email'] === 'admin@susanoo.com') {
-            header("Location: admin.php");
-        } else {
-            header("Location: ../index.php");
-        }
-        exit;
-    } else {
-        // --- SENHA INCORRETA ---
-        $erro = "Senha incorreta!";
-    }
+if (password_verify($senha, $user['senha'])) {
+$_SESSION['user_id'] = $user['id'];
+$_SESSION['nome'] = $user['nome'];
+$_SESSION['email'] = $user['email'];
+$_SESSION['foto'] = $user['foto'];
+
+
+header("Location: ../index.php");
+exit;
 } else {
-    // --- EMAIL NÃO ENCONTRADO ---
-    $erro = "Email não encontrado!";
+echo "<p style='color:red'>Senha incorreta</p>";
+}
+} else {
+echo "<p style='color:red'>Email não encontrado</p>";
 }
 }
 ?>
@@ -115,12 +109,7 @@ if (!function_exists('is_active')) {
                     <img id="avatarPreview" src="../assets/img/avatar.png" alt="Avatar" class="avatar-default">
                 </div>
                 <form class="login-form" method="post" action="login.php" enctype="multipart/form-data" novalidate>
-                    <?php if(isset($erro)): ?>
-        <div style="color: #ff4444; background-color: #ffe6e6; padding: 10px; border-radius: 5px; margin-bottom: 15px; text-align: center; font-size: 0.9rem; border: 1px solid #ff4444;">
-            <i class="fas fa-exclamation-circle"></i> <?php echo $erro; ?>
-        </div>
-    <?php endif; ?>
-    
+                    <!-- Campos do formulário (sem alterações) -->
                     <label class="field"><span class="label-title">Email</span><div class="input-wrap"><i class="fas fa-envelope icon"></i><input type="email" name="email" placeholder="seu@email.com" required></div></label>
                     <label class="field"><span class="label-title">Senha</span><div class="input-wrap"><i class="fas fa-lock icon"></i><input type="password" name="password" placeholder="Senha"></div></label>
                     <button type="submit" class="btn-login">Entrar</button>
@@ -167,7 +156,5 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 <script src="../js/theme.js"></script>
-<script src="../js/cart.js"></script>
-
 </body>
 </html>

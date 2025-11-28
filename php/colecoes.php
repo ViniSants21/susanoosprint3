@@ -293,13 +293,14 @@ if (!function_exists('is_active')) {
                         <div class="profile-dropdown-menu">
                             <ul class="dropdown-links">
                                 <li class="dropdown-link-item">
-                                <a href="../php/registro.php"><i class="fas fa-user-plus"></i>Registrar</a>
+                                <a href="php/registro.php"><i class="fas fa-user-plus"></i> Registrar</a>
                                 </li>
                                 <li class="dropdown-link-item">
-                                    <a href="../php/login.php"><i class="fas fa-sign-in-alt"></i>Login</a>
+                                    <a href="php/login.php"><i class="fas fa-sign-in-alt"></i> Login</a>
                                 </li>
                             </ul>
                         </div>
+
 
                     <?php else: ?>
                     <!-- USUÁRIO LOGADO -->

@@ -1,13 +1,3 @@
-<?php
-session_start();
-
-// Verifica se está logado e se o email é EXATAMENTE o do admin
-if (!isset($_SESSION['user_id']) || $_SESSION['email'] !== 'admin@susanoo.com') {
-    // Se não for o admin, manda de volta para o login ou home
-    header("Location: login.php");
-    exit;
-}
-?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
