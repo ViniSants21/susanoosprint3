@@ -67,13 +67,13 @@ $products_res = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
                         </a>
 
 
-                        <div class="profile-dropdown-menu">
+                       <div class="profile-dropdown-menu">
                             <ul class="dropdown-links">
                                 <li class="dropdown-link-item">
-                                <a href="php/registro.php"><i class="fas fa-user-plus"></i> Registrar</a>
+                                <a href="../php/registro.php"><i class="fas fa-user-plus"></i> Registrar</a>
                                 </li>
                                 <li class="dropdown-link-item">
-                                    <a href="php/login.php"><i class="fas fa-sign-in-alt"></i> Login</a>
+                                    <a href="../php/login.php"><i class="fas fa-sign-in-alt"></i> Login</a>
                                 </li>
                             </ul>
                         </div>
@@ -100,7 +100,7 @@ $products_res = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
 
 <ul class="dropdown-links">
 <li class="dropdown-link-item"><a href="php/perfil.php"><i class="fas fa-id-card"></i> Visualizar Perfil</a></li>
-<li class="dropdown-link-item"><a href="php/configuracoes.php"><i class="fas fa-cog"></i> Configurações</a></li>
+<li class="dropdown-link-item"><a href="../php/configuracoes.php"><i class="fas fa-cog"></i> Configurações</a></li>
 <li class="dropdown-link-item"><a href="../php/logout.php"><i class="fas fa-sign-out-alt"></i> Sair</a></li>
 </ul>
 </div>
@@ -112,7 +112,14 @@ $products_res = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
         <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
     </div>
 </nav>
+   <!-- Banner -->
+<!-- Banner -->
+<section class="promo-banner-section">
+    <a href="#" class="promo-banner-link">
+        <img src="../assets/img/Produtos1.png" alt="Banner promocional da nova coleção" class="promo-banner-image">
+    </a>
 
+</section>
     <!-- Page Header -->
     <section class="page-header">
         <div class="container"><h1 class="page-title">Nossos Produtos</h1><p class="page-subtitle">Descubra algum dos nossos produtos destaque</p></div>
@@ -238,7 +245,30 @@ $products_res = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
             </div>
         </div>
     </footer>
-
+<style>
+    /* --- Banner Promocional --- */
+        .promo-banner-section {
+            width: 100vw;
+            position: relative;
+            left: 50%;
+            right: 50%;
+            margin-left: -50vw;
+            margin-right: -50vw;
+            margin-top: -11px;
+            height: 550px; 
+            margin-bottom: -180px; /* Sobrepõe o conteúdo principal levemente */
+            overflow: hidden;
+        }
+        
+        .promo-banner-image {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: cover;
+            object-position: center;
+        }
+    
+</style>
     <!-- Back to Top Button -->
     <button id="backToTop" class="back-to-top"><span>↑</span></button>
 
