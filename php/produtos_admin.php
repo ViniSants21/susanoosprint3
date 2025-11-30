@@ -188,25 +188,7 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
 </head>
 <body class="admin-dashboard">
 
-<!-- Navbar -->
-<nav class="navbar scrolled" id="navbar">
-    <div class="nav-container">
-        <div class="nav-search">
-            <input type="text" placeholder="Pesquisar...">
-        </div>
-        <div class="nav-logo">
-            <img src="../assets/logo.png" alt="Susanoo">
-        </div>
-        <div class="nav-right-group">
-            <ul class="nav-menu">
-                <li><a href="../index.php" class="nav-link">Início</a></li>
-                <li><a href="../produtos.php" class="nav-link">Produtos</a></li>
-                <li><a href="../sobre.php" class="nav-link">Sobre</a></li>
-                <li><a href="../contato.php" class="nav-link">Contato</a></li>
-            </ul>
-        </div>
-    </div>
-</nav>
+
 
 <div class="admin-container">
     <aside class="admin-sidebar">
