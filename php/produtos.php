@@ -115,8 +115,9 @@ $products_res = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
    <!-- Banner -->
 <!-- Banner -->
 <section class="promo-banner-section">
-    <a href="#" class="promo-banner-link">
-        <img src="../assets/img/Produtos1.png" alt="Banner promocional da nova coleção" class="promo-banner-image">
+    <img src="../assets/img/Produtos1.png" alt="Banner promocional da nova coleção" class="promo-banner-image" style="pointer-events: none; cursor: default;">
+</section>
+
     </a>
 
 </section>
