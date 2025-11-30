@@ -219,7 +219,7 @@ if (!function_exists('is_active')) {
                 <!-- PRODUTO 1 -->
                 <div class="product-card" data-category="camisas"
                     data-name="Camisa Susanoo - Preta" data-price="109.99" data-img="assets/img/camisajpnsred.png"
-                    data-imgs="assets/img/camisajpnsred.png|assets/img/camisajpnsredback.png|assets/img/camisajpnsreddetailbeside.png|assets/img/camisajpnsreddetail.png" data-sizes="P|M|G|GG|XG"
+                    data-imgs="../assets/img/vermelhoroupa.png|assets/img/camisajpnsredback.png|assets/img/camisajpnsreddetailbeside.png|assets/img/camisajpnsreddetail.png" data-sizes="P|M|G|GG|XG"
                     data-longdesc="Camisa Susanoo Preta: Estilo e cultura japonesa, algodão premium, modelagem confortável.">
                     <div class="card-image"><img src="assets/img/costafoto.png" alt="Camisa Preta"><div class="card-overlay"><button class="btn-quick-view">Ver Detalhes</button></div></div>
                     <div class="card-content"><h3>Camisa Susanoo - Preta</h3><p class="product-desc">Estilo e cultura japonesa</p><p class="price">R$ 109,99</p><button class="btn btn-add-cart">Adicionar ao Carrinho</button></div>
