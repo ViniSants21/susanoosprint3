@@ -123,7 +123,7 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
         })();
     </script>
     <style>
-        /* (MANTIVE O MESMO CSS DO SEU ARQUIVO ORIGINAL PARA NÃO QUEBRAR O LAYOUT) */
+        /* ===== ESTILOS DO PAINEL ADMIN ===== */
         .admin-dashboard { background-color: var(--bg-primary); min-height: 100vh; padding-top: 80px; }
         .admin-container { display: flex; max-width: 1400px; margin: 0 auto; padding: 0 20px; }
         .admin-sidebar { width: 280px; background: var(--bg-card); border-radius: 20px; padding: 2rem 1.5rem; margin-right: 2rem; height: fit-content; position: sticky; top: 100px; box-shadow: var(--shadow-soft); border: 1px solid rgba(139, 92, 246, 0.1); }
@@ -139,11 +139,40 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
         .admin-title { font-family: var(--font-display); font-size: 2.5rem; color: var(--text-primary); margin: 0; }
         .admin-actions { display: flex; gap: 1rem; }
         
-        .products-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+        .products-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; gap: 1rem; }
+        
+        /* CSS DA PESQUISA */
         .search-box { position: relative; width: 300px; }
         .search-box input { width: 100%; padding: 0.8rem 1rem 0.8rem 2.5rem; border: 1px solid var(--border-color); border-radius: 10px; background: var(--bg-card); color: var(--text-primary); }
         .search-box i { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
         
+        /* CSS NOVO: FILTRO DE CATEGORIA */
+        .filter-options select {
+            padding: 0.8rem 1.5rem 0.8rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            background: var(--bg-card);
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            cursor: pointer;
+            outline: none;
+            transition: border-color 0.3s ease;
+            min-width: 180px;
+            appearance: none; /* Remove seta padrão */
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23888888%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.7rem top 50%;
+            background-size: 0.65rem auto;
+        }
+
+        .filter-options select:focus {
+            border-color: var(--primary-purple);
+        }
+
+        .filter-options select:hover {
+            border-color: #a78bfa;
+        }
+
         .data-table { width: 100%; background: var(--bg-card); border-radius: 15px; overflow: hidden; box-shadow: var(--shadow-soft); border: 1px solid rgba(139, 92, 246, 0.1); }
         .data-table table { width: 100%; border-collapse: collapse; }
         .data-table th { background: rgba(139, 92, 246, 0.05); padding: 1.2rem 1rem; text-align: left; font-weight: 600; color: var(--text-primary); border-bottom: 1px solid var(--border-color); }
@@ -183,7 +212,7 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
         .image-upload i { font-size: 2rem; color: var(--text-muted); margin-bottom: 1rem; }
 
         @media (max-width: 1024px) { .admin-container { flex-direction: column; } .admin-sidebar { width: 100%; position: static; margin-bottom: 2rem; } }
-        @media (max-width: 768px) { .admin-header, .products-header { flex-direction: column; align-items: flex-start; gap: 1rem; } .search-box { width: 100%; } .data-table { overflow-x: auto; } .form-row { grid-template-columns: 1fr; } }
+        @media (max-width: 768px) { .admin-header, .products-header { flex-direction: column; align-items: flex-start; gap: 1rem; } .search-box, .filter-options, .filter-options select { width: 100%; } .data-table { overflow-x: auto; } .form-row { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body class="admin-dashboard">
@@ -200,8 +229,8 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
             <li><a href="admin.php"><i class="fas fa-chart-pie"></i> Dashboard</a></li>
             <li><a href="produtos_admin.php" class="active"><i class="fas fa-box"></i> Produtos</a></li>
             <li><a href="usuarios_admin.php"><i class="fas fa-users"></i> Usuários</a></li>
-            <li><a href="#"><i class="fas fa-shopping-cart"></i> Pedidos</a></li>
-            <li><a href="relatorios_admin.php" class="active"><i class="fas fa-comment"></i>Mensagens</a></li>
+            <li><a href="pedidos_admin.php"><i class="fas fa-shopping-cart"></i> Pedidos</a></li>
+            <li><a href="relatorios_admin.php"><i class="fas fa-comment"></i>Mensagens</a></li>
             
             <li><a href="../index.php"><i class="fas fa-sign-out-alt"></i> Voltar ao Site</a></li>
         </ul>
@@ -228,13 +257,14 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
                     <option value="camisetas">Camisetas</option>
                     <option value="moletons">Moletons</option>
                     <option value="acessorios">Acessórios</option>
+                    <option value="calcas">Calças</option>
                     <option value="colecoes">Coleções</option>
                 </select>
             </div>
         </div>
 
         <div class="data-table">
-            <table>
+            <table id="products-table">
                 <thead>
                     <tr>
                         <th>Produto</th>
@@ -257,7 +287,8 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
                             $dataImage = isset($row['image']) ? htmlspecialchars($row['image']) : '';
                             $dataCollection = isset($row['collection']) ? htmlspecialchars($row['collection']) : '';
                         ?>
-                        <tr data-id="<?php echo $row['id']; ?>" 
+                        <tr class="product-row"
+                            data-id="<?php echo $row['id']; ?>" 
                             data-image="<?php echo $dataImage; ?>" 
                             data-description="<?php echo $dataDescription; ?>"
                             data-collection="<?php echo $dataCollection; ?>">
@@ -378,6 +409,36 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
 
 <script src="../js/script.js"></script>
 <script>
+    // --- LÓGICA DE FILTRO E PESQUISA ---
+    const searchInput = document.getElementById('search-products');
+    const categoryFilter = document.getElementById('category-filter');
+    const tableRows = document.querySelectorAll('.data-table tbody tr.product-row');
+
+    function filterTable() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const categoryValue = categoryFilter.value.toLowerCase();
+
+        tableRows.forEach(row => {
+            const productName = row.querySelector('.user-details h4').textContent.toLowerCase();
+            const productCategory = row.cells[1].textContent.toLowerCase(); // Coluna 1 é a categoria
+
+            const matchesSearch = productName.includes(searchTerm);
+            // Verifica se a categoria selecionada está contida no texto da coluna ou se está vazio (todos)
+            const matchesCategory = categoryValue === "" || productCategory.includes(categoryValue) || productCategory === categoryValue;
+
+            if (matchesSearch && matchesCategory) {
+                row.style.display = ""; // Mostra
+            } else {
+                row.style.display = "none"; // Esconde
+            }
+        });
+    }
+
+    // Eventos para acionar o filtro
+    searchInput.addEventListener('input', filterTable);
+    categoryFilter.addEventListener('change', filterTable);
+
+    // --- LÓGICA DO MODAL (JÁ EXISTENTE) ---
     const modal = document.getElementById('product-modal');
     const addProductBtn = document.getElementById('add-product');
     const closeModalBtns = document.querySelectorAll('.close-modal');
@@ -422,8 +483,8 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
             const id = row.getAttribute('data-id');
             const name = row.querySelector('.user-details h4').textContent;
             const category = row.cells[1].textContent.trim();
-            const collection = row.getAttribute('data-collection'); // Pega coleção
-            const status = row.cells[3].textContent.trim().toLowerCase(); // Ajustado index
+            const collection = row.getAttribute('data-collection');
+            const status = row.cells[3].textContent.trim().toLowerCase();
             const price = row.cells[4].textContent.replace('R$', '').replace('.', '').replace(',', '.').trim();
             const stock = row.cells[5].textContent.trim();
             const description = row.getAttribute('data-description');
@@ -434,7 +495,7 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
             document.getElementById('product-name').value = name;
             
             document.getElementById('product-category').value = category.toLowerCase();
-            document.getElementById('product-collection').value = collection; // Seta coleção
+            document.getElementById('product-collection').value = collection;
             
             document.getElementById('product-status').value = status;
             document.getElementById('product-price').value = price;
