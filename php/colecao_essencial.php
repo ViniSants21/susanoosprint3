@@ -51,6 +51,26 @@
 </head>
 
 <?php
+// === LÓGICA PHP INSERIDA AQUI ===
+require_once 'conexao.php';
+
+// Função auxiliar para achar tabela (igual ao produtos.php)
+function find_products_table($conn) {
+    $candidates = ['products', 'produtos'];
+    foreach ($candidates as $t) {
+        $res = $conn->query("SHOW TABLES LIKE '" . $conn->real_escape_string($t) . "'");
+        if ($res && $res->num_rows > 0) return $t;
+    }
+    return 'products';
+}
+$table = find_products_table($conn);
+
+// Seleciona APENAS produtos da coleção Essencial
+$stmt = $conn->prepare("SELECT * FROM `$table` WHERE collection = 'essencial' ORDER BY id DESC");
+$stmt->execute();
+$products_res = $stmt->get_result();
+// ==================================
+
 $current = basename($_SERVER['PHP_SELF']);
 if (!function_exists('is_active')) {
     function is_active($href, $current) {
@@ -95,7 +115,6 @@ if (!function_exists('is_active')) {
                         <i class="fas fa-user"></i>
                         </a>
 
-
                         <div class="profile-dropdown-menu">
                             <ul class="dropdown-links">
                                 <li class="dropdown-link-item">
@@ -106,7 +125,6 @@ if (!function_exists('is_active')) {
                                 </li>
                             </ul>
                         </div>
-
 
                     <?php else: ?>
                     <!-- USUÁRIO LOGADO -->
@@ -152,8 +170,6 @@ if (!function_exists('is_active')) {
          style="pointer-events: none; cursor: default;">
 </section>
 
-
-
 <!-- Cabeçalho -->
 <section class="page-header">
     <div class="container">
@@ -165,30 +181,60 @@ if (!function_exists('is_active')) {
 <!-- Produtos -->
 <section class="products-section">
     <div class="container">
-        <!-- data-imgs = FOTOS FRENTE E VERSO -->
         <div class="products-grid">
-            <div class="product-card" data-category="camisas"
-                data-name="Camiseta Boxy Susanoo Preta" data-price="109.90" data-img="../assets/img/Camisa Boxy Susanoo.jpg"
-                data-imgs="../assets/img/Camisa Boxy Susanoo.jpg|../assets/img/camisasusanoo.png" data-sizes="P|M|G|GG|XG"
-                data-longdesc="Camiseta Boxy Susanoo Preta: Modelagem boxy, algodão premium, estampa minimalista, perfeita para o dia a dia.">
-                <div class="card-image"><img src="../assets/img/Camisa Boxy Susanoo.jpg" alt="Camisa Boxy"><div class="card-overlay"><button class="btn-quick-view">Ver Detalhes</button></div></div>
-                <div class="card-content"><h3>Camiseta Boxy Susanoo Preta</h3><p class="product-desc">Camiseta da coleção Essentials cor preto e branco</p><p class="price">R$ 109,90</p><button class="btn btn-add-cart">Adicionar ao Carrinho</button></div>
-            </div>
-            <!-- data-imgs = FOTOS FRENTE E VERSO -->
-            <div class="product-card" data-category="camisas"
-                data-name="Camiseta Regular Susanoo Branca" data-price="109.90" data-img="../assets/img/camisasusanoo.png"
-                data-imgs="../assets/img/camisasusanoo.png|../assets/img/Camisa Boxy Susanoo.jpg" data-sizes="P|M|G|GG|XG"
-                data-longdesc="Camiseta Regular Susanoo Branca: Algodão macio, caimento tradicional, detalhes exclusivos Susanoo.">
-                <div class="card-image"><img src="../assets/img/camisasusanoo.png" alt="Camisa Essential"><div class="card-overlay"><button class="btn-quick-view">Ver Detalhes</button></div></div>
-                <div class="card-content"><h3>Camiseta Regular Susanoo Branca</h3><p class="product-desc">Camiseta da coleção Essentials cor branco e preto</p><p class="price">R$ 109,90</p><button class="btn btn-add-cart">Adicionar ao Carrinho</button></div>
-            </div>
-            <div class="product-card" data-category="moletons"
-                data-name="Moletom Essentials Susanoo Preto" data-price="149.90" data-img="../assets/img/Moletom_preto.jpeg"
-                data-imgs="../assets/img/Moletom_preto.jpeg" data-sizes="P|M|G|GG|XG"
-                data-longdesc="Moletom Essentials Susanoo Preto: Moletom felpado, capuz ajustável, conforto e estilo para o inverno.">
-                <div class="card-image"><img src="../assets/img/Moletom_preto.jpeg" alt="Moletom Essential"><div class="card-overlay"><button class="btn-quick-view">Ver Detalhes</button></div></div>
-                <div class="card-content"><h3>Moletom Essentials Susanoo Preto</h3><p class="product-desc">Moletom da coleção Essentials preto e branco</p><p class="price">R$ 149,90</p><button class="btn btn-add-cart">Adicionar ao Carrinho</button></div>
-            </div>
+            <?php if ($products_res && $products_res->num_rows > 0): ?>
+                <?php while ($p = $products_res->fetch_assoc()): ?>
+                    <?php
+                        $p_name = htmlspecialchars($p['name']);
+                        $p_cat = htmlspecialchars($p['category']);
+                        $p_price = number_format($p['price'], 2, ',', '.');
+                        
+                        // Lógica de Imagem (Idêntica ao produtos.php)
+                        $img = '../assets/img/placeholder.png';
+                        if (!empty($p['image'])) {
+                            $raw = $p['image'];
+                            if (strpos($raw, '://') !== false) {
+                                $img = $raw;
+                            } elseif (substr($raw, 0, 2) === '..') {
+                                $img = $raw;
+                            } elseif (substr($raw, 0, 1) === '/') {
+                                $img = '..' . $raw;
+                            } else {
+                                $img = '../' . ltrim($raw, './');
+                            }
+                        } else {
+                            $cat = strtolower($p['category']);
+                            if (strpos($cat, 'camis') !== false) $img = '../assets/img/camisabr.png';
+                            elseif (strpos($cat, 'moleton') !== false || strpos($cat, 'moletons') !== false) $img = '../assets/img/moletomroxo.png';
+                            elseif (strpos($cat, 'cal') !== false) $img = '../assets/img/jortscinza.png';
+                            elseif (strpos($cat, 'acessor') !== false) $img = '../assets/img/bonebarra.png';
+                        }
+                    ?>
+                    
+                    <div class="product-card" data-category="<?php echo $p_cat; ?>"
+                        data-name="<?php echo $p_name; ?>" data-price="<?php echo $p['price']; ?>" data-img="<?php echo $img; ?>"
+                        data-imgs="<?php echo $img; ?>" data-sizes="P|M|G|GG|XG"
+                        data-longdesc="<?php echo isset($p['description']) ? htmlspecialchars($p['description']) : ''; ?>">
+                        <div class="card-image">
+                            <img src="<?php echo $img; ?>" alt="<?php echo $p_name; ?>">
+                            <div class="card-overlay">
+                                <button class="btn-quick-view">Ver Detalhes</button>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <h3><?php echo $p_name; ?></h3>
+                            <p class="product-desc"><?php echo isset($p['description']) ? htmlspecialchars(mb_strimwidth($p['description'], 0, 50, '...')) : ''; ?></p>
+                            <p class="price">R$ <?php echo $p_price; ?></p>
+                            <button class="btn btn-add-cart">Adicionar ao Carrinho</button>
+                        </div>
+                    </div>
+
+                <?php endwhile; ?>
+            <?php else: ?>
+                <div style="grid-column: 1 / -1; text-align: center; padding: 2rem;">
+                    <p>Nenhum produto encontrado nesta coleção.</p>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
 </section>

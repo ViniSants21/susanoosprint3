@@ -25,6 +25,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $id = !empty($_POST['product_id']) ? intval($_POST['product_id']) : null;
         $name = $_POST['product-name'] ?? '';
         $category = $_POST['product-category'] ?? '';
+        
+        // NOVO: Pegar a coleção
+        $collection = !empty($_POST['product-collection']) ? $_POST['product-collection'] : null;
+        
         $status = $_POST['product-status'] ?? 'ativo';
         $price = isset($_POST['product-price']) ? floatval($_POST['product-price']) : 0;
         $stock = isset($_POST['product-stock']) ? intval($_POST['product-stock']) : 0;
@@ -53,33 +57,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
-        // -- SQL E BIND_PARAM CORRIGIDOS --
-        // Legenda dos tipos: s=string (texto), d=double (preço), i=integer (número inteiro)
-
         if ($id) {
             // >>> UPDATE (Edição)
             if ($imagePathInDB) {
-                // Com imagem nova (8 variáveis)
-                $sql = "UPDATE `$table` SET name=?, category=?, status=?, price=?, stock=?, descricao=?, image=?, updated_at=NOW() WHERE id=?";
+                // Com imagem nova
+                $sql = "UPDATE `$table` SET name=?, category=?, collection=?, status=?, price=?, stock=?, descricao=?, image=?, updated_at=NOW() WHERE id=?";
                 $stmt = $conn->prepare($sql);
-                // Tipos: string, string, string, double, integer, string, string, integer
-                $stmt->bind_param("sssdissi", $name, $category, $status, $price, $stock, $descricao, $imagePathInDB, $id);
+                // Tipos: s=string, s=string, s=string, s=string, d=double, i=int, s=string, s=string, i=int
+                $stmt->bind_param("ssssdissi", $name, $category, $collection, $status, $price, $stock, $descricao, $imagePathInDB, $id);
             } else {
-                // Sem imagem nova (7 variáveis)
-                $sql = "UPDATE `$table` SET name=?, category=?, status=?, price=?, stock=?, descricao=?, updated_at=NOW() WHERE id=?";
+                // Sem imagem nova
+                $sql = "UPDATE `$table` SET name=?, category=?, collection=?, status=?, price=?, stock=?, descricao=?, updated_at=NOW() WHERE id=?";
                 $stmt = $conn->prepare($sql);
-                // Tipos: string, string, string, double, integer, string, integer
-                $stmt->bind_param("sssdisi", $name, $category, $status, $price, $stock, $descricao, $id);
+                $stmt->bind_param("ssssdisi", $name, $category, $collection, $status, $price, $stock, $descricao, $id);
             }
             $stmt->execute();
             $stmt->close();
         } else {
             // >>> INSERT (Novo Produto)
-            // 7 variáveis
-            $sql = "INSERT INTO `$table` (name, category, status, price, stock, descricao, image, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())";
+            $sql = "INSERT INTO `$table` (name, category, collection, status, price, stock, descricao, image, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())";
             $stmt = $conn->prepare($sql);
-            // Tipos: string, string, string, double, integer, string, string
-            $stmt->bind_param("sssdiss", $name, $category, $status, $price, $stock, $descricao, $imagePathInDB);
+            $stmt->bind_param("ssssdiss", $name, $category, $collection, $status, $price, $stock, $descricao, $imagePathInDB);
             $stmt->execute();
             $stmt->close();
         }
@@ -125,7 +123,7 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
         })();
     </script>
     <style>
-        /* Estilos do Admin */
+        /* (MANTIVE O MESMO CSS DO SEU ARQUIVO ORIGINAL PARA NÃO QUEBRAR O LAYOUT) */
         .admin-dashboard { background-color: var(--bg-primary); min-height: 100vh; padding-top: 80px; }
         .admin-container { display: flex; max-width: 1400px; margin: 0 auto; padding: 0 20px; }
         .admin-sidebar { width: 280px; background: var(--bg-card); border-radius: 20px; padding: 2rem 1.5rem; margin-right: 2rem; height: fit-content; position: sticky; top: 100px; box-shadow: var(--shadow-soft); border: 1px solid rgba(139, 92, 246, 0.1); }
@@ -259,6 +257,7 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
                     <tr>
                         <th>Produto</th>
                         <th>Categoria</th>
+                        <th>Coleção</th>
                         <th>Status</th>
                         <th>Preço</th>
                         <th>Estoque</th>
@@ -274,10 +273,12 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
                             $imgSrc = !empty($row['image']) ? '../' . $row['image'] : 'https://via.placeholder.com/50';
                             $dataDescription = isset($row['descricao']) ? htmlspecialchars($row['descricao']) : '';
                             $dataImage = isset($row['image']) ? htmlspecialchars($row['image']) : '';
+                            $dataCollection = isset($row['collection']) ? htmlspecialchars($row['collection']) : '';
                         ?>
                         <tr data-id="<?php echo $row['id']; ?>" 
                             data-image="<?php echo $dataImage; ?>" 
-                            data-description="<?php echo $dataDescription; ?>">
+                            data-description="<?php echo $dataDescription; ?>"
+                            data-collection="<?php echo $dataCollection; ?>">
                             <td>
                                 <div class="user-info">
                                     <img src="<?php echo $imgSrc; ?>" alt="Foto" class="user-avatar">
@@ -287,6 +288,7 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
                                 </div>
                             </td>
                             <td><?php echo htmlspecialchars($row['category']); ?></td>
+                            <td><?php echo !empty($row['collection']) ? ucfirst($row['collection']) : '-'; ?></td>
                             <td><span class="status-badge <?php echo $statusClass; ?>"><?php echo htmlspecialchars($row['status']); ?></span></td>
                             <td>R$ <?php echo $price; ?></td>
                             <td><?php echo intval($row['stock']); ?></td>
@@ -299,7 +301,7 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
                         </tr>
                     <?php endwhile; ?>
                 <?php else: ?>
-                    <tr><td colspan="6" style="text-align:center;">Nenhum produto cadastrado.</td></tr>
+                    <tr><td colspan="7" style="text-align:center;">Nenhum produto cadastrado.</td></tr>
                 <?php endif; ?>
                 </tbody>
             </table>
@@ -333,15 +335,9 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
                     <label for="product-name">Nome do Produto</label>
                     <input type="text" id="product-name" name="product-name" required>
                 </div>
+                <!-- Categoria -->
                 <div class="form-group">
-                    <label for="product-sku">SKU (Visual)</label>
-                    <input type="text" id="product-sku" name="product-sku">
-                </div>
-            </div>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="product-category">Categoria</label>
+                    <label for="product-category">Categoria (Tipo)</label>
                     <select id="product-category" name="product-category" required>
                         <option value="">Selecione...</option>
                         <option value="camisetas">Camisetas</option>
@@ -350,6 +346,21 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
                         <option value="calcas">Calças</option>
                     </select>
                 </div>
+            </div>
+            
+            <div class="form-row">
+                <!-- NOVA OPÇÃO DE COLEÇÃO -->
+                <div class="form-group">
+                    <label for="product-collection">Coleção</label>
+                    <select id="product-collection" name="product-collection">
+                        <option value="">Nenhuma</option>
+                        <option value="essencial">Coleção Essencial</option>
+                        <option value="inverno">Coleção Inverno</option>
+                        <option value="sublime">Coleção Sublime</option>
+                        <option value="verao">Coleção Verão</option>
+                    </select>
+                </div>
+
                 <div class="form-group">
                     <label for="product-status">Status</label>
                     <select id="product-status" name="product-status" required>
@@ -429,17 +440,20 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
             const id = row.getAttribute('data-id');
             const name = row.querySelector('.user-details h4').textContent;
             const category = row.cells[1].textContent.trim();
-            const status = row.cells[2].textContent.trim().toLowerCase();
-            const price = row.cells[3].textContent.replace('R$', '').replace('.', '').replace(',', '.').trim();
-            const stock = row.cells[4].textContent.trim();
+            const collection = row.getAttribute('data-collection'); // Pega coleção
+            const status = row.cells[3].textContent.trim().toLowerCase(); // Ajustado index
+            const price = row.cells[4].textContent.replace('R$', '').replace('.', '').replace(',', '.').trim();
+            const stock = row.cells[5].textContent.trim();
             const description = row.getAttribute('data-description');
             const imageName = row.getAttribute('data-image');
 
             document.getElementById('modal-title').textContent = `Editar ${name}`;
             document.getElementById('product-id').value = id;
             document.getElementById('product-name').value = name;
-            document.getElementById('product-sku').value = "";
+            
             document.getElementById('product-category').value = category.toLowerCase();
+            document.getElementById('product-collection').value = collection; // Seta coleção
+            
             document.getElementById('product-status').value = status;
             document.getElementById('product-price').value = price;
             document.getElementById('product-stock').value = stock;
