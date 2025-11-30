@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     // ===================================================================
-    // SELETORES E VARIÁVEIS GLOBAIS
+    // 1. SELETORES E VARIÁVEIS GLOBAIS
     // ===================================================================
     const summaryItemsList = document.querySelector('.summary-items-list');
     const subtotalEl = document.getElementById('summary-subtotal');
@@ -13,186 +13,262 @@ document.addEventListener('DOMContentLoaded', function() {
     let subtotal = 0;
 
     // ===================================================================
-    // LÓGICA DO CARRINHO E RESUMO DO PEDIDO
+    // 2. LÓGICA DO CARRINHO (Recuperar e Renderizar)
     // ===================================================================
+    
+    // Função segura para pegar o carrinho com o nome CORRETO
     function getCart() {
-        return JSON.parse(localStorage.getItem('cart')) || [];
+        try {
+            // AQUI ESTAVA O ERRO: Mudamos de 'cart' para 'susanooCart'
+            const storedCart = localStorage.getItem('susanooCart');
+            return storedCart ? JSON.parse(storedCart) : [];
+        } catch (e) {
+            console.error("Erro ao ler o carrinho:", e);
+            return [];
+        }
     }
 
     function formatCurrency(value) {
         return `R$ ${value.toFixed(2).replace('.', ',')}`;
     }
 
+    // Função para corrigir o caminho da imagem
+    function fixImagePath(imagePath) {
+        if (!imagePath) return '../assets/img/placeholder.png';
+        
+        // Se já for link completo ou já tiver subido nível, mantém
+        if (imagePath.startsWith('http') || imagePath.startsWith('../')) {
+            return imagePath;
+        }
+        
+        // Se estiver na pasta assets/..., adiciona o ../ na frente
+        if (imagePath.startsWith('assets/')) {
+            return '../' + imagePath;
+        }
+
+        // Remove ./ do início se houver
+        return '../' + imagePath.replace(/^\.\//, '');
+    }
+
     function renderSummary() {
         const cart = getCart();
+        
+        // Debug para você ver no console se pegou os itens
+        console.log("Itens carregados no checkout:", cart);
+
         summaryItemsList.innerHTML = '';
         subtotal = 0;
+
         if (cart.length === 0) {
-            summaryItemsList.innerHTML = '<p>Seu carrinho está vazio.</p>';
+            summaryItemsList.innerHTML = '<div class="empty-cart-alert"><p>Seu carrinho está vazio.</p><a href="produtos.php" style="color:var(--primary-color);">Voltar às compras</a></div>';
             updateTotals();
             return;
         }
+
         cart.forEach(item => {
-            subtotal += item.price * item.quantity;
+            const itemTotal = item.price * item.quantity;
+            subtotal += itemTotal;
+            
+            const imageSrc = fixImagePath(item.image);
+
             const itemHTML = `
                 <div class="summary-item">
-                    <img src="${item.image}" alt="${item.name}" class="summary-item-image">
+                    <div class="summary-item-img-wrapper">
+                        <img src="${imageSrc}" alt="${item.name}" class="summary-item-image" onerror="this.src='../assets/img/placeholder.png'">
+                        <span class="summary-item-qty">${item.quantity}</span>
+                    </div>
                     <div class="summary-item-details">
                         <h4 class="summary-item-name">${item.name}</h4>
-                        <p class="summary-item-info">Tam: ${item.size} | Qtd: ${item.quantity}</p>
+                        <p class="summary-item-info">Tam: ${item.size}</p>
                     </div>
-                    <span class="summary-item-price">${formatCurrency(item.price * item.quantity)}</span>
+                    <span class="summary-item-price">${formatCurrency(itemTotal)}</span>
                 </div>
             `;
             summaryItemsList.insertAdjacentHTML('beforeend', itemHTML);
         });
+
         updateTotals();
     }
 
     function updateTotals() {
+        let shippingCost = 0;
         const selectedShipping = document.querySelector('input[name="shipping"]:checked');
-        const shippingCost = selectedShipping ? parseFloat(selectedShipping.value) : 0;
+        
+        if (selectedShipping) {
+            shippingCost = parseFloat(selectedShipping.value);
+        }
+
         const total = subtotal + shippingCost;
-        subtotalEl.textContent = formatCurrency(subtotal);
-        shippingEl.textContent = formatCurrency(shippingCost);
-        totalEl.textContent = formatCurrency(total);
+
+        if(subtotalEl) subtotalEl.textContent = formatCurrency(subtotal);
+        if(shippingEl) shippingEl.textContent = formatCurrency(shippingCost);
+        if(totalEl) totalEl.textContent = formatCurrency(total);
     }
 
     // ===================================================================
-    // LÓGICA DO PAGAMENTO E FORMULÁRIO
+    // 3. LÓGICA DO PAGAMENTO E FORMULÁRIO
     // ===================================================================
     function togglePaymentDetails() {
-        const selectedPayment = document.querySelector('input[name="payment"]:checked').value;
-        document.querySelectorAll('.payment-details').forEach(detail => detail.classList.remove('visible'));
+        const selectedOption = document.querySelector('input[name="payment"]:checked');
+        if(!selectedOption) return;
+
+        const selectedPayment = selectedOption.value;
+        
+        document.querySelectorAll('.payment-details').forEach(detail => {
+            detail.classList.remove('visible');
+            detail.style.display = 'none';
+        });
+
         if (selectedPayment === 'card') {
-            document.getElementById('credit-card-details').classList.add('visible');
+            const cardDetails = document.getElementById('credit-card-details');
+            if(cardDetails) {
+                cardDetails.classList.add('visible');
+                cardDetails.style.display = 'block';
+            }
         } else if (selectedPayment === 'pix') {
-            document.getElementById('pix-details').classList.add('visible');
+            const pixDetails = document.getElementById('pix-details');
+            if(pixDetails) {
+                pixDetails.classList.add('visible');
+                pixDetails.style.display = 'block';
+            }
         }
     }
 
-    checkoutForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const email = document.getElementById('email').value;
-        const name = document.getElementById('name').value;
-        const address = document.getElementById('address').value;
-        const number = document.getElementById('number').value;
+    if(checkoutForm) {
+        checkoutForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const name = document.getElementById('name').value;
+            const address = document.getElementById('address').value;
+            const number = document.getElementById('number').value;
+            const cart = getCart();
 
-        if (!email || !name || !address || !number) {
-            Swal.fire({
-                title: 'Erro!',
-                text: 'Por favor, preencha todos os campos obrigatórios.',
-                icon: 'error',
-                confirmButtonColor: '#7C3AED'
-            });
-            return;
-        }
+            if (cart.length === 0) {
+                Swal.fire({
+                    title: 'Carrinho Vazio',
+                    text: 'Adicione produtos antes de finalizar.',
+                    icon: 'warning',
+                    confirmButtonColor: '#7C3AED'
+                });
+                return;
+            }
 
-        const selectedPayment = document.querySelector('input[name="payment"]:checked').value;
+            if (!email || !name || !address || !number) {
+                Swal.fire({
+                    title: 'Atenção!',
+                    text: 'Por favor, preencha todos os campos de entrega.',
+                    icon: 'error',
+                    confirmButtonColor: '#7C3AED'
+                });
+                return;
+            }
 
-        if (selectedPayment === 'pix') {
-    const fakePixKey = '00020126360014BR.GOV.BCB.PIX0114+551299642265752040000530398654040.995802BR5922Kaua de Souza Oliveira6009SAO PAULO62140510XUJpKCA9dA6304771E';
-    Swal.fire({
-        title: "Pedido realizado! Pague com PIX",
-        html: `
-            <p>Aponte a câmera do seu celular para o QR Code abaixo ou copie o código.</p>
-            <input type="text" value="${fakePixKey}" readonly style="width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ddd; text-align: center; cursor: pointer;" onclick="this.select(); document.execCommand('copy');">
-        `,
-        // Caminho ajustado para a imagem local
-        imageUrl: '../assets/img/qrcode.jfif',
-        imageAlt: 'QR Code para pagamento PIX',
-        imageWidth: 180, // Opcional: defina a largura para manter o tamanho
-        imageHeight: 180, // Opcional: defina a altura para manter o tamanho
-        confirmButtonText: "Pagamento Concluído",
-        confirmButtonColor: '#8B5CF6'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            localStorage.removeItem('cart');
+            const selectedPayment = document.querySelector('input[name="payment"]:checked').value;
+
+            if (selectedPayment === 'pix') {
+                const fakePixKey = '00020126360014BR.GOV.BCB.PIX0114+5512999999999...';
+                Swal.fire({
+                    title: "Pagamento via PIX",
+                    html: `
+                        <p style="margin-bottom:15px;">Escaneie o QR Code ou copie a chave abaixo:</p>
+                        <div style="background:#f3f3f3; padding:10px; border-radius:8px; margin-bottom:10px;">
+                            <i class="fas fa-qrcode" style="font-size:3rem; color:#333;"></i>
+                        </div>
+                        <input type="text" value="${fakePixKey}" readonly style="width: 100%; padding: 10px; border-radius:5px; border: 1px solid #ddd; text-align: center; font-size: 0.85rem;" onclick="this.select(); document.execCommand('copy');">
+                    `,
+                    confirmButtonText: "Já fiz o pagamento",
+                    confirmButtonColor: '#10B981',
+                    showCancelButton: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        finalizeOrder();
+                    }
+                });
+            } else {
+                let timerInterval;
+                Swal.fire({
+                    title: 'Processando pagamento...',
+                    html: 'Aguarde um momento.',
+                    timer: 2000,
+                    timerProgressBar: true,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                }).then((result) => {
+                    finalizeOrder();
+                });
+            }
+        });
+    }
+
+    function finalizeOrder() {
+        Swal.fire({
+            title: "Pedido Confirmado!",
+            text: "Sua jornada Susanoo começou. Verifique seu e-mail.",
+            icon: "success",
+            confirmButtonText: "Voltar para Home",
+            confirmButtonColor: '#7C3AED'
+        }).then(() => {
+            // AQUI TAMBÉM: Limpa o carrinho com o nome correto
+            localStorage.removeItem('susanooCart'); 
             window.location.href = "../index.php";
-        }
-    });
-} else {
-    Swal.fire({
-        title: "Pedido realizado!",
-        text: "Obrigado por comprar na Susanoo! Você receberá os detalhes no seu email.",
-        icon: "success",
-        confirmButtonText: "Voltar para o Início",
-        confirmButtonColor: '#8B5CF6'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            localStorage.removeItem('cart');
-            window.location.href = "../index.php";
-        }
-    });
-}
-});
+        });
+    }
 
     // ===================================================================
-    // LÓGICA DO CEP (BUSCA AUTOMÁTICA E MÁSCARA)
+    // 4. LÓGICA DE CEP (ViaCEP)
     // ===================================================================
     const cepInput = document.getElementById('zip');
-    const addressInput = document.getElementById('address');
-    const numberInput = document.getElementById('number'); // NOVO
-    const cityInput = document.getElementById('city');
-    const stateInput = document.getElementById('state');
+    
+    if (cepInput) {
+        cepInput.addEventListener('input', (e) => {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 5) {
+                value = value.slice(0, 5) + '-' + value.slice(5, 8);
+            }
+            e.target.value = value;
+            
+            if (value.replace(/\D/g, '').length === 8) {
+                fetchAddress(value.replace(/\D/g, ''));
+            }
+        });
+    }
 
-    const fetchAddress = async () => {
-        const cep = cepInput.value.replace(/\D/g, '');
-        if (cep.length !== 8) return;
-        
-        addressInput.value = 'Buscando...';
-        cityInput.value = 'Buscando...';
-        stateInput.value = '...';
+    async function fetchAddress(cep) {
+        const addressInput = document.getElementById('address');
+        const cityInput = document.getElementById('city');
+        const stateInput = document.getElementById('state');
+        const numberInput = document.getElementById('number');
 
         try {
+            addressInput.value = '...';
             const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
             const data = await response.json();
-            if (data.erro) throw new Error('CEP não localizado.');
             
-            // Preenche os campos de endereço, cidade e estado
-            addressInput.value = data.logradouro ? `${data.logradouro}, ${data.bairro}` : '';
-            cityInput.value = data.localidade || '';
-            stateInput.value = data.uf || '';
+            if (data.erro) throw new Error('CEP inválido');
             
-            // ATUALIZADO: Move o foco para o campo NÚMERO
-            numberInput.focus(); 
+            addressInput.value = data.logradouro;
+            cityInput.value = data.localidade;
+            stateInput.value = data.uf;
+            numberInput.focus();
+            
         } catch (error) {
-            console.error('Erro ao buscar o CEP:', error);
             addressInput.value = '';
-            cityInput.value = '';
-            stateInput.value = '';
             Swal.fire({
+                toast: true,
+                position: 'top-end',
                 icon: 'error',
                 title: 'CEP não encontrado',
-                text: 'Por favor, verifique o CEP digitado e tente novamente.',
-                confirmButtonColor: '#333'
+                showConfirmButton: false,
+                timer: 3000
             });
         }
-    };
+    }
 
-    cepInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-        }
-    });
-
-    cepInput.addEventListener('input', (e) => {
-        let value = e.target.value.replace(/\D/g, '');
-        if (value.length > 5) {
-            value = value.slice(0, 5) + '-' + value.slice(5, 8);
-        }
-        e.target.value = value;
-        
-        if (value.replace(/\D/g, '').length === 8) {
-            fetchAddress();
-        }
-    });
-
-    // ===================================================================
-    // INICIALIZAÇÃO DAS FUNÇÕES
-    // ===================================================================
+    // INICIALIZAÇÃO
     renderSummary();
+    shippingOptions.forEach(opt => opt.addEventListener('change', updateTotals));
+    paymentOptions.forEach(opt => opt.addEventListener('change', togglePaymentDetails));
     togglePaymentDetails();
-    shippingOptions.forEach(option => option.addEventListener('change', updateTotals));
-    paymentOptions.forEach(option => option.addEventListener('change', togglePaymentDetails));
 });

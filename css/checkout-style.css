@@ -263,3 +263,154 @@
         padding: 1.5rem;
     }
 }
+/* Estilos para os itens do resumo no checkout */
+.summary-items-list {
+    max-height: 300px;
+    overflow-y: auto;
+    margin-bottom: 1.5rem;
+    padding-right: 5px; /* Espaço para scrollbar */
+}
+
+.summary-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.summary-item-img-wrapper {
+    position: relative;
+    width: 64px;
+    height: 64px;
+}
+
+.summary-item-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid rgba(0,0,0,0.1);
+}
+
+.summary-item-qty {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #7c3aed; /* Cor do seu tema */
+    color: white;
+    font-size: 0.75rem;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.summary-item-details {
+    flex: 1;
+}
+
+.summary-item-name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 0.2rem;
+    color: inherit;
+}
+
+.summary-item-info {
+    font-size: 0.85rem;
+    color: #666;
+}
+
+.summary-item-price {
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+/* ========================================================= */
+/*       CORREÇÃO VISUAL DO RESUMO (DARK/LIGHT MODE)         */
+/* ========================================================= */
+
+/* Container do item */
+.summary-item {
+    display: flex !important;
+    align-items: center !important; /* Centraliza verticalmente */
+    padding: 15px 0 !important;     /* Mais espaço em cima e embaixo */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important; /* Linha sutil */
+    gap: 15px !important;
+}
+
+/* Área da Imagem */
+.summary-item > div:first-child {
+    width: 70px !important;  /* Imagem um pouco maior */
+    height: 70px !important;
+    flex-shrink: 0;          /* Impede a imagem de amassar */
+}
+
+.summary-item img {
+    border-radius: 8px !important; /* Bordas arredondadas */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: #202020;
+}
+
+/* Bolinha da Quantidade */
+.summary-item span[style*="position:absolute"] {
+    background: #8B5CF6 !important; /* Roxo do tema */
+    color: #fff !important;
+    width: 22px !important;
+    height: 22px !important;
+    top: -8px !important;
+    right: -8px !important;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+    font-size: 11px !important;
+}
+
+/* Área de Texto (Nome e Tamanho) */
+.summary-item > div:nth-child(2) {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px; /* Espaço entre nome e tamanho */
+}
+
+/* Nome do Produto */
+.summary-item h4 {
+    font-size: 1rem !important;
+    color: inherit !important; /* Usa a cor do texto do site */
+    font-weight: 600 !important;
+    line-height: 1.2;
+}
+
+/* Tamanho (Aquele que estava sumido) */
+.summary-item p {
+    font-size: 0.85rem !important;
+    color: #a0a0a0 !important; /* Cinza claro para ler no fundo escuro */
+    margin: 0 !important;
+}
+
+/* Preço */
+.summary-item > span:last-child {
+    font-size: 0.95rem !important;
+    font-weight: 700 !important;
+    color: #fff !important; /* Branco para destacar */
+    white-space: nowrap;    /* Não quebra linha */
+}
+
+/* Rolagem bonita na lista */
+.summary-items-list {
+    max-height: 350px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+/* Scrollbar fina */
+.summary-items-list::-webkit-scrollbar {
+    width: 6px;
+}
+.summary-items-list::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.2);
+    border-radius: 3px;
+}
