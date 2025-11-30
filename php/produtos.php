@@ -8,18 +8,37 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
     <script>(function(){const theme=localStorage.getItem('theme');if(theme==='light'){document.documentElement.classList.add('light-mode');}})();</script>
-    <!-- Estilos locais para o ícone de pesquisa -->
     <style>
         .nav-search{display:flex;align-items:center;gap:.5rem;}
         .nav-search input[type="text"]{padding:.45rem .75rem;border-radius:24px;border:1px solid rgba(0,0,0,.08);background:transparent;color:inherit;min-width:160px}
         .nav-search .nav-search-btn{border:none;background:transparent;padding:.35rem;border-radius:50%;cursor:pointer;color:inherit;display:inline-flex;align-items:center;justify-content:center}
         .nav-search .nav-search-btn .fa-search{font-size:0.95rem}
+        /* Ajuste do banner para evitar scroll horizontal em telas menores */
+        .promo-banner-section {
+            width: 100vw;
+            position: relative;
+            left: 50%;
+            right: 50%;
+            margin-left: -50vw;
+            margin-right: -50vw;
+            margin-top: -11px;
+            height: 550px; 
+            margin-bottom: -180px; 
+            overflow: hidden;
+        }
+        .promo-banner-image {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: cover;
+            object-position: center;
+        }
     </style>
 </head>
 <body>
 
 <?php
-// Bloco PHP movido para dentro do Body para evitar erros de renderização
+// LÓGICA PHP INICIAL
 $current = basename($_SERVER['PHP_SELF']);
 if (!function_exists('is_active')) {
     function is_active($href, $current) {
@@ -27,8 +46,9 @@ if (!function_exists('is_active')) {
         return $base === $current ? 'active' : '';
     }
 }
-// Conexão e busca de produtos
+
 require_once 'conexao.php';
+
 function find_products_table($conn) {
     $candidates = ['products', 'produtos'];
     foreach ($candidates as $t) {
@@ -37,39 +57,34 @@ function find_products_table($conn) {
     }
     return 'products';
 }
-// ... código anterior de conexão ...
 $table = find_products_table($conn);
 
-// LÓGICA DE PESQUISA DO BANCO DE DADOS
+// LÓGICA DE PESQUISA
 if (isset($_GET['busca']) && !empty($_GET['busca'])) {
     $busca = $conn->real_escape_string($_GET['busca']);
-    // Busca no nome, descrição ou categoria
+    // Busca no nome, descrição (longa ou curta) ou categoria
     $sql = "SELECT * FROM `$table` 
             WHERE name LIKE '%$busca%' 
             OR descricao LIKE '%$busca%' 
+            OR (short_desc LIKE '%$busca%')
             OR category LIKE '%$busca%' 
             ORDER BY id DESC";
 } else {
-    // Se não tiver busca, traz tudo
     $sql = "SELECT * FROM `$table` ORDER BY id DESC";
 }
 
 $products_res = $conn->query($sql);
-
 ?>
 
- <nav class="navbar scrolled" id="navbar">
+<nav class="navbar scrolled" id="navbar">
     <div class="nav-container">
-        <!-- Substitua/inserir aqui o campo de pesquisa -->
-        <!-- Dentro do produtos.php, substitua a div nav-search por: -->
-<form action="produtos.php" method="GET" class="nav-search">
-    <!-- Repare que mantemos o valor preenchido se já houver busca -->
-    <input type="text" name="busca" placeholder="Pesquisar..." aria-label="Pesquisar" 
-           value="<?php echo isset($_GET['busca']) ? htmlspecialchars($_GET['busca']) : ''; ?>">
-    <button type="submit" class="nav-search-btn" aria-label="Pesquisar">
-        <i class="fas fa-search"></i>
-    </button>
-</form>
+        <form action="produtos.php" method="GET" class="nav-search">
+            <input type="text" name="busca" placeholder="Pesquisar..." aria-label="Pesquisar" 
+                   value="<?php echo isset($_GET['busca']) ? htmlspecialchars($_GET['busca']) : ''; ?>">
+            <button type="submit" class="nav-search-btn" aria-label="Pesquisar">
+                <i class="fas fa-search"></i>
+            </button>
+        </form>
         <div class="nav-logo"><a href="../index.php"><img src="../assets/img/LOGOSUSANOO.png" alt="LOGOSUSANOO"></a></div>
         <div class="nav-right-group">
             <ul class="nav-menu" id="nav-menu">
@@ -80,104 +95,75 @@ $products_res = $conn->query($sql);
                 <li><a href="contato.php" class="nav-link <?php echo is_active('contato.php', $current); ?>">Contato</a></li>
             </ul>
             <div class="nav-icons">
-                    <div class="profile-dropdown-wrapper">
-                        <?php if (!isset($_SESSION)) { session_start(); } ?>
-                        <?php if (!isset($_SESSION['user_id'])): ?>
-                    <!-- USUÁRIO DESLOGADO -->
-                        <a href="login.php" class="nav-icon-link" aria-label="Login">
-                        <i class="fas fa-user"></i>
-                        </a>
-
-
-                       <div class="profile-dropdown-menu">
+                <div class="profile-dropdown-wrapper">
+                    <?php if (!isset($_SESSION)) { session_start(); } ?>
+                    <?php if (!isset($_SESSION['user_id'])): ?>
+                        <a href="login.php" class="nav-icon-link" aria-label="Login"><i class="fas fa-user"></i></a>
+                        <div class="profile-dropdown-menu">
                             <ul class="dropdown-links">
-                                <li class="dropdown-link-item">
-                                <a href="../php/registro.php"><i class="fas fa-user-plus"></i> Registrar</a>
-                                </li>
-                                <li class="dropdown-link-item">
-                                    <a href="../php/login.php"><i class="fas fa-sign-in-alt"></i> Login</a>
-                                </li>
+                                <li class="dropdown-link-item"><a href="../php/registro.php"><i class="fas fa-user-plus"></i> Registrar</a></li>
+                                <li class="dropdown-link-item"><a href="../php/login.php"><i class="fas fa-sign-in-alt"></i> Login</a></li>
                             </ul>
                         </div>
-
-
                     <?php else: ?>
-                    <!-- USUÁRIO LOGADO -->
-                    <a href="#" class="nav-icon-link" aria-label="Perfil">
-                    <img src="<?php echo $_SESSION['foto']; ?>"
-                    class="dropdown-avatar"
-                    style="width:28px; height:28px; border-radius:50%; object-fit:cover;">
-                    </a>
-
-
-<div class="profile-dropdown-menu">
-<div class="dropdown-header">
-<img src="<?php echo $_SESSION['foto']; ?>" alt="Avatar" class="dropdown-avatar">
-<div>
-<div class="dropdown-user-name"><?php echo $_SESSION['nome']; ?></div>
-<div class="dropdown-user-email"><?php echo $_SESSION['email']; ?></div>
-</div>
-</div>
-
-
-<ul class="dropdown-links">
-<li class="dropdown-link-item"><a href="../php/perfil.php"><i class="fas fa-id-card"></i> Visualizar Perfil</a></li>
-<li class="dropdown-link-item"><a href="../php/configuracoes.php"><i class="fas fa-cog"></i> Configurações</a></li>
-<li class="dropdown-link-item"><a href="../php/logout.php"><i class="fas fa-sign-out-alt"></i> Sair</a></li>
-</ul>
-</div>
-<?php endif; ?>
-</div>
+                        <a href="#" class="nav-icon-link" aria-label="Perfil">
+                            <img src="<?php echo $_SESSION['foto']; ?>" class="dropdown-avatar" style="width:28px; height:28px; border-radius:50%; object-fit:cover;">
+                        </a>
+                        <div class="profile-dropdown-menu">
+                            <div class="dropdown-header">
+                                <img src="<?php echo $_SESSION['foto']; ?>" alt="Avatar" class="dropdown-avatar">
+                                <div>
+                                    <div class="dropdown-user-name"><?php echo $_SESSION['nome']; ?></div>
+                                    <div class="dropdown-user-email"><?php echo $_SESSION['email']; ?></div>
+                                </div>
+                            </div>
+                            <ul class="dropdown-links">
+                                <li class="dropdown-link-item"><a href="../php/perfil.php"><i class="fas fa-id-card"></i> Visualizar Perfil</a></li>
+                                <li class="dropdown-link-item"><a href="../php/configuracoes.php"><i class="fas fa-cog"></i> Configurações</a></li>
+                                <li class="dropdown-link-item"><a href="../php/logout.php"><i class="fas fa-sign-out-alt"></i> Sair</a></li>
+                            </ul>
+                        </div>
+                    <?php endif; ?>
+                </div>
                 <a href="carrinho.php" class="nav-icon-link" aria-label="Carrinho"><i class="fas fa-shopping-bag"></i></a>
             </div>
         </div>
         <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
     </div>
 </nav>
-   <!-- Banner -->
+
 <!-- Banner -->
 <section class="promo-banner-section">
-    <img src="../assets/img/Produtos1.png" alt="Banner promocional da nova coleção" class="promo-banner-image" style="pointer-events: none; cursor: default;">
+    <img src="../assets/img/Produtos1.png" alt="Banner promocional" class="promo-banner-image" style="pointer-events: none; cursor: default;">
 </section>
 
-    </a>
-
+<!-- Page Header -->
+<section class="page-header">
+    <div class="container"><h1 class="page-title">Nossos Produtos</h1><p class="page-subtitle">Desperte seu poder interior com estilo único.</p></div>
 </section>
-    <!-- Page Header -->
-    <section class="page-header">
-        <div class="container"><h1 class="page-title">Nossos Produtos</h1><p class="page-subtitle">Descubra algum dos nossos produtos destaque</p></div>
-    </section>
 
-    <!-- Filters -->
-    <section class="filters-section">
-        <div class="container">
-            <div class="filters">
-                <button class="filter-btn active" data-filter="all">Todos</button>
-                <button class="filter-btn" data-filter="camisetas">Camisas</button>
-                <button class="filter-btn" data-filter="moletons">Moletons</button>
-                <button class="filter-btn" data-filter="calcas">Calças</button>
-                <button class="filter-btn" data-filter="acessorios">Acessórios</button>
-            </div>
+<!-- Filters -->
+<section class="filters-section">
+    <div class="container">
+        <div class="filters">
+            <button class="filter-btn active" data-filter="all">Todos</button>
+            <button class="filter-btn" data-filter="camisetas">Camisas</button>
+            <button class="filter-btn" data-filter="moletons">Moletons</button>
+            <button class="filter-btn" data-filter="calcas">Calças</button>
+            <button class="filter-btn" data-filter="acessorios">Acessórios</button>
         </div>
-    </section>
-
-    <!-- Products Grid -->
-    <section class="products-section">
-        <section class="featured-products">
-        <div class="sakura-container">
-        <div class="petal"></div>
-        <div class="petal"></div>
-        <div class="petal"></div>
-        <div class="petal"></div>
-        <div class="petal"></div>
-        <div class="petal"></div>
-        <div class="petal"></div>
-        <div class="petal"></div>
-        <div class="petal"></div>
-        <div class="petal"></div>
-        <div class="petal"></div>
-        <div class="petal"></div>
     </div>
+</section>
+
+<!-- Products Grid -->
+<section class="products-section">
+    <section class="featured-products">
+        <div class="sakura-container">
+            <div class="petal"></div><div class="petal"></div><div class="petal"></div>
+            <div class="petal"></div><div class="petal"></div><div class="petal"></div>
+            <div class="petal"></div><div class="petal"></div><div class="petal"></div>
+            <div class="petal"></div><div class="petal"></div><div class="petal"></div>
+        </div>
         <div class="container">
             <div class="products-grid">
                 <?php if ($products_res && $products_res->num_rows > 0): ?>
@@ -186,117 +172,129 @@ $products_res = $conn->query($sql);
                             $p_name = htmlspecialchars($p['name']);
                             $p_cat = htmlspecialchars($p['category']);
                             $p_price = number_format($p['price'], 2, ',', '.');
-                            // Use imagem salva no banco quando disponível
+                            
+                            // Tratamento de Imagem
                             $img = '../assets/img/placeholder.png';
                             if (!empty($p['image'])) {
-                                // Normaliza o caminho salvo no DB — evita duplicar '../'
                                 $raw = $p['image'];
                                 if (strpos($raw, '://') !== false) {
-                                    $img = $raw; // URL absoluta
+                                    $img = $raw;
                                 } elseif (substr($raw, 0, 2) === '..') {
-                                    $img = $raw; // já relativo
+                                    $img = $raw;
                                 } elseif (substr($raw, 0, 1) === '/') {
-                                    $img = '..' . $raw; // /assets/... -> ../assets/...
+                                    $img = '..' . $raw;
                                 } else {
                                     $img = '../' . ltrim($raw, './');
                                 }
                             } else {
+                                // Fallback por categoria
                                 $cat = strtolower($p['category']);
                                 if (strpos($cat, 'camis') !== false) $img = '../assets/img/camisabr.png';
-                                elseif (strpos($cat, 'moleton') !== false || strpos($cat, 'moletons') !== false) $img = '../assets/img/moletomroxo.png';
+                                elseif (strpos($cat, 'moleton') !== false) $img = '../assets/img/moletomroxo.png';
                                 elseif (strpos($cat, 'cal') !== false) $img = '../assets/img/jortscinza.png';
                                 elseif (strpos($cat, 'acessor') !== false) $img = '../assets/img/bonebarra.png';
                             }
+
+                            // --- LÓGICA DAS DUAS DESCRIÇÕES ---
+                            
+                            // 1. Descrição Completa (para o Modal/Detalhes)
+                            // Tenta pegar 'descricao', se não tiver, pega 'short_desc'
+                            $rawLong = isset($p['descricao']) ? $p['descricao'] : (isset($p['description']) ? $p['description'] : '');
+                            if (empty($rawLong) && !empty($p['short_desc'])) $rawLong = $p['short_desc'];
+                            
+                            // 2. Descrição Curta (para o Card)
+                            // Tenta pegar 'short_desc', se não tiver, corta a longa
+                            $rawShort = isset($p['short_desc']) ? $p['short_desc'] : '';
+                            if (empty($rawShort) && !empty($rawLong)) {
+                                $rawShort = mb_strimwidth($rawLong, 0, 100, '...');
+                            }
+                            
+                            $displayLong = htmlspecialchars($rawLong);
+                            $displayShort = htmlspecialchars($rawShort);
                         ?>
-                            <div class="product-card" data-category="<?php echo $p_cat; ?>"
-                                data-name="<?php echo $p_name; ?>" data-price="<?php echo $p['price']; ?>" data-img="<?php echo $img; ?>"
-                                data-imgs="<?php echo $img; ?>" data-sizes="<?php echo isset($p['sizes']) && trim($p['sizes']) !== '' ? htmlspecialchars($p['sizes']) : ''; ?>"
-                                data-longdesc="<?php echo isset($p['description']) ? htmlspecialchars($p['description']) : (isset($p['descricao']) ? htmlspecialchars($p['descricao']) : ''); ?>">
-                            <div class="card-image"><img src="<?php echo $img; ?>" alt="<?php echo $p_name; ?>"><div class="card-overlay"><button class="btn-quick-view">Ver Detalhes</button></div></div>
-                            <div class="card-content"><h3><?php echo $p_name; ?></h3><p class="product-desc"><?php echo isset($p['short_desc']) ? htmlspecialchars($p['short_desc']) : (isset($p['description']) ? htmlspecialchars(mb_strimwidth($p['description'],0,140,'...')) : (isset($p['descricao']) ? htmlspecialchars(mb_strimwidth($p['descricao'],0,140,'...')) : '')); ?></p><p class="price">R$ <?php echo $p_price; ?></p><button class="btn btn-add-cart">Adicionar ao Carrinho</button></div>
+                        <div class="product-card" 
+                            data-category="<?php echo $p_cat; ?>"
+                            data-name="<?php echo $p_name; ?>" 
+                            data-price="<?php echo $p['price']; ?>" 
+                            data-img="<?php echo $img; ?>"
+                            data-imgs="<?php echo $img; ?>" 
+                            data-sizes="<?php echo isset($p['sizes']) && trim($p['sizes']) !== '' ? htmlspecialchars($p['sizes']) : ''; ?>"
+                            data-longdesc="<?php echo $displayLong; ?>">
+                            
+                            <div class="card-image">
+                                <img src="<?php echo $img; ?>" alt="<?php echo $p_name; ?>">
+                                <div class="card-overlay">
+                                    <button class="btn-quick-view">Ver Detalhes</button>
+                                </div>
+                            </div>
+                            
+                            <div class="card-content">
+                                <h3><?php echo $p_name; ?></h3>
+                                <!-- Exibindo a Descrição Curta -->
+                                <p class="product-desc"><?php echo $displayShort; ?></p>
+                                <p class="price">R$ <?php echo $p_price; ?></p>
+                                <button class="btn btn-add-cart">Adicionar ao Carrinho</button>
+                            </div>
                         </div>
                     <?php endwhile; ?>
                 <?php else: ?>
-                    <p>Nenhum produto disponível.</p>
+                    <p>Nenhum produto encontrado.</p>
                 <?php endif; ?>
             </div>
         </div>
     </section>
+</section>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <div class="footer-logo"><h3>須佐能乎</h3><span>SUSANOO</span></div>
-                    <p>Desperte seu poder interior com estilo único e elegância oriental.</p>
-                    <div class="social-links">
-                        <a href="#" class="social-link">Instagram</a>
-                        <a href="#" class="social-link">Facebook</a>
-                        <a href="#" class="social-link">X</a>
-                    </div>
-                </div>
-                <div class="footer-section">
-                    <h4>Navegação</h4>
-                    <ul>
-                        <li><a href="../index.php">Home</a></li>
-                        <li><a href="produtos.php">Produtos</a></li>
-                        <li><a href="colecoes.php">Coleções</a></li>
-                        <li><a href="sobre.php">Sobre Nós</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>Atendimento</h4>
-                    <ul>
-                        <li><a href="contato.php">Contato</a></li>
-                        <li><a href="#">FAQ</a></li>
-                        <li><a href="#">Trocas e Devoluções</a></li>
-                        <li><a href="#">Política de Privacidade</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>Newsletter</h4>
-                    <p>Receba novidades e ofertas exclusivas</p>
-                    <form class="newsletter-form">
-                        <input type="email" placeholder="Seu email" required>
-                        <button type="submit" class="btn btn-primary">Inscrever</button>
-                    </form>
+<!-- Footer -->
+<footer class="footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-section">
+                <div class="footer-logo"><h3>須佐能乎</h3><span>SUSANOO</span></div>
+                <p>Desperte seu poder interior com estilo único e elegância oriental.</p>
+                <div class="social-links">
+                    <a href="#" class="social-link">Instagram</a>
+                    <a href="#" class="social-link">Facebook</a>
+                    <a href="#" class="social-link">X</a>
                 </div>
             </div>
-            <div class="footer-bottom">
-                <p>&copy; <?php echo date('Y'); ?> Susanoo. Todos os direitos reservados.</p>
+            <div class="footer-section">
+                <h4>Navegação</h4>
+                <ul>
+                    <li><a href="../index.php">Home</a></li>
+                    <li><a href="produtos.php">Produtos</a></li>
+                    <li><a href="colecoes.php">Coleções</a></li>
+                    <li><a href="sobre.php">Sobre Nós</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Atendimento</h4>
+                <ul>
+                    <li><a href="contato.php">Contato</a></li>
+                    <li><a href="#">FAQ</a></li>
+                    <li><a href="#">Trocas e Devoluções</a></li>
+                    <li><a href="#">Política de Privacidade</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Newsletter</h4>
+                <p>Receba novidades e ofertas exclusivas</p>
+                <form class="newsletter-form">
+                    <input type="email" placeholder="Seu email" required>
+                    <button type="submit" class="btn btn-primary">Inscrever</button>
+                </form>
             </div>
         </div>
-    </footer>
-<style>
-    /* --- Banner Promocional --- */
-        .promo-banner-section {
-            width: 100vw;
-            position: relative;
-            left: 50%;
-            right: 50%;
-            margin-left: -50vw;
-            margin-right: -50vw;
-            margin-top: -11px;
-            height: 550px; 
-            margin-bottom: -180px; /* Sobrepõe o conteúdo principal levemente */
-            overflow: hidden;
-        }
-        
-        .promo-banner-image {
-            width: 100%;
-            height: 100%;
-            display: block;
-            object-fit: cover;
-            object-position: center;
-        }
-    
-</style>
-    <!-- Back to Top Button -->
-    <button id="backToTop" class="back-to-top"><span>↑</span></button>
+        <div class="footer-bottom">
+            <p>&copy; <?php echo date('Y'); ?> Susanoo. Todos os direitos reservados.</p>
+        </div>
+    </div>
+</footer>
 
-    <script src="../js/cart.js"></script>
-    <script src="../js/script.js"></script>
-    <script src="../js/theme.js"></script> <!-- ou ../js/theme.js para páginas internas -->
+<button id="backToTop" class="back-to-top"><span>↑</span></button>
+
+<script src="../js/cart.js"></script>
+<script src="../js/script.js"></script>
+<script src="../js/theme.js"></script>
 </body>
 </html>

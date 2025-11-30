@@ -24,6 +24,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($action === 'save') {
         $id = !empty($_POST['product_id']) ? intval($_POST['product_id']) : null;
         $name = $_POST['product-name'] ?? '';
+        
+        // NOVO: Pegando a descrição curta
+        $short_desc = $_POST['product-short-desc'] ?? '';
+        
         $category = $_POST['product-category'] ?? '';
         $collection = !empty($_POST['product-collection']) ? $_POST['product-collection'] : null;
         $status = $_POST['product-status'] ?? 'ativo';
@@ -51,23 +55,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         if ($id) {
-            // UPDATE
+            // UPDATE (Atualizar)
             if ($imagePathInDB) {
-                $sql = "UPDATE `$table` SET name=?, category=?, collection=?, status=?, price=?, stock=?, descricao=?, image=?, updated_at=NOW() WHERE id=?";
+                // Com imagem nova
+                $sql = "UPDATE `$table` SET name=?, short_desc=?, category=?, collection=?, status=?, price=?, stock=?, descricao=?, image=?, updated_at=NOW() WHERE id=?";
                 $stmt = $conn->prepare($sql);
-                $stmt->bind_param("ssssdissi", $name, $category, $collection, $status, $price, $stock, $descricao, $imagePathInDB, $id);
+                // "sssssdissi" -> name(s), short(s), cat(s), coll(s), stat(s), price(d), stock(i), desc(s), img(s), id(i)
+                $stmt->bind_param("sssssdisi", $name, $short_desc, $category, $collection, $status, $price, $stock, $descricao, $imagePathInDB, $id);
             } else {
-                $sql = "UPDATE `$table` SET name=?, category=?, collection=?, status=?, price=?, stock=?, descricao=?, updated_at=NOW() WHERE id=?";
+                // Sem imagem nova (mantém a antiga)
+                $sql = "UPDATE `$table` SET name=?, short_desc=?, category=?, collection=?, status=?, price=?, stock=?, descricao=?, updated_at=NOW() WHERE id=?";
                 $stmt = $conn->prepare($sql);
-                $stmt->bind_param("ssssdisi", $name, $category, $collection, $status, $price, $stock, $descricao, $id);
+                $stmt->bind_param("sssssdisi", $name, $short_desc, $category, $collection, $status, $price, $stock, $descricao, $id);
             }
             $stmt->execute();
             $stmt->close();
         } else {
-            // INSERT
-            $sql = "INSERT INTO `$table` (name, category, collection, status, price, stock, descricao, image, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())";
+            // INSERT (Novo)
+            $sql = "INSERT INTO `$table` (name, short_desc, category, collection, status, price, stock, descricao, image, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
             $stmt = $conn->prepare($sql);
-            $stmt->bind_param("ssssdiss", $name, $category, $collection, $status, $price, $stock, $descricao, $imagePathInDB);
+            $stmt->bind_param("sssssdiss", $name, $short_desc, $category, $collection, $status, $price, $stock, $descricao, $imagePathInDB);
             $stmt->execute();
             $stmt->close();
         }
@@ -112,11 +119,10 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
         })();
     </script>
     <style>
-        /* ===== ESTILOS DO PAINEL ADMIN (Igual ao admin.php) ===== */
+        /* ===== ESTILOS DO PAINEL ADMIN ===== */
         .admin-dashboard { background-color: var(--bg-primary); min-height: 100vh; padding-top: 80px; }
         .admin-container { display: flex; max-width: 1400px; margin: 0 auto; padding: 0 20px; }
         
-        /* Sidebar atualizada */
         .admin-sidebar { width: 280px; background: var(--bg-card); border-radius: 20px; padding: 2rem 1.5rem; margin-right: 2rem; height: fit-content; position: sticky; top: 100px; box-shadow: var(--shadow-soft); border: 1px solid rgba(139, 92, 246, 0.1); }
         .admin-logo { text-align: center; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); }
         .admin-logo h2 { font-family: var(--font-display); color: var(--primary-purple); margin: 0; font-size: 1.8rem; }
@@ -134,29 +140,11 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
         
         .products-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; gap: 1rem; }
         
-        /* CSS DA PESQUISA */
         .search-box { position: relative; width: 300px; }
         .search-box input { width: 100%; padding: 0.8rem 1rem 0.8rem 2.5rem; border: 1px solid var(--border-color); border-radius: 10px; background: var(--bg-card); color: var(--text-primary); }
         .search-box i { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
         
-        /* CSS FILTRO DE CATEGORIA */
-        .filter-options select {
-            padding: 0.8rem 1.5rem 0.8rem 1rem;
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            background: var(--bg-card);
-            color: var(--text-primary);
-            font-size: 0.95rem;
-            cursor: pointer;
-            outline: none;
-            transition: border-color 0.3s ease;
-            min-width: 180px;
-            appearance: none;
-            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23888888%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
-            background-repeat: no-repeat;
-            background-position: right 0.7rem top 50%;
-            background-size: 0.65rem auto;
-        }
+        .filter-options select { padding: 0.8rem 1.5rem 0.8rem 1rem; border: 1px solid var(--border-color); border-radius: 10px; background: var(--bg-card); color: var(--text-primary); cursor: pointer; }
 
         .data-table { width: 100%; background: var(--bg-card); border-radius: 15px; overflow: hidden; box-shadow: var(--shadow-soft); border: 1px solid rgba(139, 92, 246, 0.1); }
         .data-table table { width: 100%; border-collapse: collapse; }
@@ -168,19 +156,7 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
         .status-active { background: rgba(16, 185, 129, 0.2); color: var(--success); }
         .status-inactive { background: rgba(239, 68, 68, 0.2); color: var(--error); }
         
-        /* ALERTA DE ESTOQUE */
-        .stock-alert {
-            background: rgba(239, 68, 68, 0.15);
-            color: #ef4444;
-            padding: 5px 10px;
-            border-radius: 6px;
-            font-weight: bold;
-            font-size: 0.85rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            border: 1px solid rgba(239, 68, 68, 0.2);
-        }
+        .stock-alert { background: rgba(239, 68, 68, 0.15); color: #ef4444; padding: 5px 10px; border-radius: 6px; font-weight: bold; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 5px; border: 1px solid rgba(239, 68, 68, 0.2); }
 
         .action-buttons { display: flex; gap: 0.5rem; }
         .btn-icon { width: 35px; height: 35px; border: none; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; }
@@ -190,8 +166,7 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
         .user-info { display: flex; align-items: center; }
         .user-avatar { width: 50px; height: 50px; border-radius: 10px; object-fit: cover; margin-right: 1rem; }
         .user-details h4 { margin: 0 0 0.2rem 0; color: var(--text-primary); }
-        .user-details span { font-size: 0.85rem; color: var(--text-muted); }
-
+        
         /* Modal */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 1000; align-items: center; justify-content: center; }
         .modal.active { display: flex; }
@@ -201,7 +176,7 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
         
         .form-group { margin-bottom: 1.5rem; }
         .form-group label { display: block; margin-bottom: 0.5rem; color: var(--text-primary); font-weight: 500; }
-        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.8rem 1rem; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-primary); color: var(--text-primary); }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.8rem 1rem; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-primary); color: var(--text-primary); font-family: inherit; }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
         
         .image-upload { border: 2px dashed var(--border-color); border-radius: 10px; padding: 2rem; text-align: center; cursor: pointer; transition: all 0.3s ease; }
@@ -213,7 +188,6 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
 <body class="admin-dashboard">
 
 <div class="admin-container">
-    <!-- Sidebar SINCRONIZADA com admin.php -->
     <aside class="admin-sidebar">
         <div class="admin-logo">
             <h2>Susanoo Admin</h2>
@@ -225,7 +199,6 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
             <li><a href="usuarios_admin.php"><i class="fas fa-users"></i> Usuários</a></li>
             <li><a href="pedidos_admin.php"><i class="fas fa-shopping-cart"></i> Pedidos</a></li>
             <li><a href="relatorios_admin.php"><i class="fas fa-comment"></i>Mensagens</a></li>
-            
             <li><a href="../index.php"><i class="fas fa-sign-out-alt"></i> Voltar ao Site</a></li>
         </ul>
     </aside>
@@ -277,22 +250,23 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
                             $statusClass = (strtolower($row['status']) === 'ativo') ? 'status-active' : 'status-inactive';
                             $price = number_format($row['price'], 2, ',', '.');
                             $imgSrc = !empty($row['image']) ? '../' . $row['image'] : 'https://via.placeholder.com/50';
+                            
+                            // Dados para o JavaScript
                             $dataDescription = isset($row['descricao']) ? htmlspecialchars($row['descricao']) : '';
+                            // NOVO: Descrição Curta
+                            $dataShortDesc = isset($row['short_desc']) ? htmlspecialchars($row['short_desc']) : '';
+                            
                             $dataImage = isset($row['image']) ? htmlspecialchars($row['image']) : '';
                             $dataCollection = isset($row['collection']) ? htmlspecialchars($row['collection']) : '';
                             
-                            // LÓGICA DO ESTOQUE
                             $stock = intval($row['stock']);
-                            if ($stock > 0) {
-                                $stockDisplay = $stock;
-                            } else {
-                                $stockDisplay = '<span class="stock-alert"><i class="fas fa-exclamation-circle"></i> Esgotado!</span>';
-                            }
+                            $stockDisplay = ($stock > 0) ? $stock : '<span class="stock-alert"><i class="fas fa-exclamation-circle"></i> Esgotado!</span>';
                         ?>
                         <tr class="product-row"
                             data-id="<?php echo $row['id']; ?>" 
                             data-image="<?php echo $dataImage; ?>" 
                             data-description="<?php echo $dataDescription; ?>"
+                            data-short-desc="<?php echo $dataShortDesc; ?>"
                             data-collection="<?php echo $dataCollection; ?>">
                             <td>
                                 <div class="user-info">
@@ -306,7 +280,6 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
                             <td><?php echo !empty($row['collection']) ? ucfirst($row['collection']) : '-'; ?></td>
                             <td><span class="status-badge <?php echo $statusClass; ?>"><?php echo htmlspecialchars($row['status']); ?></span></td>
                             <td>R$ <?php echo $price; ?></td>
-                            <!-- Exibição do estoque modificado -->
                             <td><?php echo $stockDisplay; ?></td>
                             <td>
                                 <div class="action-buttons">
@@ -351,9 +324,8 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
                     <label for="product-name">Nome do Produto</label>
                     <input type="text" id="product-name" name="product-name" required>
                 </div>
-                <!-- Categoria -->
                 <div class="form-group">
-                    <label for="product-category">Categoria (Tipo)</label>
+                    <label for="product-category">Categoria</label>
                     <select id="product-category" name="product-category" required>
                         <option value="">Selecione...</option>
                         <option value="camisetas">Camisetas</option>
@@ -362,6 +334,12 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
                         <option value="calcas">Calças</option>
                     </select>
                 </div>
+            </div>
+
+            <!-- NOVO CAMPO: Descrição Curta -->
+            <div class="form-group">
+                <label for="product-short-desc">Descrição Curta (Aparece no Card - Recomendado máx 120 caracteres)</label>
+                <textarea id="product-short-desc" name="product-short-desc" rows="2" maxlength="150" placeholder="Ex: Algodão premium, corte oversized..."></textarea>
             </div>
             
             <div class="form-row">
@@ -397,8 +375,8 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
             </div>
             
             <div class="form-group">
-                <label for="product-description">Descrição</label>
-                <textarea id="product-description" name="product-description" rows="4"></textarea>
+                <label for="product-description">Descrição Completa (Detalhes)</label>
+                <textarea id="product-description" name="product-description" rows="5" placeholder="Detalhes técnicos, história do produto, etc..."></textarea>
             </div>
             
             <div class="admin-actions" style="margin-top: 2rem;">
@@ -411,7 +389,7 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
 
 <script src="../js/script.js"></script>
 <script>
-    // --- LÓGICA DE FILTRO E PESQUISA ---
+    // Filtro e Pesquisa
     const searchInput = document.getElementById('search-products');
     const categoryFilter = document.getElementById('category-filter');
     const tableRows = document.querySelectorAll('.data-table tbody tr.product-row');
@@ -438,7 +416,7 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
     searchInput.addEventListener('input', filterTable);
     categoryFilter.addEventListener('change', filterTable);
 
-    // --- MODAL E UPLOAD (Código Existente) ---
+    // Modal e Upload
     const modal = document.getElementById('product-modal');
     const addProductBtn = document.getElementById('add-product');
     const closeModalBtns = document.querySelectorAll('.close-modal');
@@ -473,22 +451,27 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
         uploadIcon.style.color = "";
     }
 
+    // --- Lógica de Edição Atualizada ---
     document.querySelectorAll('.btn-edit').forEach(btn => {
         btn.addEventListener('click', function() {
             const row = this.closest('tr');
+            
+            // Recuperar dados
             const id = row.getAttribute('data-id');
             const name = row.querySelector('.user-details h4').textContent;
             const category = row.cells[1].textContent.trim();
             const collection = row.getAttribute('data-collection');
             const status = row.cells[3].textContent.trim().toLowerCase();
             const price = row.cells[4].textContent.replace('R$', '').replace('.', '').replace(',', '.').trim();
-            // Pega o número do estoque apenas se não tiver o span de alerta (para edição funcionar)
+            
             let stock = row.cells[5].textContent.trim();
             if (row.cells[5].querySelector('.stock-alert')) stock = "0";
 
             const description = row.getAttribute('data-description');
+            const shortDesc = row.getAttribute('data-short-desc'); // Pegando a descrição curta
             const imageName = row.getAttribute('data-image');
 
+            // Preencher Formulário
             document.getElementById('modal-title').textContent = `Editar ${name}`;
             document.getElementById('product-id').value = id;
             document.getElementById('product-name').value = name;
@@ -497,7 +480,9 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
             document.getElementById('product-status').value = status;
             document.getElementById('product-price').value = price;
             document.getElementById('product-stock').value = stock;
-            document.getElementById('product-description').value = description;
+            
+            document.getElementById('product-short-desc').value = shortDesc; // Preenchendo a curta
+            document.getElementById('product-description').value = description; // Preenchendo a longa
 
             if(imageName) {
                 uploadText.textContent = "Imagem atual: " + imageName.split('/').pop();
