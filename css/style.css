@@ -502,6 +502,7 @@ section {
     grid-template-columns: 2fr 1fr 1fr;
     grid-template-rows: 300px 300px;
     gap: 1.5rem;
+    margin-bottom: -260px;
 }
 
 .collection-card {
@@ -1621,7 +1622,8 @@ html.light-mode .dropdown-user-name {
 .products-section,
 .featured-products {
     background: #0e0e0e;
-    padding: 60px 0;
+    padding: 20px 0;
+    padding-bottom: 70px;
 }
 
 .products-section .container,
