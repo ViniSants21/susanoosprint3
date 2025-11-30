@@ -1657,3 +1657,39 @@ html.light-mode .dropdown-user-name {
     pointer-events: none;
     cursor: default;
 }
+.file-field input[type="file"] {
+    display: none;
+}
+
+.file-field {
+    display: block;
+}
+
+.file-field .label-title {
+    margin-bottom: 6px;
+    display: inline-block;
+}
+
+.file-field::after {
+    content: "Selecionar imagem";
+    display: inline-block;
+    background: #7a00ff;
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    border: 2px solid transparent;
+    transition: 0.2s;
+    text-align: center;
+}
+
+.file-field:hover::after {
+    background: transparent;
+    border-color: #7a00ff;
+    color: #7a00ff;
+}
+
+.file-field:active::after {
+    transform: scale(0.95);
+}
