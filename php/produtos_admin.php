@@ -1,11 +1,10 @@
 <?php
 // ==========================================
-// LÓGICA PHP (BACKEND) - UNIFICADO
+// LÓGICA PHP (BACKEND) - ATUALIZADO
 // ==========================================
 
 require_once 'conexao.php';
 
-// 1. Descobrir o nome correto da tabela
 function find_products_table($conn) {
     $candidates = ['products', 'produtos', 'produts'];
     foreach ($candidates as $t) {
@@ -24,10 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($action === 'save') {
         $id = !empty($_POST['product_id']) ? intval($_POST['product_id']) : null;
         $name = $_POST['product-name'] ?? '';
-        
-        // CAMPO: Descrição Curta (Do Código 2)
         $short_desc = $_POST['product-short-desc'] ?? '';
-        
         $category = $_POST['product-category'] ?? '';
         $collection = !empty($_POST['product-collection']) ? $_POST['product-collection'] : null;
         $status = $_POST['product-status'] ?? 'ativo';
@@ -35,49 +31,55 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stock = isset($_POST['product-stock']) ? intval($_POST['product-stock']) : 0;
         $descricao = $_POST['product-description'] ?? '';
 
-        // -- Upload de Múltiplas Imagens (Do Código 1) --
-        $imagePathsString = null;
-        $uploadedPaths = [];
+        // -- LÓGICA DE UPLOAD REFEITA (CAPA + GALERIA) --
+        
+        $uploadDir = __DIR__ . '/../assets/img/products/';
+        if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
+        $allowed = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+        
+        $newPaths = []; // Array para guardar os caminhos temporários
+        
+        // 1. Processar a CAPA (Obrigatório ser a primeira do array se enviada)
+        if (isset($_FILES['cover-image']) && $_FILES['cover-image']['error'] === UPLOAD_ERR_OK) {
+            $ext = strtolower(pathinfo($_FILES['cover-image']['name'], PATHINFO_EXTENSION));
+            if (in_array($ext, $allowed)) {
+                $newFileName = uniqid('cover_') . '.' . $ext;
+                if (move_uploaded_file($_FILES['cover-image']['tmp_name'], $uploadDir . $newFileName)) {
+                    $newPaths[] = 'assets/img/products/' . $newFileName;
+                }
+            }
+        }
 
-        // Verifica se arquivos foram enviados no campo 'product-images'
-        if (isset($_FILES['product-images']) && is_array($_FILES['product-images']['name'])) {
-            $uploadDir = __DIR__ . '/../assets/img/products/';
-            if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
-
-            $count = count($_FILES['product-images']['name']);
-            
+        // 2. Processar a GALERIA (Adiciona as demais fotos na sequencia)
+        if (isset($_FILES['gallery-images']) && is_array($_FILES['gallery-images']['name'])) {
+            $count = count($_FILES['gallery-images']['name']);
             for ($i = 0; $i < $count; $i++) {
-                if ($_FILES['product-images']['error'][$i] === UPLOAD_ERR_OK) {
-                    $ext = strtolower(pathinfo($_FILES['product-images']['name'][$i], PATHINFO_EXTENSION));
-                    $allowed = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
-
+                if ($_FILES['gallery-images']['error'][$i] === UPLOAD_ERR_OK) {
+                    $ext = strtolower(pathinfo($_FILES['gallery-images']['name'][$i], PATHINFO_EXTENSION));
                     if (in_array($ext, $allowed)) {
-                        $newFileName = uniqid('prod_') . '_' . $i . '.' . $ext;
-                        $destination = $uploadDir . $newFileName;
-                        
-                        if (move_uploaded_file($_FILES['product-images']['tmp_name'][$i], $destination)) {
-                            $uploadedPaths[] = 'assets/img/products/' . $newFileName;
+                        $newFileName = uniqid('gallery_') . '_' . $i . '.' . $ext;
+                        if (move_uploaded_file($_FILES['gallery-images']['tmp_name'][$i], $uploadDir . $newFileName)) {
+                            $newPaths[] = 'assets/img/products/' . $newFileName;
                         }
                     }
                 }
             }
         }
 
-        if (!empty($uploadedPaths)) {
-            $imagePathsString = implode('|', $uploadedPaths);
-        }
+        // Monta a string final
+        $imagePathsString = !empty($newPaths) ? implode('|', $newPaths) : null;
 
         if ($id) {
             // UPDATE
             if ($imagePathsString) {
-                // Se subiu novas imagens, atualiza tudo (incluindo short_desc)
+                // Se enviou novas imagens (Capa ou Galeria), substitui tudo
+                // Obs: Se o usuário quiser manter a capa antiga e mudar a galeria, teria que reenviar a capa.
+                // Para simplificar, assumimos que "Upload novo" = "Substituir imagens".
                 $sql = "UPDATE `$table` SET name=?, short_desc=?, category=?, collection=?, status=?, price=?, stock=?, descricao=?, image=?, updated_at=NOW() WHERE id=?";
                 $stmt = $conn->prepare($sql);
-                // Tipos: s=string, d=double, i=integer
-                // name(s), short(s), cat(s), coll(s), stat(s), price(d), stock(i), desc(s), img(s), id(i)
                 $stmt->bind_param("sssssdissi", $name, $short_desc, $category, $collection, $status, $price, $stock, $descricao, $imagePathsString, $id);
             } else {
-                // Se não subiu imagens novas, mantém a antiga mas atualiza short_desc
+                // Mantém imagens antigas
                 $sql = "UPDATE `$table` SET name=?, short_desc=?, category=?, collection=?, status=?, price=?, stock=?, descricao=?, updated_at=NOW() WHERE id=?";
                 $stmt = $conn->prepare($sql);
                 $stmt->bind_param("sssssdisi", $name, $short_desc, $category, $collection, $status, $price, $stock, $descricao, $id);
@@ -113,7 +115,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// 3. Buscar dados
 $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
 ?>
 
@@ -125,66 +126,41 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
     <title>Gerenciar Produtos - Susanoo Admin</title>
     <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <script>
-        (function(){
-            const theme = localStorage.getItem('theme');
-            if(theme === 'light') {
-                document.documentElement.classList.add('light-mode');
-            }
-        })();
-    </script>
+    <script>(function(){const theme=localStorage.getItem('theme');if(theme==='light'){document.documentElement.classList.add('light-mode');}})();</script>
     <style>
         /* ===== ESTILOS DO PAINEL ADMIN ===== */
         .admin-dashboard { background-color: var(--bg-primary); min-height: 100vh; padding-top: 80px; }
         .admin-container { display: flex; max-width: 1400px; margin: 0 auto; padding: 0 20px; }
-        
         .admin-sidebar { width: 280px; background: var(--bg-card); border-radius: 20px; padding: 2rem 1.5rem; margin-right: 2rem; height: fit-content; position: sticky; top: 100px; box-shadow: var(--shadow-soft); border: 1px solid rgba(139, 92, 246, 0.1); }
         .admin-logo { text-align: center; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); }
         .admin-logo h2 { font-family: var(--font-display); color: var(--primary-purple); margin: 0; font-size: 1.8rem; }
-        .admin-logo span { color: var(--text-secondary); font-size: 0.9rem; }
         .admin-nav { list-style: none; padding: 0; margin: 0; }
         .admin-nav li { margin-bottom: 0.5rem; }
         .admin-nav a { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.2rem; text-decoration: none; color: var(--text-secondary); border-radius: 12px; transition: all 0.3s ease; font-weight: 500; }
-        .admin-nav a:hover, .admin-nav a.active { background: rgba(139, 92, 246, 0.1); color: var(--primary-purple); transform: translateX(5px); }
-        .admin-nav a i { width: 20px; text-align: center; font-size: 1.1rem; }
-        
+        .admin-nav a:hover, .admin-nav a.active { background: rgba(139, 92, 246, 0.1); color: var(--primary-purple); }
         .admin-main { flex: 1; padding-bottom: 3rem; }
         .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); }
         .admin-title { font-family: var(--font-display); font-size: 2.5rem; color: var(--text-primary); margin: 0; }
         .admin-actions { display: flex; gap: 1rem; }
         
         .products-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; gap: 1rem; }
-        
         .search-box { position: relative; width: 300px; }
         .search-box input { width: 100%; padding: 0.8rem 1rem 0.8rem 2.5rem; border: 1px solid var(--border-color); border-radius: 10px; background: var(--bg-card); color: var(--text-primary); }
         .search-box i { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
-        
-        .filter-options select {
-            padding: 0.8rem 1.5rem 0.8rem 1rem;
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            background: var(--bg-card);
-            color: var(--text-primary);
-            min-width: 180px;
-        }
+        .filter-options select { padding: 0.8rem 1.5rem 0.8rem 1rem; border: 1px solid var(--border-color); border-radius: 10px; background: var(--bg-card); color: var(--text-primary); min-width: 180px; }
 
         .data-table { width: 100%; background: var(--bg-card); border-radius: 15px; overflow: hidden; box-shadow: var(--shadow-soft); border: 1px solid rgba(139, 92, 246, 0.1); }
         .data-table table { width: 100%; border-collapse: collapse; }
         .data-table th { background: rgba(139, 92, 246, 0.05); padding: 1.2rem 1rem; text-align: left; font-weight: 600; color: var(--text-primary); border-bottom: 1px solid var(--border-color); }
         .data-table td { padding: 1.2rem 1rem; border-bottom: 1px solid var(--border-color); color: var(--text-secondary); vertical-align: middle; }
-        .data-table tr:hover { background: rgba(139, 92, 246, 0.02); }
-        
         .status-badge { padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
         .status-active { background: rgba(16, 185, 129, 0.2); color: var(--success); }
         .status-inactive { background: rgba(239, 68, 68, 0.2); color: var(--error); }
-        
         .stock-alert { background: rgba(239, 68, 68, 0.15); color: #ef4444; padding: 5px 10px; border-radius: 6px; font-weight: bold; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 5px; border: 1px solid rgba(239, 68, 68, 0.2); }
-
         .action-buttons { display: flex; gap: 0.5rem; }
         .btn-icon { width: 35px; height: 35px; border: none; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; }
         .btn-edit { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
         .btn-delete { background: rgba(239, 68, 68, 0.1); color: var(--error); }
-        
         .user-info { display: flex; align-items: center; }
         .user-avatar { width: 50px; height: 50px; border-radius: 10px; object-fit: cover; margin-right: 1rem; }
         .user-details h4 { margin: 0 0 0.2rem 0; color: var(--text-primary); }
@@ -195,14 +171,14 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
         .modal-content { background: var(--bg-card); border-radius: 20px; padding: 2rem; width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow-strong); }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border-color); }
         .close-modal { background: none; border: none; font-size: 1.5rem; color: var(--text-muted); cursor: pointer; }
-        
         .form-group { margin-bottom: 1.5rem; }
         .form-group label { display: block; margin-bottom: 0.5rem; color: var(--text-primary); font-weight: 500; }
         .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.8rem 1rem; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-primary); color: var(--text-primary); }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
         
-        .image-upload { border: 2px dashed var(--border-color); border-radius: 10px; padding: 2rem; text-align: center; cursor: pointer; transition: all 0.3s ease; }
-
+        .image-upload { border: 2px dashed var(--border-color); border-radius: 10px; padding: 1.5rem; text-align: center; cursor: pointer; transition: all 0.3s ease; margin-bottom: 10px; }
+        .upload-label { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem; display:block; font-weight:bold; }
+        
         @media (max-width: 1024px) { .admin-container { flex-direction: column; } .admin-sidebar { width: 100%; position: static; margin-bottom: 2rem; } }
         @media (max-width: 768px) { .admin-header, .products-header { flex-direction: column; align-items: flex-start; gap: 1rem; } .form-row { grid-template-columns: 1fr; } }
     </style>
@@ -272,23 +248,17 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
                             $statusClass = (strtolower($row['status']) === 'ativo') ? 'status-active' : 'status-inactive';
                             $price = number_format($row['price'], 2, ',', '.');
                             
-                            // LÓGICA DE MÚLTIPLAS IMAGENS
                             $imagesArray = !empty($row['image']) ? explode('|', $row['image']) : [];
-                            $mainImage = !empty($imagesArray) ? $imagesArray[0] : '';
+                            $mainImage = !empty($imagesArray) ? $imagesArray[0] : ''; // A primeira é sempre a CAPA agora
                             $imgSrc = !empty($mainImage) ? '../' . $mainImage : 'https://via.placeholder.com/50';
                             
-                            // Dados para o JavaScript
                             $dataImageString = isset($row['image']) ? htmlspecialchars($row['image']) : '';
                             $dataDescription = isset($row['descricao']) ? htmlspecialchars($row['descricao']) : '';
-                            $dataShortDesc = isset($row['short_desc']) ? htmlspecialchars($row['short_desc']) : ''; // Short desc do Código 2
+                            $dataShortDesc = isset($row['short_desc']) ? htmlspecialchars($row['short_desc']) : '';
                             $dataCollection = isset($row['collection']) ? htmlspecialchars($row['collection']) : '';
                             
                             $stock = intval($row['stock']);
-                            if ($stock > 0) {
-                                $stockDisplay = $stock;
-                            } else {
-                                $stockDisplay = '<span class="stock-alert"><i class="fas fa-exclamation-circle"></i> Esgotado!</span>';
-                            }
+                            $stockDisplay = ($stock > 0) ? $stock : '<span class="stock-alert"><i class="fas fa-exclamation-circle"></i> Esgotado!</span>';
                         ?>
                         <tr class="product-row"
                             data-id="<?php echo $row['id']; ?>" 
@@ -301,7 +271,6 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
                                     <img src="<?php echo $imgSrc; ?>" alt="Foto" class="user-avatar">
                                     <div class="user-details">
                                         <h4><?php echo htmlspecialchars($row['name']); ?></h4>
-                                        <!-- Mostra contador se tiver mais de 1 imagem (Código 1) -->
                                         <?php if(count($imagesArray) > 1): ?>
                                             <span style="font-size:0.75rem; color:#888;">+<?php echo count($imagesArray)-1; ?> fotos</span>
                                         <?php endif; ?>
@@ -330,7 +299,7 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
     </main>
 </div>
 
-<!-- Modal Unificado -->
+<!-- Modal com Upload Dividido -->
 <div class="modal" id="product-modal">
     <div class="modal-content">
         <div class="modal-header">
@@ -342,13 +311,23 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
             <input type="hidden" name="action" value="save">
             <input type="hidden" name="product_id" id="product-id" value="">
             
+            <!-- PARTE 1: UPLOAD DA CAPA -->
             <div class="form-group">
-                <label for="product-images">Imagens do Produto (Selecione várias)</label>
-                <div class="image-upload" id="image-upload-area">
-                    <i class="fas fa-cloud-upload-alt" id="upload-icon"></i>
-                    <p id="upload-text">Clique para escolher imagens (Ctrl + Clique para várias)</p>
-                    <!-- MULTIPLE upload (Código 1) -->
-                    <input type="file" id="product-images" name="product-images[]" accept="image/*" multiple style="display: none;">
+                <span class="upload-label">1. Imagem de Capa (Principal - Aparece no Card)</span>
+                <div class="image-upload" id="cover-upload-area" style="border-color: var(--primary-purple);">
+                    <i class="fas fa-star" id="cover-icon" style="color: var(--primary-purple);"></i>
+                    <p id="cover-text">Clique para escolher a Capa</p>
+                    <input type="file" id="cover-image" name="cover-image" accept="image/*" style="display: none;">
+                </div>
+            </div>
+
+            <!-- PARTE 2: UPLOAD DA GALERIA -->
+            <div class="form-group">
+                <span class="upload-label">2. Imagens da Galeria (Carrossel/Detalhes)</span>
+                <div class="image-upload" id="gallery-upload-area">
+                    <i class="fas fa-images" id="gallery-icon"></i>
+                    <p id="gallery-text">Clique para escolher fotos extras (Segure Ctrl para várias)</p>
+                    <input type="file" id="gallery-images" name="gallery-images[]" accept="image/*" multiple style="display: none;">
                 </div>
             </div>
             
@@ -369,7 +348,6 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
                 </div>
             </div>
             
-            <!-- Campo DESCRIÇÃO CURTA (Código 2) -->
             <div class="form-group">
                 <label for="product-short-desc">Descrição Curta (Aparece no Card)</label>
                 <textarea id="product-short-desc" name="product-short-desc" rows="2" maxlength="150" placeholder="Ex: Algodão premium, corte oversized..."></textarea>
@@ -429,22 +407,14 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
     function filterTable() {
         const searchTerm = searchInput.value.toLowerCase();
         const categoryValue = categoryFilter.value.toLowerCase();
-
         tableRows.forEach(row => {
             const productName = row.querySelector('.user-details h4').textContent.toLowerCase();
             const productCategory = row.cells[1].textContent.toLowerCase();
-
             const matchesSearch = productName.includes(searchTerm);
             const matchesCategory = categoryValue === "" || productCategory.includes(categoryValue) || productCategory === categoryValue;
-
-            if (matchesSearch && matchesCategory) {
-                row.style.display = "";
-            } else {
-                row.style.display = "none";
-            }
+            row.style.display = (matchesSearch && matchesCategory) ? "" : "none";
         });
     }
-
     searchInput.addEventListener('input', filterTable);
     categoryFilter.addEventListener('change', filterTable);
 
@@ -452,66 +422,79 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
     const modal = document.getElementById('product-modal');
     const addProductBtn = document.getElementById('add-product');
     const closeModalBtns = document.querySelectorAll('.close-modal');
-    const uploadArea = document.getElementById('image-upload-area');
-    const fileInput = document.getElementById('product-images');
-    const uploadText = document.getElementById('upload-text');
-    const uploadIcon = document.getElementById('upload-icon');
+    
+    // Elementos de Upload
+    const coverArea = document.getElementById('cover-upload-area');
+    const coverInput = document.getElementById('cover-image');
+    const coverText = document.getElementById('cover-text');
+    const coverIcon = document.getElementById('cover-icon');
+
+    const galleryArea = document.getElementById('gallery-upload-area');
+    const galleryInput = document.getElementById('gallery-images');
+    const galleryText = document.getElementById('gallery-text');
+    const galleryIcon = document.getElementById('gallery-icon');
 
     addProductBtn.addEventListener('click', () => {
         modal.classList.add('active');
         document.getElementById('modal-title').textContent = 'Adicionar Produto';
         document.getElementById('product-form').reset();
         document.getElementById('product-id').value = '';
-        resetUploadPreview();
+        resetUploadPreviews();
     });
 
     closeModalBtns.forEach(btn => btn.addEventListener('click', () => modal.classList.remove('active')));
     modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('active'); });
 
-    uploadArea.addEventListener('click', () => fileInput.click());
-    
-    // Contador de arquivos (Código 1)
-    fileInput.addEventListener('change', (e) => {
+    // Lógica Upload CAPA
+    coverArea.addEventListener('click', () => coverInput.click());
+    coverInput.addEventListener('change', (e) => {
         if (e.target.files.length > 0) {
-            const count = e.target.files.length;
-            if(count === 1) {
-                uploadText.textContent = e.target.files[0].name;
-            } else {
-                uploadText.textContent = count + " imagens selecionadas";
-            }
-            uploadIcon.className = "fas fa-check-circle";
-            uploadIcon.style.color = "var(--success)";
+            coverText.textContent = "Capa selecionada: " + e.target.files[0].name;
+            coverIcon.className = "fas fa-check-circle";
         }
     });
 
-    function resetUploadPreview() {
-        uploadText.textContent = "Clique para escolher imagens (Ctrl + Clique para várias)";
-        uploadIcon.className = "fas fa-cloud-upload-alt";
-        uploadIcon.style.color = "";
+    // Lógica Upload GALERIA
+    galleryArea.addEventListener('click', () => galleryInput.click());
+    galleryInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+            galleryText.textContent = e.target.files.length + " imagens adicionais selecionadas";
+            galleryIcon.className = "fas fa-check-circle";
+            galleryIcon.style.color = "var(--success)";
+        }
+    });
+
+    function resetUploadPreviews() {
+        coverText.textContent = "Clique para escolher a Capa";
+        coverIcon.className = "fas fa-star";
+        
+        galleryText.textContent = "Clique para escolher fotos extras (Segure Ctrl para várias)";
+        galleryIcon.className = "fas fa-images";
+        galleryIcon.style.color = "";
     }
 
-    // --- LÓGICA DE EDIÇÃO UNIFICADA ---
+    // --- EDITAR ---
     document.querySelectorAll('.btn-edit').forEach(btn => {
         btn.addEventListener('click', function() {
             const row = this.closest('tr');
             
-            // Pega dados da TR
             const id = row.getAttribute('data-id');
             const name = row.querySelector('.user-details h4').textContent;
             const category = row.cells[1].textContent.trim();
             const collection = row.getAttribute('data-collection');
             const status = row.cells[3].textContent.trim().toLowerCase();
             const price = row.cells[4].textContent.replace('R$', '').replace('.', '').replace(',', '.').trim();
-            
             let stock = row.cells[5].textContent.trim();
             if (row.cells[5].querySelector('.stock-alert')) stock = "0";
-
             const description = row.getAttribute('data-description');
-            const shortDesc = row.getAttribute('data-short-desc'); // Recupera a curta
-            const imagesString = row.getAttribute('data-image');   // Recupera string de imagens
-            const imagesCount = imagesString ? imagesString.split('|').length : 0;
+            const shortDesc = row.getAttribute('data-short-desc');
+            const imagesString = row.getAttribute('data-image');
+            
+            // Separa Capa de Galeria
+            const images = imagesString ? imagesString.split('|') : [];
+            const hasImages = images.length > 0;
+            const hasGallery = images.length > 1;
 
-            // Preenche Formulário
             document.getElementById('modal-title').textContent = `Editar ${name}`;
             document.getElementById('product-id').value = id;
             document.getElementById('product-name').value = name;
@@ -521,15 +504,19 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
             document.getElementById('product-price').value = price;
             document.getElementById('product-stock').value = stock;
             document.getElementById('product-description').value = description;
-            document.getElementById('product-short-desc').value = shortDesc; // Preenche a curta
+            document.getElementById('product-short-desc').value = shortDesc;
 
-            // Ajusta texto de upload
-            if(imagesCount > 0) {
-                uploadText.textContent = `${imagesCount} imagens salvas (Envie novas para substituir)`;
-                uploadIcon.className = "fas fa-images";
-            } else {
-                resetUploadPreview();
+            resetUploadPreviews();
+            
+            if(hasImages) {
+                coverText.textContent = "Capa atual salva (Envie nova para substituir)";
+                coverIcon.className = "fas fa-image";
             }
+            if(hasGallery) {
+                galleryText.textContent = (images.length - 1) + " imagens extras salvas (Envie novas para substituir)";
+                galleryIcon.className = "fas fa-images";
+            }
+
             modal.classList.add('active');
         });
     });
