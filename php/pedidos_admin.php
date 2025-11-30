@@ -1,3 +1,66 @@
+<?php
+// ==========================================================
+// 1. LÓGICA PHP (Processamento de Dados)
+// ==========================================================
+session_start();
+require_once 'conexao.php'; // Certifique-se que conecta ao banco corretamente
+
+// -- A. Atualizar Status do Pedido --
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'update_status') {
+    $pedido_id = intval($_POST['pedido_id']);
+    $novo_status = $conn->real_escape_string($_POST['status_pedido']);
+    
+    $sql_update = "UPDATE pedidos SET status = '$novo_status' WHERE id = $pedido_id";
+    if ($conn->query($sql_update)) {
+        // Redireciona para evitar reenvio do formulário ao atualizar (F5)
+        header("Location: pedidos_admin.php?msg=status_updated");
+        exit;
+    } else {
+        $error_msg = "Erro ao atualizar: " . $conn->error;
+    }
+}
+
+// -- B. Buscar Pedidos e Itens --
+// Array para armazenar pedidos e passar para o JS (para o modal funcionar rápido)
+$orders_data = [];
+
+// Busca pedidos ordenados por data
+$sql = "SELECT * FROM pedidos ORDER BY data_pedido DESC";
+$res = $conn->query($sql);
+
+if ($res) {
+    while ($row = $res->fetch_assoc()) {
+        $id = $row['id'];
+        
+        // Busca itens deste pedido
+        $sql_itens = "SELECT * FROM itens_pedido WHERE pedido_id = $id";
+        $res_itens = $conn->query($sql_itens);
+        $itens = [];
+        $qtd_total_itens = 0;
+        
+        while ($item = $res_itens->fetch_assoc()) {
+            $itens[] = $item;
+            $qtd_total_itens += $item['quantidade'];
+        }
+        
+        // Monta o objeto completo
+        $row['itens'] = $itens;
+        $row['qtd_itens_total'] = $qtd_total_itens;
+        $orders_data[$id] = $row;
+    }
+}
+
+// Função auxiliar para classe CSS do status
+function getStatusClass($status) {
+    $s = strtolower($status);
+    if (strpos($s, 'pendente') !== false) return 'status-pending';
+    if (strpos($s, 'process') !== false) return 'status-processing';
+    if (strpos($s, 'envia') !== false) return 'status-shipped';
+    if (strpos($s, 'entregue') !== false || strpos($s, 'conclu') !== false) return 'status-delivered';
+    if (strpos($s, 'cancel') !== false) return 'status-cancelled';
+    return 'status-processing'; // Padrão
+}
+?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -6,6 +69,10 @@
     <title>Gerenciar Pedidos - Susanoo Admin</title>
     <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- SweetAlert2 (Para alertas bonitos) -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
         (function(){
             const theme = localStorage.getItem('theme');
@@ -15,455 +82,90 @@
         })();
     </script>
     <style>
-        /* ===== ESTILOS DO PAINEL ADMIN ===== */
-        .admin-dashboard {
-            background-color: var(--bg-primary);
-            min-height: 100vh;
-            padding-top: 80px;
-        }
-        
-        .admin-container {
-            display: flex;
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
+        /* ===== ESTILOS DO PAINEL ADMIN (MANTIDOS) ===== */
+        .admin-dashboard { background-color: var(--bg-primary); min-height: 100vh; padding-top: 80px; }
+        .admin-container { display: flex; max-width: 1400px; margin: 0 auto; padding: 0 20px; }
         
         /* Sidebar */
-        .admin-sidebar {
-            width: 280px;
-            background: var(--bg-card);
-            border-radius: 20px;
-            padding: 2rem 1.5rem;
-            margin-right: 2rem;
-            height: fit-content;
-            position: sticky;
-            top: 100px;
-            box-shadow: var(--shadow-soft);
-            border: 1px solid rgba(139, 92, 246, 0.1);
-        }
-        
-        .admin-logo {
-            text-align: center;
-            margin-bottom: 2rem;
-            padding-bottom: 1.5rem;
-            border-bottom: 1px solid var(--border-color);
-        }
-        
-        .admin-logo h2 {
-            font-family: var(--font-display);
-            color: var(--primary-purple);
-            margin: 0;
-            font-size: 1.8rem;
-        }
-        
-        .admin-logo span {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
-        
-        .admin-nav {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        
-        .admin-nav li {
-            margin-bottom: 0.5rem;
-        }
-        
-        .admin-nav a {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 1rem 1.2rem;
-            text-decoration: none;
-            color: var(--text-secondary);
-            border-radius: 12px;
-            transition: all 0.3s ease;
-            font-weight: 500;
-        }
-        
-        .admin-nav a:hover,
-        .admin-nav a.active {
-            background: rgba(139, 92, 246, 0.1);
-            color: var(--primary-purple);
-            transform: translateX(5px);
-        }
-        
-        .admin-nav a i {
-            width: 20px;
-            text-align: center;
-            font-size: 1.1rem;
-        }
+        .admin-sidebar { width: 280px; background: var(--bg-card); border-radius: 20px; padding: 2rem 1.5rem; margin-right: 2rem; height: fit-content; position: sticky; top: 100px; box-shadow: var(--shadow-soft); border: 1px solid rgba(139, 92, 246, 0.1); }
+        .admin-logo { text-align: center; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); }
+        .admin-logo h2 { font-family: var(--font-display); color: var(--primary-purple); margin: 0; font-size: 1.8rem; }
+        .admin-logo span { color: var(--text-secondary); font-size: 0.9rem; }
+        .admin-nav { list-style: none; padding: 0; margin: 0; }
+        .admin-nav li { margin-bottom: 0.5rem; }
+        .admin-nav a { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.2rem; text-decoration: none; color: var(--text-secondary); border-radius: 12px; transition: all 0.3s ease; font-weight: 500; }
+        .admin-nav a:hover, .admin-nav a.active { background: rgba(139, 92, 246, 0.1); color: var(--primary-purple); transform: translateX(5px); }
+        .admin-nav a i { width: 20px; text-align: center; font-size: 1.1rem; }
         
         /* Conteúdo Principal */
-        .admin-main {
-            flex: 1;
-            padding-bottom: 3rem;
-        }
+        .admin-main { flex: 1; padding-bottom: 3rem; }
+        .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); }
+        .admin-title { font-family: var(--font-display); font-size: 2.5rem; color: var(--text-primary); margin: 0; }
+        .admin-actions { display: flex; gap: 1rem; }
         
-        .admin-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-            padding-bottom: 1.5rem;
-            border-bottom: 1px solid var(--border-color);
-        }
+        /* Pedidos Styles */
+        .products-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+        .search-box { position: relative; width: 300px; }
+        .search-box input { width: 100%; padding: 0.8rem 1rem 0.8rem 2.5rem; border: 1px solid var(--border-color); border-radius: 10px; background: var(--bg-card); color: var(--text-primary); font-size: 0.9rem; }
+        .search-box i { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
         
-        .admin-title {
-            font-family: var(--font-display);
-            font-size: 2.5rem;
-            color: var(--text-primary);
-            margin: 0;
-        }
+        .filter-options select { padding: 0.8rem; border-radius: 10px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); margin-left: 10px; }
+
+        .data-table { width: 100%; background: var(--bg-card); border-radius: 15px; overflow: hidden; box-shadow: var(--shadow-soft); border: 1px solid rgba(139, 92, 246, 0.1); }
+        .data-table table { width: 100%; border-collapse: collapse; }
+        .data-table th { background: rgba(139, 92, 246, 0.05); padding: 1.2rem 1rem; text-align: left; font-weight: 600; color: var(--text-primary); border-bottom: 1px solid var(--border-color); }
+        .data-table td { padding: 1.2rem 1rem; border-bottom: 1px solid var(--border-color); color: var(--text-secondary); vertical-align: middle; }
+        .data-table tr:last-child td { border-bottom: none; }
+        .data-table tr:hover { background: rgba(139, 92, 246, 0.02); }
         
-        .admin-actions {
-            display: flex;
-            gap: 1rem;
-        }
+        /* Badges */
+        .status-badge { padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600; white-space: nowrap; }
+        .status-pending { background: rgba(245, 158, 11, 0.2); color: var(--warning); }
+        .status-processing { background: rgba(59, 130, 246, 0.2); color: #3b82f6; }
+        .status-shipped { background: rgba(139, 92, 246, 0.2); color: var(--primary-purple); }
+        .status-delivered { background: rgba(16, 185, 129, 0.2); color: var(--success); }
+        .status-cancelled { background: rgba(239, 68, 68, 0.2); color: var(--error); }
         
-        /* Pedidos */
-        .products-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-        }
+        .action-buttons { display: flex; gap: 0.5rem; }
+        .btn-icon { width: 35px; height: 35px; border: none; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; font-size: 0.9rem; }
+        .btn-view { background: rgba(139, 92, 246, 0.1); color: var(--primary-purple); }
+        .btn-view:hover { background: var(--primary-purple); color: white; }
         
-        .search-box {
-            position: relative;
-            width: 300px;
-        }
-        
-        .search-box input {
-            width: 100%;
-            padding: 0.8rem 1rem 0.8rem 2.5rem;
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            background: var(--bg-card);
-            color: var(--text-primary);
-            font-size: 0.9rem;
-        }
-        
-        .search-box i {
-            position: absolute;
-            left: 1rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-muted);
-        }
-        
-        .data-table {
-            width: 100%;
-            background: var(--bg-card);
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: var(--shadow-soft);
-            border: 1px solid rgba(139, 92, 246, 0.1);
-        }
-        
-        .data-table table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        
-        .data-table th {
-            background: rgba(139, 92, 246, 0.05);
-            padding: 1.2rem 1rem;
-            text-align: left;
-            font-weight: 600;
-            color: var(--text-primary);
-            border-bottom: 1px solid var(--border-color);
-        }
-        
-        .data-table td {
-            padding: 1.2rem 1rem;
-            border-bottom: 1px solid var(--border-color);
-            color: var(--text-secondary);
-        }
-        
-        .data-table tr:last-child td {
-            border-bottom: none;
-        }
-        
-        .data-table tr:hover {
-            background: rgba(139, 92, 246, 0.02);
-        }
-        
-        .status-badge {
-            padding: 0.4rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-        
-        .status-pending {
-            background: rgba(245, 158, 11, 0.2);
-            color: var(--warning);
-        }
-        
-        .status-processing {
-            background: rgba(59, 130, 246, 0.2);
-            color: #3b82f6;
-        }
-        
-        .status-shipped {
-            background: rgba(139, 92, 246, 0.2);
-            color: var(--primary-purple);
-        }
-        
-        .status-delivered {
-            background: rgba(16, 185, 129, 0.2);
-            color: var(--success);
-        }
-        
-        .status-cancelled {
-            background: rgba(239, 68, 68, 0.2);
-            color: var(--error);
-        }
-        
-        .action-buttons {
-            display: flex;
-            gap: 0.5rem;
-        }
-        
-        .btn-icon {
-            width: 35px;
-            height: 35px;
-            border: none;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-size: 0.9rem;
-        }
-        
-        .btn-edit {
-            background: rgba(59, 130, 246, 0.1);
-            color: #3b82f6;
-        }
-        
-        .btn-delete {
-            background: rgba(239, 68, 68, 0.1);
-            color: var(--error);
-        }
-        
-        .btn-view {
-            background: rgba(139, 92, 246, 0.1);
-            color: var(--primary-purple);
-        }
-        
-        .btn-edit:hover {
-            background: #3b82f6;
-            color: white;
-        }
-        
-        .btn-delete:hover {
-            background: var(--error);
-            color: white;
-        }
-        
-        .btn-view:hover {
-            background: var(--primary-purple);
-            color: white;
-        }
-        
-        .user-info {
-            display: flex;
-            align-items: center;
-        }
-        
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: rgba(139, 92, 246, 0.1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 1rem;
-            color: var(--primary-purple);
-        }
-        
-        .user-details h4 {
-            margin: 0 0 0.2rem 0;
-            color: var(--text-primary);
-        }
-        
-        .user-details span {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-        }
+        .user-info { display: flex; align-items: center; }
+        .user-avatar { width: 40px; height: 40px; border-radius: 50%; background: rgba(139, 92, 246, 0.1); display: flex; align-items: center; justify-content: center; margin-right: 1rem; color: var(--primary-purple); }
+        .user-details h4 { margin: 0 0 0.2rem 0; color: var(--text-primary); }
+        .user-details span { font-size: 0.85rem; color: var(--text-muted); }
         
         /* Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        .modal.active { display: flex; }
+        .modal-content { background: var(--bg-card); border-radius: 20px; padding: 2rem; width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow-strong); border: 1px solid rgba(139, 92, 246, 0.2); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border-color); }
+        .modal-title { font-size: 1.5rem; color: var(--text-primary); margin: 0; }
+        .close-modal { background: none; border: none; font-size: 1.5rem; color: var(--text-muted); cursor: pointer; }
         
-        .modal.active {
-            display: flex;
-        }
+        .order-details { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem; }
+        .order-section { background: rgba(139, 92, 246, 0.05); padding: 1.5rem; border-radius: 10px; border: 1px solid rgba(139, 92, 246, 0.1); }
+        .order-section h4 { margin: 0 0 1rem 0; color: var(--primary-purple); font-size: 1.1rem; }
         
-        .modal-content {
-            background: var(--bg-card);
-            border-radius: 20px;
-            padding: 2rem;
-            width: 90%;
-            max-width: 800px;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: var(--shadow-strong);
-        }
+        .order-items { width: 100%; }
+        .order-item { display: flex; align-items: center; padding: 1rem 0; border-bottom: 1px solid var(--border-color); }
+        .order-item:last-child { border-bottom: none; }
+        .order-item-img { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; margin-right: 1rem; background: #333; }
+        .order-item-info { flex: 1; }
+        .order-item-name { font-weight: 600; color: var(--text-primary); margin: 0 0 0.2rem 0; }
+        .order-item-details { color: var(--text-muted); font-size: 0.85rem; margin: 0; }
+        .order-total { text-align: right; font-size: 1.2rem; font-weight: 700; color: var(--primary-purple); margin-top: 1rem; padding-top: 1rem; border-top: 2px solid var(--border-color); }
         
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--border-color);
-        }
-        
-        .modal-title {
-            font-size: 1.5rem;
-            color: var(--text-primary);
-            margin: 0;
-        }
-        
-        .close-modal {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            color: var(--text-muted);
-            cursor: pointer;
-        }
-        
-        .order-details {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-            margin-bottom: 2rem;
-        }
-        
-        .order-section {
-            background: rgba(139, 92, 246, 0.05);
-            padding: 1.5rem;
-            border-radius: 10px;
-            border: 1px solid rgba(139, 92, 246, 0.1);
-        }
-        
-        .order-section h4 {
-            margin: 0 0 1rem 0;
-            color: var(--primary-purple);
-            font-size: 1.1rem;
-        }
-        
-        .order-items {
-            width: 100%;
-        }
-        
-        .order-item {
-            display: flex;
-            align-items: center;
-            padding: 1rem 0;
-            border-bottom: 1px solid var(--border-color);
-        }
-        
-        .order-item:last-child {
-            border-bottom: none;
-        }
-        
-        .order-item-img {
-            width: 50px;
-            height: 50px;
-            border-radius: 8px;
-            object-fit: cover;
-            margin-right: 1rem;
-        }
-        
-        .order-item-info {
-            flex: 1;
-        }
-        
-        .order-item-name {
-            font-weight: 600;
-            color: var(--text-primary);
-            margin: 0 0 0.2rem 0;
-        }
-        
-        .order-item-details {
-            color: var(--text-muted);
-            font-size: 0.85rem;
-            margin: 0;
-        }
-        
-        .order-total {
-            text-align: right;
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: var(--primary-purple);
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 2px solid var(--border-color);
-        }
-        
+        /* Form elements inside modal */
+        .status-select-container { margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color); }
+        .form-select { width: 100%; padding: 0.8rem; border-radius: 10px; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); margin-bottom: 1rem; }
+        .btn-save { width: 100%; padding: 10px; background: var(--primary-purple); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn-save:hover { background: var(--secondary-purple); }
+
         /* Responsividade */
-        @media (max-width: 1024px) {
-            .admin-container {
-                flex-direction: column;
-            }
-            
-            .admin-sidebar {
-                width: 100%;
-                margin-right: 0;
-                margin-bottom: 2rem;
-                position: static;
-            }
-            
-            .order-details {
-                grid-template-columns: 1fr;
-            }
-        }
-        
-        @media (max-width: 768px) {
-            .admin-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 1rem;
-            }
-            
-            .admin-actions {
-                width: 100%;
-                justify-content: space-between;
-            }
-            
-            .products-header {
-                flex-direction: column;
-                gap: 1rem;
-                align-items: flex-start;
-            }
-            
-            .search-box {
-                width: 100%;
-            }
-            
-            .data-table {
-                overflow-x: auto;
-            }
-        }
+        @media (max-width: 1024px) { .admin-container { flex-direction: column; } .admin-sidebar { width: 100%; margin-right: 0; margin-bottom: 2rem; position: static; } .order-details { grid-template-columns: 1fr; } }
+        @media (max-width: 768px) { .admin-header { flex-direction: column; align-items: flex-start; gap: 1rem; } .admin-actions { width: 100%; justify-content: space-between; } .products-header { flex-direction: column; gap: 1rem; align-items: flex-start; } .search-box { width: 100%; } .data-table { overflow-x: auto; } }
     </style>
 </head>
 <body class="admin-dashboard">
@@ -475,19 +177,15 @@
             <input type="text" placeholder="Pesquisar...">
         </div>
         <div class="nav-logo">
-            <img src="../assets/logo.png" alt="Susanoo">
+            <img src="../assets/img/LOGOSUSANOO.png" alt="Susanoo" style="height:40px;">
         </div>
         <div class="nav-right-group">
             <ul class="nav-menu">
                 <li><a href="../index.php" class="nav-link">Início</a></li>
-                <li><a href="../produtos.php" class="nav-link">Produtos</a></li>
-                <li><a href="../sobre.php" class="nav-link">Sobre</a></li>
-                <li><a href="../contato.php" class="nav-link">Contato</a></li>
+                <li><a href="produtos.php" class="nav-link">Produtos</a></li>
+                <li><a href="sobre.php" class="nav-link">Sobre</a></li>
+                <li><a href="contato.php" class="nav-link">Contato</a></li>
             </ul>
-            <div class="nav-icons">
-                <a href="#" class="nav-icon-link"><i class="fas fa-shopping-cart"></i></a>
-                <a href="#" class="nav-icon-link"><i class="fas fa-user"></i></a>
-            </div>
         </div>
     </div>
 </nav>
@@ -504,8 +202,8 @@
             <li><a href="produtos_admin.php"><i class="fas fa-box"></i> Produtos</a></li>
             <li><a href="usuarios_admin.php"><i class="fas fa-users"></i> Usuários</a></li>
             <li><a href="pedidos_admin.php" class="active"><i class="fas fa-shopping-cart"></i> Pedidos</a></li>
-            <li><a href="relatorios_admin.php"><i class="fas fa-chart-line"></i> Relatórios</a></li>
-            <li><a href="configuracoes_admin.php"><i class="fas fa-cog"></i> Configurações</a></li>
+            <li><a href="relatorios_admin.php" class="active"><i class="fas fa-comment"></i>Mensagens</a></li>
+            
             <li><a href="../index.php"><i class="fas fa-sign-out-alt"></i> Voltar ao Site</a></li>
         </ul>
     </aside>
@@ -515,7 +213,8 @@
         <div class="admin-header">
             <h1 class="admin-title">Gerenciar Pedidos</h1>
             <div class="admin-actions">
-                <button class="btn btn-secondary" id="export-orders">
+                <!-- Botão de exemplo -->
+                <button class="btn btn-secondary" id="export-orders" onclick="alert('Funcionalidade em desenvolvimento')">
                     <i class="fas fa-download"></i> Exportar
                 </button>
             </div>
@@ -524,22 +223,16 @@
         <div class="products-header">
             <div class="search-box">
                 <i class="fas fa-search"></i>
-                <input type="text" placeholder="Buscar pedidos..." id="search-orders">
+                <input type="text" placeholder="Buscar por cliente ou ID..." id="search-orders">
             </div>
             <div class="filter-options">
                 <select id="status-filter">
                     <option value="">Todos os status</option>
-                    <option value="pending">Pendente</option>
-                    <option value="processing">Processando</option>
-                    <option value="shipped">Enviado</option>
-                    <option value="delivered">Entregue</option>
-                    <option value="cancelled">Cancelado</option>
-                </select>
-                <select id="date-filter">
-                    <option value="">Todos os períodos</option>
-                    <option value="today">Hoje</option>
-                    <option value="week">Esta semana</option>
-                    <option value="month">Este mês</option>
+                    <option value="Pendente">Pendente</option>
+                    <option value="Processando">Processando</option>
+                    <option value="Enviado">Enviado</option>
+                    <option value="Entregue">Entregue</option>
+                    <option value="Cancelado">Cancelado</option>
                 </select>
             </div>
         </div>
@@ -557,316 +250,218 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>
-                            <div class="user-info">
-                                <div class="user-avatar">
-                                    <i class="fas fa-receipt"></i>
+                    <?php if (empty($orders_data)): ?>
+                        <tr>
+                            <td colspan="6" style="text-align:center; padding: 2rem;">Nenhum pedido encontrado.</td>
+                        </tr>
+                    <?php else: ?>
+                        <?php foreach($orders_data as $order): ?>
+                        <tr class="order-row" data-status="<?php echo $order['status']; ?>">
+                            <!-- Coluna Pedido -->
+                            <td>
+                                <div class="user-info">
+                                    <div class="user-avatar">
+                                        <i class="fas fa-receipt"></i>
+                                    </div>
+                                    <div class="user-details">
+                                        <h4>#<?php echo $order['id']; ?></h4>
+                                        <span><?php echo $order['qtd_itens_total']; ?> produtos</span>
+                                    </div>
                                 </div>
+                            </td>
+                            
+                            <!-- Coluna Cliente -->
+                            <td>
                                 <div class="user-details">
-                                    <h4>#4582</h4>
-                                    <span>3 produtos</span>
+                                    <h4><?php echo htmlspecialchars($order['cliente_nome']); ?></h4>
+                                    <span><?php echo htmlspecialchars($order['cliente_email']); ?></span>
                                 </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="user-details">
-                                <h4>João Silva</h4>
-                                <span>joao.silva@email.com</span>
-                            </div>
-                        </td>
-                        <td>15/03/2024</td>
-                        <td>R$ 419,70</td>
-                        <td><span class="status-badge status-processing">Processando</span></td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn-icon btn-view" title="Visualizar" data-order="4582">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                                <button class="btn-icon btn-edit" title="Editar">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div class="user-info">
-                                <div class="user-avatar">
-                                    <i class="fas fa-receipt"></i>
+                            </td>
+                            
+                            <!-- Coluna Data -->
+                            <td><?php echo date('d/m/Y', strtotime($order['data_pedido'])); ?></td>
+                            
+                            <!-- Coluna Valor -->
+                            <td style="font-weight:bold; color:var(--primary-purple);">
+                                R$ <?php echo number_format($order['total'], 2, ',', '.'); ?>
+                            </td>
+                            
+                            <!-- Coluna Status -->
+                            <td>
+                                <span class="status-badge <?php echo getStatusClass($order['status']); ?>">
+                                    <?php echo htmlspecialchars($order['status']); ?>
+                                </span>
+                            </td>
+                            
+                            <!-- Coluna Ações -->
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn-icon btn-view" title="Visualizar e Editar" onclick="openOrderModal(<?php echo $order['id']; ?>)">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
                                 </div>
-                                <div class="user-details">
-                                    <h4>#4581</h4>
-                                    <span>2 produtos</span>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="user-details">
-                                <h4>Maria Oliveira</h4>
-                                <span>maria.oliveira@email.com</span>
-                            </div>
-                        </td>
-                        <td>14/03/2024</td>
-                        <td>R$ 249,90</td>
-                        <td><span class="status-badge status-shipped">Enviado</span></td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn-icon btn-view" title="Visualizar" data-order="4581">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                                <button class="btn-icon btn-edit" title="Editar">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div class="user-info">
-                                <div class="user-avatar">
-                                    <i class="fas fa-receipt"></i>
-                                </div>
-                                <div class="user-details">
-                                    <h4>#4580</h4>
-                                    <span>1 produto</span>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="user-details">
-                                <h4>Pedro Santos</h4>
-                                <span>pedro.santos@email.com</span>
-                            </div>
-                        </td>
-                        <td>13/03/2024</td>
-                        <td>R$ 99,90</td>
-                        <td><span class="status-badge status-delivered">Entregue</span></td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn-icon btn-view" title="Visualizar" data-order="4580">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                                <button class="btn-icon btn-edit" title="Editar">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div class="user-info">
-                                <div class="user-avatar">
-                                    <i class="fas fa-receipt"></i>
-                                </div>
-                                <div class="user-details">
-                                    <h4>#4579</h4>
-                                    <span>4 produtos</span>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="user-details">
-                                <h4>Ana Costa</h4>
-                                <span>ana.costa@email.com</span>
-                            </div>
-                        </td>
-                        <td>12/03/2024</td>
-                        <td>R$ 729,60</td>
-                        <td><span class="status-badge status-pending">Pendente</span></td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn-icon btn-view" title="Visualizar" data-order="4579">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                                <button class="btn-icon btn-edit" title="Editar">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
                 </tbody>
             </table>
         </div>
     </main>
 </div>
 
-<!-- Modal Detalhes do Pedido -->
+<!-- Modal Detalhes do Pedido com Formulário de Edição -->
 <div class="modal" id="order-modal">
     <div class="modal-content">
         <div class="modal-header">
-            <h3 class="modal-title">Detalhes do Pedido #<span id="order-number"></span></h3>
+            <h3 class="modal-title">Detalhes do Pedido #<span id="modal-order-id"></span></h3>
             <button class="close-modal">&times;</button>
         </div>
         
         <div class="order-details">
             <div class="order-section">
                 <h4>Informações do Cliente</h4>
-                <p><strong>Nome:</strong> <span id="customer-name">João Silva</span></p>
-                <p><strong>Email:</strong> <span id="customer-email">joao.silva@email.com</span></p>
-                <p><strong>Telefone:</strong> <span id="customer-phone">(11) 99999-9999</span></p>
+                <p><strong>Nome:</strong> <span id="modal-customer-name"></span></p>
+                <p><strong>Email:</strong> <span id="modal-customer-email"></span></p>
+                <p><strong>Data:</strong> <span id="modal-order-date"></span></p>
             </div>
             
-            <div class="order-section">
-                <h4>Endereço de Entrega</h4>
-                <p id="shipping-address">Rua das Flores, 123 - Centro<br>São Paulo - SP<br>CEP: 01234-567</p>
+            <div class="order-section" id="modal-status-section">
+                <h4>Status do Pedido</h4>
+                
+                <!-- Formulário de Atualização -->
+                <form method="POST" action="pedidos_admin.php">
+                    <input type="hidden" name="action" value="update_status">
+                    <input type="hidden" name="pedido_id" id="form-pedido-id">
+                    
+                    <select name="status_pedido" id="status-select" class="form-select">
+                        <option value="Pendente">Pendente</option>
+                        <option value="Processando">Processando</option>
+                        <option value="Enviado">Enviado</option>
+                        <option value="Entregue">Entregue</option>
+                        <option value="Cancelado">Cancelado</option>
+                    </select>
+                    
+                    <button type="submit" class="btn-save">
+                        <i class="fas fa-save"></i> Atualizar Status
+                    </button>
+                </form>
             </div>
         </div>
         
         <div class="order-section">
             <h4>Itens do Pedido</h4>
-            <div class="order-items">
-                <div class="order-item">
-                    <img src="../assets/img/IMG3.png" alt="Camisa Brazil" class="order-item-img">
-                    <div class="order-item-info">
-                        <div class="order-item-name">Camisa Brazil</div>
-                        <div class="order-item-details">Quantidade: 1 • Tamanho: M</div>
-                    </div>
-                    <div class="order-item-price">R$ 99,90</div>
-                </div>
-                <div class="order-item">
-                    <img src="../assets/img/Imagem2.png" alt="Moletom Sakura" class="order-item-img">
-                    <div class="order-item-info">
-                        <div class="order-item-name">Moletom Sakura</div>
-                        <div class="order-item-details">Quantidade: 1 • Tamanho: G</div>
-                    </div>
-                    <div class="order-item-price">R$ 249,90</div>
-                </div>
-                <div class="order-item">
-                    <img src="../assets/img/IMG5.png" alt="Boné AMATERASU" class="order-item-img">
-                    <div class="order-item-info">
-                        <div class="order-item-name">Boné AMATERASU</div>
-                        <div class="order-item-details">Quantidade: 1</div>
-                    </div>
-                    <div class="order-item-price">R$ 69,90</div>
-                </div>
+            <div class="order-items" id="modal-items-list">
+                <!-- Itens injetados via JS -->
             </div>
-            <div class="order-total">
-                Total: R$ 419,70
+            <div class="order-total" id="modal-total">
+                Total: R$ 0,00
             </div>
-        </div>
-        
-        <div class="admin-actions" style="margin-top: 2rem;">
-            <button type="button" class="btn btn-secondary close-modal">Fechar</button>
-            <button type="button" class="btn btn-primary" id="update-status">Atualizar Status</button>
         </div>
     </div>
 </div>
 
 <script src="../js/script.js"></script>
 <script>
-    // Controle do Modal
+    // 1. Dados dos pedidos vindos do PHP para o JS
+    const ordersData = <?php echo json_encode($orders_data); ?>;
+
+    // 2. Elementos do Modal
     const modal = document.getElementById('order-modal');
     const closeModalBtns = document.querySelectorAll('.close-modal');
 
-    // Fechar modal
-    closeModalBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            modal.classList.remove('active');
-        });
-    });
+    // 3. Função para abrir o modal e preencher dados
+    function openOrderModal(id) {
+        const order = ordersData[id];
+        if(!order) return;
 
-    // Fechar modal clicando fora
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
-            modal.classList.remove('active');
+        // Preencher textos
+        document.getElementById('modal-order-id').textContent = order.id;
+        document.getElementById('form-pedido-id').value = order.id;
+        document.getElementById('modal-customer-name').textContent = order.cliente_nome;
+        document.getElementById('modal-customer-email').textContent = order.cliente_email;
+        
+        // Data formatada
+        const dateObj = new Date(order.data_pedido);
+        document.getElementById('modal-order-date').textContent = dateObj.toLocaleDateString('pt-BR') + ' ' + dateObj.toLocaleTimeString('pt-BR');
+        
+        // Selecionar o status atual no select
+        document.getElementById('status-select').value = order.status;
+
+        // Limpar e preencher lista de itens
+        const itemsContainer = document.getElementById('modal-items-list');
+        itemsContainer.innerHTML = '';
+
+        let total = parseFloat(order.total);
+
+        if(order.itens && order.itens.length > 0) {
+            order.itens.forEach(item => {
+                const itemTotal = parseFloat(item.preco_unitario);
+                const html = `
+                    <div class="order-item">
+                        <div class="order-item-img" style="display:flex;align-items:center;justify-content:center;color:#fff;">
+                            <i class="fas fa-box"></i>
+                        </div>
+                        <div class="order-item-info">
+                            <div class="order-item-name">${item.produto_nome}</div>
+                            <div class="order-item-details">Qtd: ${item.quantidade} • Categoria: ${item.categoria || 'Geral'}</div>
+                        </div>
+                        <div class="order-item-price">R$ ${itemTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div>
+                    </div>
+                `;
+                itemsContainer.insertAdjacentHTML('beforeend', html);
+            });
+        } else {
+            itemsContainer.innerHTML = '<p>Sem itens registrados.</p>';
         }
-    });
 
-    // Visualizar pedido
-    document.querySelectorAll('.btn-view').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const orderNumber = this.getAttribute('data-order');
-            document.getElementById('order-number').textContent = orderNumber;
-            modal.classList.add('active');
-        });
-    });
+        // Total
+        document.getElementById('modal-total').textContent = 'Total: ' + total.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
 
-    // Busca de pedidos
+        // Exibir modal
+        modal.classList.add('active');
+    }
+
+    // 4. Fechar Modal
+    closeModalBtns.forEach(btn => btn.addEventListener('click', () => modal.classList.remove('active')));
+    window.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('active'); });
+
+    // 5. Filtros de Pesquisa na Tabela
     const searchInput = document.getElementById('search-orders');
-    searchInput.addEventListener('input', filterOrders);
-
-    // Filtros
     const statusFilter = document.getElementById('status-filter');
-    const dateFilter = document.getElementById('date-filter');
-    
-    statusFilter.addEventListener('change', filterOrders);
-    dateFilter.addEventListener('change', filterOrders);
 
-    function filterOrders() {
-        const searchTerm = searchInput.value.toLowerCase();
-        const statusValue = statusFilter.value;
-        const dateValue = dateFilter.value;
-        
-        const rows = document.querySelectorAll('.data-table tbody tr');
-        
+    function filterTable() {
+        const term = searchInput.value.toLowerCase();
+        const status = statusFilter.value;
+        const rows = document.querySelectorAll('.order-row');
+
         rows.forEach(row => {
-            const orderNumber = row.querySelector('.user-details h4').textContent.toLowerCase();
-            const customerName = row.cells[1].querySelector('h4').textContent.toLowerCase();
-            const status = row.cells[4].textContent.toLowerCase();
+            const txt = row.innerText.toLowerCase();
+            const rowStatus = row.getAttribute('data-status');
             
-            const matchesSearch = orderNumber.includes(searchTerm) || customerName.includes(searchTerm);
-            const matchesStatus = !statusValue || status.includes(statusValue);
-            const matchesDate = !dateValue; // Implementação básica
-            
-            if (matchesSearch && matchesStatus && matchesDate) {
-                row.style.display = '';
-            } else {
-                row.style.display = 'none';
-            }
+            const matchSearch = txt.includes(term);
+            const matchStatus = status === "" || rowStatus === status;
+
+            row.style.display = (matchSearch && matchStatus) ? '' : 'none';
         });
     }
 
-    // Atualizar status do pedido
-    document.getElementById('update-status').addEventListener('click', function() {
-        const statusSelect = document.createElement('select');
-        statusSelect.innerHTML = `
-            <option value="pending">Pendente</option>
-            <option value="processing">Processando</option>
-            <option value="shipped">Enviado</option>
-            <option value="delivered">Entregue</option>
-            <option value="cancelled">Cancelado</option>
-        `;
-        
-        const currentStatus = document.querySelector('.status-badge').textContent.toLowerCase();
-        statusSelect.value = currentStatus;
-        
-        if (confirm('Deseja atualizar o status do pedido?')) {
-            showNotification('Status do pedido atualizado com sucesso!', 'success');
-            modal.classList.remove('active');
-        }
-    });
+    searchInput.addEventListener('keyup', filterTable);
+    statusFilter.addEventListener('change', filterTable);
 
-    // Exportar pedidos
-    document.getElementById('export-orders').addEventListener('click', function() {
-        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Exportando...';
-        setTimeout(() => {
-            this.innerHTML = '<i class="fas fa-download"></i> Exportar';
-            showNotification('Pedidos exportados com sucesso!', 'success');
-        }, 1500);
-    });
-
-    // Função de notificação
-    function showNotification(message, type) {
-        const notification = document.createElement('div');
-        notification.style.cssText = `
-            position: fixed;
-            top: 100px;
-            right: 20px;
-            background: ${type === 'success' ? 'var(--success)' : 'var(--error)'};
-            color: white;
-            padding: 1rem 1.5rem;
-            border-radius: 10px;
-            z-index: 10000;
-            box-shadow: var(--shadow-medium);
-            animation: slideIn 0.3s ease;
-        `;
-        notification.textContent = message;
-        document.body.appendChild(notification);
-        
-        setTimeout(() => {
-            notification.remove();
-        }, 3000);
+    // 6. Alerta de Sucesso (se vier do PHP após salvar)
+    const urlParams = new URLSearchParams(window.location.search);
+    if(urlParams.get('msg') === 'status_updated') {
+        Swal.fire({
+            icon: 'success',
+            title: 'Sucesso!',
+            text: 'Status do pedido atualizado.',
+            timer: 2000,
+            showConfirmButton: false
+        }).then(() => {
+            // Limpa a URL
+            window.history.replaceState(null, null, window.location.pathname);
+        });
     }
 </script>
 </body>

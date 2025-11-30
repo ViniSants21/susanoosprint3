@@ -1,3 +1,78 @@
+<?php
+// ==========================================================
+// 1. CONEXÃO E LÓGICA DE DADOS (PHP NO TOPO)
+// ==========================================================
+require_once 'conexao.php'; // Certifique-se de que este arquivo existe e conecta ao BD
+
+// --- A. Estatísticas Gerais (Cards) ---
+
+// 1. Vendas Totais
+$sql_total = "SELECT SUM(total) as total_vendas FROM pedidos";
+$res_total = $conn->query($sql_total);
+$total_vendas = 0;
+if($res_total) {
+    $row = $res_total->fetch_assoc();
+    $total_vendas = $row['total_vendas'] ?? 0;
+}
+
+// 2. Pedidos Pendentes
+$sql_pendentes = "SELECT COUNT(*) as total FROM pedidos WHERE status = 'Pendente'";
+$res_pendentes = $conn->query($sql_pendentes);
+$pedidos_pendentes = ($res_pendentes) ? $res_pendentes->fetch_assoc()['total'] : 0;
+
+// 3. Contagem de Usuários
+$sql_users = "SELECT COUNT(*) AS total FROM users";
+$res_users = $conn->query($sql_users);
+$users_count = ($res_users) ? $res_users->fetch_assoc()['total'] : 0;
+
+// --- B. Dados para Gráficos ---
+
+// 1. Categorias (Rosca)
+$sql_cat = "SELECT categoria, COUNT(*) as qtd FROM itens_pedido GROUP BY categoria";
+$res_cat = $conn->query($sql_cat);
+
+$cat_labels = [];
+$cat_data = [];
+if($res_cat) {
+    while($row = $res_cat->fetch_assoc()) {
+        $cat_labels[] = $row['categoria'];
+        $cat_data[] = $row['qtd'];
+    }
+}
+
+// 2. Vendas por Mês (Linha) - Ano Atual
+$sql_chart = "SELECT MONTH(data_pedido) as mes, SUM(total) as total 
+              FROM pedidos 
+              WHERE YEAR(data_pedido) = YEAR(CURRENT_DATE()) 
+              GROUP BY MONTH(data_pedido) 
+              ORDER BY mes";
+$res_chart = $conn->query($sql_chart);
+
+// Inicializa array com 0 para os 12 meses
+$sales_month_data = array_fill(0, 12, 0); 
+if($res_chart) {
+    while($row = $res_chart->fetch_assoc()) {
+        // Mês 1 (Jan) vira índice 0 no array JS
+        $sales_month_data[intval($row['mes']) - 1] = floatval($row['total']); 
+    }
+}
+
+// --- C. Listas Dinâmicas ---
+
+// 1. Atividade Recente (Últimos 5 pedidos)
+$sql_recent = "SELECT * FROM pedidos ORDER BY data_pedido DESC LIMIT 5";
+$res_recent = $conn->query($sql_recent);
+
+// 2. Produtos Mais Vendidos (Top 3)
+// Agrupa itens pelo nome e soma a quantidade e receita
+$sql_top = "SELECT produto_nome, SUM(quantidade) as qtd_total, SUM(quantidade * preco_unitario) as receita_total 
+            FROM itens_pedido 
+            GROUP BY produto_nome 
+            ORDER BY qtd_total DESC 
+            LIMIT 3";
+$res_top = $conn->query($sql_top);
+?>
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -17,414 +92,81 @@
     </script>
     <style>
         /* ===== ESTILOS DO PAINEL ADMIN ===== */
-        .admin-dashboard {
-            background-color: var(--bg-primary);
-            min-height: 100vh;
-            padding-top: 80px;
-        }
-        
-        .admin-container {
-            display: flex;
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
+        .admin-dashboard { background-color: var(--bg-primary); min-height: 100vh; padding-top: 80px; }
+        .admin-container { display: flex; max-width: 1400px; margin: 0 auto; padding: 0 20px; }
         
         /* Sidebar */
-        .admin-sidebar {
-            width: 280px;
-            background: var(--bg-card);
-            border-radius: 20px;
-            padding: 2rem 1.5rem;
-            margin-right: 2rem;
-            height: fit-content;
-            position: sticky;
-            top: 100px;
-            box-shadow: var(--shadow-soft);
-            border: 1px solid rgba(139, 92, 246, 0.1);
-        }
-        
-        .admin-logo {
-            text-align: center;
-            margin-bottom: 2rem;
-            padding-bottom: 1.5rem;
-            border-bottom: 1px solid var(--border-color);
-        }
-        
-        .admin-logo h2 {
-            font-family: var(--font-display);
-            color: var(--primary-purple);
-            margin: 0;
-            font-size: 1.8rem;
-        }
-        
-        .admin-logo span {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
-        
-        .admin-nav {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        
-        .admin-nav li {
-            margin-bottom: 0.5rem;
-        }
-        
-        .admin-nav a {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 1rem 1.2rem;
-            text-decoration: none;
-            color: var(--text-secondary);
-            border-radius: 12px;
-            transition: all 0.3s ease;
-            font-weight: 500;
-        }
-        
-        .admin-nav a:hover,
-        .admin-nav a.active {
-            background: rgba(139, 92, 246, 0.1);
-            color: var(--primary-purple);
-            transform: translateX(5px);
-        }
-        
-        .admin-nav a i {
-            width: 20px;
-            text-align: center;
-            font-size: 1.1rem;
-        }
+        .admin-sidebar { width: 280px; background: var(--bg-card); border-radius: 20px; padding: 2rem 1.5rem; margin-right: 2rem; height: fit-content; position: sticky; top: 100px; box-shadow: var(--shadow-soft); border: 1px solid rgba(139, 92, 246, 0.1); }
+        .admin-logo { text-align: center; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); }
+        .admin-logo h2 { font-family: var(--font-display); color: var(--primary-purple); margin: 0; font-size: 1.8rem; }
+        .admin-logo span { color: var(--text-secondary); font-size: 0.9rem; }
+        .admin-nav { list-style: none; padding: 0; margin: 0; }
+        .admin-nav li { margin-bottom: 0.5rem; }
+        .admin-nav a { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.2rem; text-decoration: none; color: var(--text-secondary); border-radius: 12px; transition: all 0.3s ease; font-weight: 500; }
+        .admin-nav a:hover, .admin-nav a.active { background: rgba(139, 92, 246, 0.1); color: var(--primary-purple); transform: translateX(5px); }
+        .admin-nav a i { width: 20px; text-align: center; font-size: 1.1rem; }
         
         /* Conteúdo Principal */
-        .admin-main {
-            flex: 1;
-            padding-bottom: 3rem;
-        }
-        
-        .admin-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-            padding-bottom: 1.5rem;
-            border-bottom: 1px solid var(--border-color);
-        }
-        
-        .admin-title {
-            font-family: var(--font-display);
-            font-size: 2.5rem;
-            color: var(--text-primary);
-            margin: 0;
-        }
-        
-        .admin-actions {
-            display: flex;
-            gap: 1rem;
-        }
+        .admin-main { flex: 1; padding-bottom: 3rem; }
+        .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); }
+        .admin-title { font-family: var(--font-display); font-size: 2.5rem; color: var(--text-primary); margin: 0; }
+        .admin-actions { display: flex; gap: 1rem; }
         
         /* Cards de Estatísticas */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-        
-        .stat-card {
-            background: var(--bg-card);
-            border-radius: 15px;
-            padding: 1.5rem;
-            box-shadow: var(--shadow-soft);
-            border: 1px solid rgba(139, 92, 246, 0.1);
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--shadow-medium);
-            border-color: var(--primary-purple);
-        }
-        
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: linear-gradient(90deg, var(--primary-purple), var(--secondary-purple));
-        }
-        
-        .stat-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 1rem;
-            font-size: 1.5rem;
-        }
-        
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .stat-card { background: var(--bg-card); border-radius: 15px; padding: 1.5rem; box-shadow: var(--shadow-soft); border: 1px solid rgba(139, 92, 246, 0.1); transition: all 0.3s ease; position: relative; overflow: hidden; }
+        .stat-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-medium); border-color: var(--primary-purple); }
+        .stat-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, var(--primary-purple), var(--secondary-purple)); }
+        .stat-icon { width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem; font-size: 1.5rem; }
         .stat-icon.primary { background: rgba(139, 92, 246, 0.2); color: var(--primary-purple); }
         .stat-icon.success { background: rgba(16, 185, 129, 0.2); color: var(--success); }
         .stat-icon.warning { background: rgba(245, 158, 11, 0.2); color: var(--warning); }
         .stat-icon.info { background: rgba(59, 130, 246, 0.2); color: #3b82f6; }
-        
-        .stat-value {
-            font-size: 2rem;
-            font-weight: 700;
-            margin: 0.5rem 0;
-            color: var(--text-primary);
-        }
-        
-        .stat-label {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            margin-bottom: 0.5rem;
-        }
-        
-        .stat-change {
-            display: flex;
-            align-items: center;
-            font-size: 0.85rem;
-            font-weight: 600;
-        }
-        
+        .stat-value { font-size: 2rem; font-weight: 700; margin: 0.5rem 0; color: var(--text-primary); }
+        .stat-label { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 0.5rem; }
+        .stat-change { display: flex; align-items: center; font-size: 0.85rem; font-weight: 600; }
         .stat-change.positive { color: var(--success); }
         .stat-change.negative { color: var(--error); }
         
         /* Grid de Gráficos */
-        .charts-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
+        .charts-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-bottom: 2rem; }
+        .chart-container { background: var(--bg-card); border-radius: 15px; padding: 1.5rem; box-shadow: var(--shadow-soft); border: 1px solid rgba(139, 92, 246, 0.1); }
+        .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+        .chart-title { font-size: 1.2rem; font-weight: 600; color: var(--text-primary); margin: 0; }
+        .chart-actions { display: flex; gap: 0.5rem; }
+        .chart-actions button { background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); padding: 0.4rem 0.8rem; border-radius: 6px; font-size: 0.8rem; cursor: pointer; transition: all 0.2s ease; }
+        .chart-actions button:hover, .chart-actions button.active { background: rgba(139, 92, 246, 0.1); color: var(--primary-purple); border-color: var(--primary-purple); }
+        .chart-wrapper { height: 300px; position: relative; }
         
-        .chart-container {
-            background: var(--bg-card);
-            border-radius: 15px;
-            padding: 1.5rem;
-            box-shadow: var(--shadow-soft);
-            border: 1px solid rgba(139, 92, 246, 0.1);
-        }
-        
-        .chart-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-        
-        .chart-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin: 0;
-        }
-        
-        .chart-actions {
-            display: flex;
-            gap: 0.5rem;
-        }
-        
-        .chart-actions button {
-            background: transparent;
-            border: 1px solid var(--border-color);
-            color: var(--text-secondary);
-            padding: 0.4rem 0.8rem;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        
-        .chart-actions button:hover,
-        .chart-actions button.active {
-            background: rgba(139, 92, 246, 0.1);
-            color: var(--primary-purple);
-            border-color: var(--primary-purple);
-        }
-        
-        .chart-wrapper {
-            height: 300px;
-            position: relative;
-        }
-        
-        /* Listas de Atividade */
-        .activity-list, .product-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        
-        .activity-item, .product-item {
-            display: flex;
-            align-items: center;
-            padding: 1rem 0;
-            border-bottom: 1px solid var(--border-color);
-        }
-        
-        .activity-item:last-child, .product-item:last-child {
-            border-bottom: none;
-        }
-        
-        .activity-icon, .product-image {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 1rem;
-            font-size: 1rem;
-        }
-        
+        /* Listas */
+        .activity-list, .product-list { list-style: none; padding: 0; margin: 0; }
+        .activity-item, .product-item { display: flex; align-items: center; padding: 1rem 0; border-bottom: 1px solid var(--border-color); }
+        .activity-item:last-child, .product-item:last-child { border-bottom: none; }
+        .activity-icon, .product-image { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 1rem; font-size: 1rem; }
         .activity-icon.order { background: rgba(16, 185, 129, 0.2); color: var(--success); }
         .activity-icon.user { background: rgba(59, 130, 246, 0.2); color: #3b82f6; }
         .activity-icon.product { background: rgba(139, 92, 246, 0.2); color: var(--primary-purple); }
+        .activity-content, .product-info { flex: 1; }
+        .activity-title, .product-name { font-weight: 600; color: var(--text-primary); margin: 0 0 0.2rem 0; }
+        .activity-desc, .product-sales { color: var(--text-secondary); font-size: 0.85rem; margin: 0; }
+        .activity-time { color: var(--text-muted); font-size: 0.8rem; }
+        .product-image { border-radius: 8px; object-fit: cover; }
+        .product-revenue { font-weight: 600; color: var(--primary-purple); }
         
-        .activity-content, .product-info {
-            flex: 1;
-        }
-        
-        .activity-title, .product-name {
-            font-weight: 600;
-            color: var(--text-primary);
-            margin: 0 0 0.2rem 0;
-        }
-        
-        .activity-desc, .product-sales {
-            color: var(--text-secondary);
-            font-size: 0.85rem;
-            margin: 0;
-        }
-        
-        .activity-time {
-            color: var(--text-muted);
-            font-size: 0.8rem;
-        }
-        
-        .product-image {
-            border-radius: 8px;
-            object-fit: cover;
-        }
-        
-        .product-revenue {
-            font-weight: 600;
-            color: var(--primary-purple);
-        }
-        
-        /* Cards de Acesso Rápido */
-        .quick-access-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-            margin-top: 2rem;
-        }
-        
-        .quick-access-card {
-            background: var(--bg-card);
-            border-radius: 15px;
-            padding: 1.5rem;
-            text-align: center;
-            text-decoration: none;
-            color: var(--text-secondary);
-            transition: all 0.3s ease;
-            border: 1px solid rgba(139, 92, 246, 0.1);
-        }
-        
-        .quick-access-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--primary-purple);
-            color: var(--primary-purple);
-            box-shadow: var(--shadow-medium);
-        }
-        
-        .quick-access-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 1rem;
-            font-size: 1.5rem;
-            background: rgba(139, 92, 246, 0.1);
-            color: var(--primary-purple);
-        }
-        
-        .quick-access-card h3 {
-            margin: 0 0 0.5rem 0;
-            font-size: 1.1rem;
-        }
-        
-        .quick-access-card p {
-            margin: 0;
-            font-size: 0.9rem;
-            opacity: 0.8;
-        }
+        /* Acesso Rápido */
+        .quick-access-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
+        .quick-access-card { background: var(--bg-card); border-radius: 15px; padding: 1.5rem; text-align: center; text-decoration: none; color: var(--text-secondary); transition: all 0.3s ease; border: 1px solid rgba(139, 92, 246, 0.1); }
+        .quick-access-card:hover { transform: translateY(-5px); border-color: var(--primary-purple); color: var(--primary-purple); box-shadow: var(--shadow-medium); }
+        .quick-access-icon { width: 60px; height: 60px; border-radius: 15px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-size: 1.5rem; background: rgba(139, 92, 246, 0.1); color: var(--primary-purple); }
+        .quick-access-card h3 { margin: 0 0 0.5rem 0; font-size: 1.1rem; }
+        .quick-access-card p { margin: 0; font-size: 0.9rem; opacity: 0.8; }
         
         /* Responsividade */
-        @media (max-width: 1024px) {
-            .admin-container {
-                flex-direction: column;
-            }
-            
-            .admin-sidebar {
-                width: 100%;
-                margin-right: 0;
-                margin-bottom: 2rem;
-                position: static;
-            }
-            
-            .charts-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-        
-        @media (max-width: 768px) {
-            .admin-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 1rem;
-            }
-            
-            .admin-actions {
-                width: 100%;
-                justify-content: space-between;
-            }
-            
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .quick-access-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
+        @media (max-width: 1024px) { .admin-container { flex-direction: column; } .admin-sidebar { width: 100%; margin-right: 0; margin-bottom: 2rem; position: static; } .charts-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 768px) { .admin-header { flex-direction: column; align-items: flex-start; gap: 1rem; } .admin-actions { width: 100%; justify-content: space-between; } .stats-grid { grid-template-columns: 1fr; } .quick-access-grid { grid-template-columns: repeat(2, 1fr); } }
     </style>
 </head>
 <body class="admin-dashboard">
-
-<?php
-// Obter contagem de usuários reais do banco
-require_once 'conexao.php';
-$users_count = 0;
-$res_users = $conn->query("SELECT COUNT(*) AS total FROM users");
-if ($res_users) {
-    $row_u = $res_users->fetch_assoc();
-    $users_count = intval($row_u['total']);
-}
-?>
-
-
 
 <div class="admin-container">
     <!-- Sidebar -->
@@ -438,8 +180,8 @@ if ($res_users) {
             <li><a href="produtos_admin.php"><i class="fas fa-box"></i> Produtos</a></li>
             <li><a href="usuarios_admin.php"><i class="fas fa-users"></i> Usuários</a></li>
             <li><a href="pedidos_admin.php"><i class="fas fa-shopping-cart"></i> Pedidos</a></li>
-            <li><a href="relatorios_admin.php"><i class="fas fa-chart-line"></i> Relatórios</a></li>
-            <li><a href="configuracoes_admin.php"><i class="fas fa-cog"></i> Configurações</a></li>
+            <li><a href="relatorios_admin.php" class="active"><i class="fas fa-comment"></i>Mensagens</a></li>
+           
             <li><a href="../index.php"><i class="fas fa-sign-out-alt"></i> Voltar ao Site</a></li>
         </ul>
     </aside>
@@ -449,56 +191,59 @@ if ($res_users) {
         <div class="admin-header">
             <h1 class="admin-title">Dashboard</h1>
             <div class="admin-actions">
-                <button class="btn btn-primary" id="refresh-data">
-                    <i class="fas fa-sync-alt"></i> Atualizar Dados
+                <button class="btn btn-primary" onclick="window.location.reload()">
+                    <i class="fas fa-sync-alt"></i> Atualizar
                 </button>
-                
             </div>
         </div>
 
-        <!-- Grid de Estatísticas -->
+        <!-- Grid de Estatísticas (DADOS REAIS) -->
         <div class="stats-grid">
+            <!-- Vendas Totais -->
             <div class="stat-card">
                 <div class="stat-icon primary">
                     <i class="fas fa-shopping-cart"></i>
                 </div>
                 <div class="stat-label">Vendas Totais</div>
-                <div class="stat-value">R$ 12.847,90</div>
+                <div class="stat-value">R$ <?php echo number_format($total_vendas, 2, ',', '.'); ?></div>
                 <div class="stat-change positive">
-                    <i class="fas fa-arrow-up"></i> 12.4% vs mês anterior
+                    <i class="fas fa-check-circle"></i> Dados atualizados
                 </div>
             </div>
             
+            <!-- Novos Clientes -->
             <div class="stat-card">
                 <div class="stat-icon success">
                     <i class="fas fa-users"></i>
                 </div>
-                <div class="stat-label">Novos Clientes</div>
-                <div class="stat-value"><?php echo isset($users_count) ? $users_count : 0; ?></div>
-                <div class="stat-change positive">
-                    <i class="fas fa-arrow-up"></i> 5.2% vs mês anterior
+                <div class="stat-label">Usuários Cadastrados</div>
+                <div class="stat-value"><?php echo $users_count; ?></div>
+                <div class="stat-change info">
+                    <i class="fas fa-user-check"></i> Total registrado
                 </div>
             </div>
             
+            <!-- Pedidos Pendentes -->
             <div class="stat-card">
                 <div class="stat-icon warning">
                     <i class="fas fa-box"></i>
                 </div>
                 <div class="stat-label">Pedidos Pendentes</div>
-                <div class="stat-value">18</div>
-                <div class="stat-change negative">
-                    <i class="fas fa-arrow-down"></i> 2.1% vs mês anterior
+                <div class="stat-value"><?php echo $pedidos_pendentes; ?></div>
+                <div class="stat-change <?php echo $pedidos_pendentes > 0 ? 'negative' : 'positive'; ?>">
+                    <?php echo $pedidos_pendentes > 0 ? '<i class="fas fa-clock"></i> Requer atenção' : '<i class="fas fa-check"></i> Tudo em dia'; ?>
                 </div>
             </div>
             
+            <!-- Taxa (Estática/Exemplo pois precisa de tracking de visitas) -->
             <div class="stat-card">
                 <div class="stat-icon info">
                     <i class="fas fa-chart-line"></i>
                 </div>
-                <div class="stat-label">Taxa de Conversão</div>
-                <div class="stat-value">3.8%</div>
+                <div class="stat-label">Status do Sistema</div>
+                <div class="stat-value" style="font-size:1.5rem">Online</div>
                 <div class="stat-change positive">
-                    <i class="fas fa-arrow-up"></i> 0.7% vs mês anterior
+                    <i class="fas fa-server"></i> Conectado
                 </div>
             </div>
         </div>
@@ -507,12 +252,7 @@ if ($res_users) {
         <div class="charts-grid">
             <div class="chart-container">
                 <div class="chart-header">
-                    <h3 class="chart-title">Vendas ao Longo do Tempo</h3>
-                    <div class="chart-actions">
-                        <button data-period="week">Semana</button>
-                        <button data-period="month" class="active">Mês</button>
-                        <button data-period="year">Ano</button>
-                    </div>
+                    <h3 class="chart-title">Vendas este Ano</h3>
                 </div>
                 <div class="chart-wrapper">
                     <canvas id="salesChart"></canvas>
@@ -521,10 +261,7 @@ if ($res_users) {
             
             <div class="chart-container">
                 <div class="chart-header">
-                    <h3 class="chart-title">Categorias de Produtos</h3>
-                    <div class="chart-actions">
-                        <button><i class="fas fa-download"></i></button>
-                    </div>
+                    <h3 class="chart-title">Categorias Vendidas</h3>
                 </div>
                 <div class="chart-wrapper">
                     <canvas id="categoriesChart"></canvas>
@@ -532,81 +269,65 @@ if ($res_users) {
             </div>
         </div>
         
-        <!-- Grid Inferior -->
+        <!-- Grid Inferior (Listas) -->
         <div class="charts-grid">
+            <!-- Atividade Recente (DADOS REAIS) -->
             <div class="chart-container">
                 <div class="chart-header">
-                    <h3 class="chart-title">Atividade Recente</h3>
+                    <h3 class="chart-title">Pedidos Recentes</h3>
                     <div class="chart-actions">
-                        <button>Ver Tudo</button>
+                        <a href="pedidos_admin.php" style="text-decoration:none; font-size:0.8rem;">Ver Todos</a>
                     </div>
                 </div>
                 <ul class="activity-list">
-                    <li class="activity-item">
-                        <div class="activity-icon order">
-                            <i class="fas fa-shopping-cart"></i>
-                        </div>
-                        <div class="activity-content">
-                            <h4 class="activity-title">Novo Pedido Recebido</h4>
-                            <p class="activity-desc">Pedido #4582 de João Silva</p>
-                        </div>
-                        <div class="activity-time">5 min atrás</div>
-                    </li>
-                    <li class="activity-item">
-                        <div class="activity-icon user">
-                            <i class="fas fa-user-plus"></i>
-                        </div>
-                        <div class="activity-content">
-                            <h4 class="activity-title">Novo Cliente Registrado</h4>
-                            <p class="activity-desc">Maria Oliveira se cadastrou</p>
-                        </div>
-                        <div class="activity-time">1 hora atrás</div>
-                    </li>
-                    <li class="activity-item">
-                        <div class="activity-icon product">
-                            <i class="fas fa-box"></i>
-                        </div>
-                        <div class="activity-content">
-                            <h4 class="activity-title">Produto Esgotado</h4>
-                            <p class="activity-desc">Camisa Brazil está sem estoque</p>
-                        </div>
-                        <div class="activity-time">2 horas atrás</div>
-                    </li>
+                    <?php if($res_recent && $res_recent->num_rows > 0): ?>
+                        <?php while($order = $res_recent->fetch_assoc()): ?>
+                            <li class="activity-item">
+                                <div class="activity-icon order">
+                                    <i class="fas fa-shopping-bag"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <h4 class="activity-title">Pedido #<?php echo $order['id']; ?></h4>
+                                    <p class="activity-desc">
+                                        <?php echo htmlspecialchars($order['cliente_nome']); ?> - 
+                                        R$ <?php echo number_format($order['total'], 2, ',', '.'); ?>
+                                    </p>
+                                </div>
+                                <div class="activity-time">
+                                    <?php echo date('d/m H:i', strtotime($order['data_pedido'])); ?>
+                                </div>
+                            </li>
+                        <?php endwhile; ?>
+                    <?php else: ?>
+                        <li class="activity-item"><p style="padding:10px; color:var(--text-secondary);">Nenhum pedido recente.</p></li>
+                    <?php endif; ?>
                 </ul>
             </div>
             
+            <!-- Produtos Mais Vendidos (DADOS REAIS) -->
             <div class="chart-container">
                 <div class="chart-header">
-                    <h3 class="chart-title">Produtos Mais Vendidos</h3>
-                    <div class="chart-actions">
-                        <button>Ver Tudo</button>
-                    </div>
+                    <h3 class="chart-title">Top 3 Produtos</h3>
                 </div>
                 <ul class="product-list">
-                    <li class="product-item">
-                        <img src="../assets/img/IMG3.png" alt="Camisa Brazil" class="product-image">
-                        <div class="product-info">
-                            <h4 class="product-name">Camisa Brazil</h4>
-                            <p class="product-sales">128 vendas</p>
-                        </div>
-                        <div class="product-revenue">R$ 12.672,00</div>
-                    </li>
-                    <li class="product-item">
-                        <img src="../assets/img/Imagem2.png" alt="Moletom Sakura" class="product-image">
-                        <div class="product-info">
-                            <h4 class="product-name">Moletom Sakura</h4>
-                            <p class="product-sales">94 vendas</p>
-                        </div>
-                        <div class="product-revenue">R$ 23.490,60</div>
-                    </li>
-                    <li class="product-item">
-                        <img src="../assets/img/IMG5.png" alt="Boné AMATERASU" class="product-image">
-                        <div class="product-info">
-                            <h4 class="product-name">Boné AMATERASU</h4>
-                            <p class="product-sales">76 vendas</p>
-                        </div>
-                        <div class="product-revenue">R$ 5.312,40</div>
-                    </li>
+                    <?php if($res_top && $res_top->num_rows > 0): ?>
+                        <?php while($prod = $res_top->fetch_assoc()): ?>
+                            <li class="product-item">
+                                <div class="activity-icon product">
+                                    <i class="fas fa-crown"></i>
+                                </div>
+                                <div class="product-info">
+                                    <h4 class="product-name"><?php echo htmlspecialchars($prod['produto_nome']); ?></h4>
+                                    <p class="product-sales"><?php echo $prod['qtd_total']; ?> unidades vendidas</p>
+                                </div>
+                                <div class="product-revenue">
+                                    R$ <?php echo number_format($prod['receita_total'], 2, ',', '.'); ?>
+                                </div>
+                            </li>
+                        <?php endwhile; ?>
+                    <?php else: ?>
+                        <li class="product-item"><p style="padding:10px; color:var(--text-secondary);">Ainda não há vendas suficientes.</p></li>
+                    <?php endif; ?>
                 </ul>
             </div>
         </div>
@@ -618,35 +339,24 @@ if ($res_users) {
             </div>
             <div class="quick-access-grid">
                 <a href="produtos_admin.php" class="quick-access-card">
-                    <div class="quick-access-icon">
-                        <i class="fas fa-box"></i>
-                    </div>
+                    <div class="quick-access-icon"><i class="fas fa-box"></i></div>
                     <h3>Gerenciar Produtos</h3>
-                    <p>Adicionar, editar ou remover produtos</p>
+                    <p>Adicionar, editar ou remover</p>
                 </a>
-                
                 <a href="usuarios_admin.php" class="quick-access-card">
-                    <div class="quick-access-icon">
-                        <i class="fas fa-users"></i>
-                    </div>
+                    <div class="quick-access-icon"><i class="fas fa-users"></i></div>
                     <h3>Gerenciar Usuários</h3>
-                    <p>Administrar contas de usuários</p>
+                    <p>Administrar contas</p>
                 </a>
-                
                 <a href="pedidos_admin.php" class="quick-access-card">
-                    <div class="quick-access-icon">
-                        <i class="fas fa-shopping-cart"></i>
-                    </div>
+                    <div class="quick-access-icon"><i class="fas fa-shopping-cart"></i></div>
                     <h3>Ver Pedidos</h3>
-                    <p>Visualizar e gerenciar pedidos</p>
+                    <p>Gerenciar status de envio</p>
                 </a>
-                
                 <a href="relatorios_admin.php" class="quick-access-card">
-                    <div class="quick-access-icon">
-                        <i class="fas fa-chart-line"></i>
-                    </div>
+                    <div class="quick-access-icon"><i class="fas fa-chart-line"></i></div>
                     <h3>Relatórios</h3>
-                    <p>Relatórios detalhados de vendas</p>
+                    <p>Visualizar métricas</p>
                 </a>
             </div>
         </div>
@@ -655,48 +365,24 @@ if ($res_users) {
 
 <script src="../js/script.js"></script>
 <script>
-    // Dados simulados para os gráficos
-    const salesData = {
-        week: [1200, 1900, 1500, 2100, 1800, 2500, 2200],
-        month: [8500, 9200, 9800, 10200, 11000, 12500, 11800, 13200, 12800, 12400, 13000, 12800],
-        year: [45000, 52000, 58000, 62000, 68000, 75000, 82000, 90000, 95000, 102000, 110000, 128000]
-    };
-    
-    const categoriesData = {
-        labels: ['Camisetas', 'Moletons', 'Acessórios', 'Coleções', 'Outros'],
-        datasets: [{
-            data: [35, 25, 20, 15, 5],
-            backgroundColor: [
-                'rgba(139, 92, 246, 0.8)',
-                'rgba(167, 139, 250, 0.8)',
-                'rgba(196, 181, 253, 0.8)',
-                'rgba(221, 214, 254, 0.8)',
-                'rgba(243, 240, 255, 0.8)'
-            ],
-            borderColor: [
-                'rgba(139, 92, 246, 1)',
-                'rgba(167, 139, 250, 1)',
-                'rgba(196, 181, 253, 1)',
-                'rgba(221, 214, 254, 1)',
-                'rgba(243, 240, 255, 1)'
-            ],
-            borderWidth: 1
-        }]
-    };
-    
-    // Inicializar gráficos
-    let salesChart, categoriesChart;
-    
+    // ==========================================
+    // INJETANDO DADOS PHP NO JAVASCRIPT
+    // ==========================================
+    const phpSalesData = <?php echo json_encode(array_values($sales_month_data)); ?>;
+    const phpCatLabels = <?php echo json_encode($cat_labels); ?>;
+    const phpCatData   = <?php echo json_encode($cat_data); ?>;
+
     document.addEventListener('DOMContentLoaded', function() {
-        // Gráfico de vendas
+        
+        // 1. Configuração do Gráfico de Vendas (Linha)
         const salesCtx = document.getElementById('salesChart').getContext('2d');
-        salesChart = new Chart(salesCtx, {
+        new Chart(salesCtx, {
             type: 'line',
             data: {
                 labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
                 datasets: [{
                     label: 'Vendas (R$)',
-                    data: salesData.month,
+                    data: phpSalesData, // Usa os dados do PHP
                     borderColor: 'rgba(139, 92, 246, 1)',
                     backgroundColor: 'rgba(139, 92, 246, 0.1)',
                     borderWidth: 2,
@@ -704,24 +390,20 @@ if ($res_users) {
                     tension: 0.4,
                     pointBackgroundColor: 'rgba(139, 92, 246, 1)',
                     pointBorderColor: '#fff',
-                    pointBorderWidth: 2,
-                    pointRadius: 4,
-                    pointHoverRadius: 6
+                    pointRadius: 4
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    legend: {
-                        display: false
-                    },
+                    legend: { display: false },
                     tooltip: {
                         mode: 'index',
                         intersect: false,
                         callbacks: {
                             label: function(context) {
-                                return `R$ ${context.raw.toLocaleString('pt-BR')}`;
+                                return `R$ ${context.raw.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
                             }
                         }
                     }
@@ -729,33 +411,41 @@ if ($res_users) {
                 scales: {
                     y: {
                         beginAtZero: true,
-                        grid: {
-                            color: 'rgba(255, 255, 255, 0.1)'
-                        },
+                        grid: { color: 'rgba(255, 255, 255, 0.1)' },
                         ticks: {
                             color: 'rgba(255, 255, 255, 0.7)',
-                            callback: function(value) {
-                                return 'R$ ' + value.toLocaleString('pt-BR');
-                            }
+                            callback: function(value) { return 'R$ ' + value; }
                         }
                     },
                     x: {
-                        grid: {
-                            color: 'rgba(255, 255, 255, 0.1)'
-                        },
-                        ticks: {
-                            color: 'rgba(255, 255, 255, 0.7)'
-                        }
+                        grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                        ticks: { color: 'rgba(255, 255, 255, 0.7)' }
                     }
                 }
             }
         });
         
-        // Gráfico de categorias
+        // 2. Configuração do Gráfico de Categorias (Rosca)
         const categoriesCtx = document.getElementById('categoriesChart').getContext('2d');
-        categoriesChart = new Chart(categoriesCtx, {
+        
+        // Se não houver dados, mostra um placeholder
+        const finalCatData = phpCatData.length > 0 ? phpCatData : [1];
+        const finalCatLabels = phpCatLabels.length > 0 ? phpCatLabels : ['Sem dados'];
+        const finalColors = phpCatData.length > 0 ? 
+            ['rgba(139, 92, 246, 0.8)', 'rgba(167, 139, 250, 0.8)', 'rgba(196, 181, 253, 0.8)', 'rgba(59, 130, 246, 0.8)'] : 
+            ['rgba(255, 255, 255, 0.1)'];
+
+        new Chart(categoriesCtx, {
             type: 'doughnut',
-            data: categoriesData,
+            data: {
+                labels: finalCatLabels,
+                datasets: [{
+                    data: finalCatData,
+                    backgroundColor: finalColors,
+                    borderColor: 'rgba(30, 30, 40, 1)', // Cor de fundo do card para "separar" fatias
+                    borderWidth: 2
+                }]
+            },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
@@ -765,129 +455,14 @@ if ($res_users) {
                         labels: {
                             color: 'rgba(255, 255, 255, 0.7)',
                             padding: 15,
-                            usePointStyle: true,
-                            pointStyle: 'circle'
-                        }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return `${context.label}: ${context.raw}%`;
-                            }
+                            usePointStyle: true
                         }
                     }
                 },
-                cutout: '65%'
+                cutout: '70%'
             }
         });
-        
-        // Interatividade para os botões de período
-        document.querySelectorAll('.chart-actions button[data-period]').forEach(button => {
-            button.addEventListener('click', function() {
-                // Remover classe active de todos os botões
-                document.querySelectorAll('.chart-actions button[data-period]').forEach(btn => {
-                    btn.classList.remove('active');
-                });
-                
-                // Adicionar classe active ao botão clicado
-                this.classList.add('active');
-                
-                // Atualizar gráfico com dados do período selecionado
-                const period = this.getAttribute('data-period');
-                let labels, data;
-                
-                if (period === 'week') {
-                    labels = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
-                    data = salesData.week;
-                } else if (period === 'month') {
-                    labels = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
-                    data = salesData.month;
-                } else {
-                    labels = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
-                    data = salesData.year;
-                }
-                
-                salesChart.data.labels = labels;
-                salesChart.data.datasets[0].data = data;
-                salesChart.update();
-            });
-        });
-        
-        // Botão de atualizar dados
-        document.getElementById('refresh-data').addEventListener('click', function() {
-            // Simular atualização de dados
-            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Atualizando...';
-            this.disabled = true;
-            
-            setTimeout(() => {
-                // Gerar dados aleatórios para simular atualização
-                const randomData = salesData.month.map(value => 
-                    Math.max(0, value + (Math.random() * 2000 - 1000))
-                );
-                
-                salesChart.data.datasets[0].data = randomData;
-                salesChart.update();
-                
-                // Atualizar estatísticas
-                document.querySelectorAll('.stat-value').forEach((stat, index) => {
-                    if (index === 0) {
-                        const newValue = Math.floor(Math.random() * 5000) + 10000;
-                        stat.textContent = `R$ ${newValue.toLocaleString('pt-BR')}`;
-                    } else if (index === 1) {
-                        const newValue = Math.floor(Math.random() * 100) + 300;
-                        stat.textContent = newValue;
-                    } else if (index === 2) {
-                        const newValue = Math.floor(Math.random() * 10) + 10;
-                        stat.textContent = newValue;
-                    } else {
-                        const newValue = (Math.random() * 2 + 3).toFixed(1);
-                        stat.textContent = `${newValue}%`;
-                    }
-                });
-                
-                this.innerHTML = '<i class="fas fa-sync-alt"></i> Atualizar Dados';
-                this.disabled = false;
-                
-                showNotification('Dados atualizados com sucesso!', 'success');
-            }, 1500);
-        });
-        
-        // Botão de exportar relatório
-        document.getElementById('export-report').addEventListener('click', function() {
-            // Simular exportação
-            this.innerHTML = '<i class="fas fa-download"></i> Exportando...';
-            this.disabled = true;
-            
-            setTimeout(() => {
-                this.innerHTML = '<i class="fas fa-download"></i> Exportar Relatório';
-                this.disabled = false;
-                showNotification('Relatório exportado com sucesso!', 'success');
-            }, 1000);
-        });
     });
-
-    // Função de notificação
-    function showNotification(message, type) {
-        const notification = document.createElement('div');
-        notification.style.cssText = `
-            position: fixed;
-            top: 100px;
-            right: 20px;
-            background: ${type === 'success' ? 'var(--success)' : 'var(--error)'};
-            color: white;
-            padding: 1rem 1.5rem;
-            border-radius: 10px;
-            z-index: 10000;
-            box-shadow: var(--shadow-medium);
-            animation: slideIn 0.3s ease;
-        `;
-        notification.textContent = message;
-        document.body.appendChild(notification);
-        
-        setTimeout(() => {
-            notification.remove();
-        }, 3000);
-    }
 </script>
 </body>
 </html>

@@ -29,9 +29,11 @@ if (!function_exists('is_active')) {
     <!-- Ícones e Fontes -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    
+    <!-- Script de Tema (Dark/Light) -->
     <script>(function(){const theme=localStorage.getItem('theme');if(theme==='light'){document.documentElement.classList.add('light-mode');}})();</script>
 
-    <!-- SweetAlert2 -->
+    <!-- SweetAlert2 (Para alertas bonitos) -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
@@ -40,7 +42,7 @@ if (!function_exists('is_active')) {
         .nav-search .nav-search-btn{border:none;background:transparent;padding:.35rem;border-radius:50%;cursor:pointer;color:inherit;display:inline-flex;align-items:center;justify-content:center}
         .nav-search .nav-search-btn .fa-search{font-size:0.95rem}
 
-        /* --- CSS EXTRA: CORREÇÃO VISUAL DO RESUMO (DARK MODE) --- */
+        /* --- CSS EXTRA: CORREÇÃO VISUAL DO RESUMO --- */
         .summary-item {
             display: flex !important;
             align-items: center !important;
@@ -87,7 +89,6 @@ if (!function_exists('is_active')) {
             <div class="nav-icons">
                     <div class="profile-dropdown-wrapper">
                         <?php 
-                        // A sessão já foi iniciada lá no topo, então só verificamos
                         if (!isset($_SESSION['user_id'])): 
                         ?>
                         <a href="php/login.php" class="nav-icon-link" aria-label="Login"><i class="fas fa-user"></i></a>
@@ -139,11 +140,11 @@ if (!function_exists('is_active')) {
                     <h2><i class="fas fa-user-circle"></i> Informações de Contato</h2>
                     <div class="form-group">
                         <label for="email">Email</label>
-                        <input type="email" id="email" placeholder="seu@email.com" required>
+                        <input type="email" id="email" placeholder="seu@email.com" required value="<?php echo isset($_SESSION['email']) ? $_SESSION['email'] : ''; ?>">
                     </div>
                     <div class="form-group">
                         <label for="name">Nome Completo</label>
-                        <input type="text" id="name" placeholder="Seu nome completo" required>
+                        <input type="text" id="name" placeholder="Seu nome completo" required value="<?php echo isset($_SESSION['nome']) ? $_SESSION['nome'] : ''; ?>">
                     </div>
                 </section>
 
@@ -204,7 +205,7 @@ if (!function_exists('is_active')) {
                         <span id="summary-subtotal">R$ 0,00</span>
                     </div>
                     
-                    <!-- LINHA DO CUPOM NO CHECKOUT -->
+                    <!-- LINHA DO CUPOM -->
                     <div class="summary-row" id="summary-discount-row" style="display:none; color: #10B981;">
                         <span>Desconto (Cupom)</span>
                         <span id="summary-discount-val">- R$ 0,00</span>
@@ -310,7 +311,7 @@ if (!function_exists('is_active')) {
 <script src="../js/script.js"></script>
 <script src="../js/theme.js"></script>
 
-<!-- SCRIPT DE CHECKOUT + CUPOM -->
+<!-- SCRIPT DE CHECKOUT + INTEGRAÇÃO COM BACKEND -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     console.log(">>> Checkout Iniciado <<<");
@@ -323,13 +324,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const paymentOptions = document.querySelectorAll('input[name="payment"]');
     const checkoutForm = document.getElementById('checkout-form');
     
-    // Elementos de Desconto
     const discountRow = document.getElementById('summary-discount-row');
     const discountValEl = document.getElementById('summary-discount-val');
 
     let subtotal = 0;
 
-    // --- FUNÇÕES DE CARRINHO E FORMATO ---
+    // --- FUNÇÕES AUXILIARES ---
     function getCart() {
         const raw = localStorage.getItem('susanooCart');
         if (!raw) return [];
@@ -385,18 +385,18 @@ document.addEventListener('DOMContentLoaded', function() {
         updateTotals();
     }
 
-    // --- CÁLCULO TOTAL + CUPOM ---
+    // --- CÁLCULO TOTAL ---
     function updateTotals() {
         let shippingCost = 0;
         let discountAmount = 0;
 
-        // 1. Frete
+        // Frete
         const selectedShipping = document.querySelector('input[name="shipping"]:checked');
         if (selectedShipping) {
             shippingCost = parseFloat(selectedShipping.value);
         }
 
-        // 2. Cupom SUSANOO30
+        // Cupom
         const activeCoupon = localStorage.getItem('susanooDiscount');
         if (activeCoupon === 'SUSANOO30') {
             discountAmount = subtotal * 0.30; // 30%
@@ -413,9 +413,11 @@ document.addEventListener('DOMContentLoaded', function() {
         if (subtotalEl) subtotalEl.textContent = formatCurrency(subtotal);
         if (shippingEl) shippingEl.textContent = formatCurrency(shippingCost);
         if (totalEl) totalEl.textContent = formatCurrency(total);
+        
+        return total; // Retorna o valor numérico para uso no envio
     }
 
-    // --- PAGAMENTO E FORMULÁRIO ---
+    // --- UI PAGAMENTO ---
     function togglePaymentDetails() {
         const selectedOption = document.querySelector('input[name="payment"]:checked');
         if (!selectedOption) return;
@@ -433,53 +435,100 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // --- ENVIO DO FORMULÁRIO ---
     if (checkoutForm) {
         checkoutForm.addEventListener('submit', function(e) {
             e.preventDefault();
             
+            // 1. Validação de Campos
             const email = document.getElementById('email').value;
             const name = document.getElementById('name').value;
             const address = document.getElementById('address').value;
             const number = document.getElementById('number').value;
 
             if (!email || !name || !address || !number) {
-                Swal.fire('Erro', 'Preencha todos os campos de entrega.', 'error');
+                Swal.fire('Erro', 'Preencha todos os campos obrigatórios de entrega.', 'error');
                 return;
             }
 
-            // Simula Pagamento
+            // 2. Preparar Dados
+            const cart = getCart();
+            if(cart.length === 0) {
+                Swal.fire('Erro', 'Seu carrinho está vazio.', 'error');
+                return;
+            }
+
+            const finalTotal = updateTotals(); // Recalcula o valor exato
             const selectedPayment = document.querySelector('input[name="payment"]:checked').value;
+            
+            const orderPayload = {
+                cliente: { nome: name, email: email },
+                itens: cart,
+                total: finalTotal
+            };
+
+            // 3. Função para Enviar ao Banco
+            const sendOrder = () => {
+                Swal.fire({
+                    title: 'Processando Pedido...',
+                    text: 'Aguarde um momento.',
+                    allowOutsideClick: false,
+                    didOpen: () => Swal.showLoading()
+                });
+
+                // Envia para o arquivo PHP que cria o pedido no banco
+                fetch('processar_pedido.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(orderPayload)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            title: 'Pedido Confirmado!',
+                            text: 'Seu pedido foi salvo e processado com sucesso!',
+                            icon: 'success',
+                            confirmButtonColor: '#8B5CF6'
+                        }).then(() => {
+                            localStorage.removeItem('susanooCart'); // Limpa carrinho
+                            localStorage.removeItem('susanooDiscount'); // Limpa cupom
+                            window.location.href = '../index.php';
+                        });
+                    } else {
+                        Swal.fire('Erro', data.message || 'Erro ao salvar pedido.', 'error');
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    Swal.fire('Erro', 'Não foi possível conectar ao servidor.', 'error');
+                });
+            };
+
+            // 4. Fluxo de Pagamento
             if (selectedPayment === 'pix') {
-                const fakePixKey = '00020126360014BR.GOV.BCB.PIX...'; 
+                const fakePixKey = '00020126360014BR.GOV.BCB.PIX0114...SUSANOO...'; 
                 Swal.fire({
                     title: "Pagamento via PIX",
                     html: `
-                        <p>Copie a chave abaixo:</p>
-                        <input type="text" value="${fakePixKey}" readonly style="width:100%; padding:8px; text-align:center;">
+                        <p style="margin-bottom:10px;">Escaneie o QR Code ou copie a chave:</p>
+                        <div style="background:#f3f3f3; padding:15px; border-radius:8px; margin-bottom:10px;">
+                            <i class="fas fa-qrcode" style="font-size:3rem; color:#333;"></i>
+                        </div>
+                        <input type="text" value="${fakePixKey}" readonly style="width:100%; padding:8px; text-align:center; border:1px solid #ddd; border-radius:4px;">
+                        <p style="font-size:0.85rem; color:#666; margin-top:10px;">O pedido será processado após a confirmação.</p>
                     `,
                     confirmButtonText: "Já realizei o pagamento",
-                    confirmButtonColor: '#10B981'
-                }).then((r) => { if(r.isConfirmed) finalizeOrder(); });
+                    confirmButtonColor: '#10B981',
+                    showCancelButton: true,
+                    cancelButtonText: "Cancelar"
+                }).then((r) => { 
+                    if(r.isConfirmed) sendOrder(); 
+                });
             } else {
-                Swal.fire({
-                    title: 'Processando...',
-                    timer: 1500,
-                    didOpen: () => Swal.showLoading()
-                }).then(() => finalizeOrder());
+                // Simulação de cartão (envia direto)
+                sendOrder();
             }
-        });
-    }
-
-    function finalizeOrder() {
-        Swal.fire({
-            title: 'Pedido Confirmado!',
-            text: 'Obrigado por comprar na Susanoo!',
-            icon: 'success',
-            confirmButtonColor: '#8B5CF6'
-        }).then(() => {
-            localStorage.removeItem('susanooCart'); // Limpa carrinho
-            localStorage.removeItem('susanooDiscount'); // Limpa cupom
-            window.location.href = '../index.php';
         });
     }
 

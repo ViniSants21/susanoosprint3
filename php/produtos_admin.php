@@ -201,8 +201,8 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
             <li><a href="produtos_admin.php" class="active"><i class="fas fa-box"></i> Produtos</a></li>
             <li><a href="usuarios_admin.php"><i class="fas fa-users"></i> Usuários</a></li>
             <li><a href="#"><i class="fas fa-shopping-cart"></i> Pedidos</a></li>
-            <li><a href="#"><i class="fas fa-chart-line"></i> Relatórios</a></li>
-            <li><a href="#"><i class="fas fa-cog"></i> Configurações</a></li>
+            <li><a href="relatorios_admin.php" class="active"><i class="fas fa-comment"></i>Mensagens</a></li>
+            
             <li><a href="../index.php"><i class="fas fa-sign-out-alt"></i> Voltar ao Site</a></li>
         </ul>
     </aside>
