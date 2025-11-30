@@ -14,6 +14,28 @@
         .nav-search .nav-search-btn{border:none;background:transparent;padding:.35rem;border-radius:50%;cursor:pointer;color:inherit;display:inline-flex;align-items:center;justify-content:center}
         .nav-search .nav-search-btn .fa-search{font-size:0.95rem}
         
+        /* Ajuste do banner para evitar scroll horizontal em telas menores */
+        .promo-banner-section {
+            width: 100vw;
+            position: relative;
+            left: 50%;
+            right: 50%;
+            margin-left: -50vw;
+            margin-right: -50vw;
+            margin-top: -11px;
+            height: 550px; 
+            margin-bottom: -180px; 
+            overflow: hidden;
+        }
+        .promo-banner-image {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: cover;
+            object-position: center;
+        }
+
+        /* Estilo para botão desabilitado (Feature do amigo) */
         .btn-disabled {
             background-color: #2a2a2a !important;
             color: #777 !important;
@@ -26,6 +48,7 @@
 <body>
 
 <?php
+// --- LÓGICA PHP INICIAL ---
 $current = basename($_SERVER['PHP_SELF']);
 if (!function_exists('is_active')) {
     function is_active($href, $current) {
@@ -33,7 +56,9 @@ if (!function_exists('is_active')) {
         return $base === $current ? 'active' : '';
     }
 }
+
 require_once 'conexao.php';
+
 function find_products_table($conn) {
     $candidates = ['products', 'produtos'];
     foreach ($candidates as $t) {
@@ -44,20 +69,24 @@ function find_products_table($conn) {
 }
 $table = find_products_table($conn);
 
+// --- LÓGICA DE PESQUISA (Mantida a versão mais completa do Código A) ---
 if (isset($_GET['busca']) && !empty($_GET['busca'])) {
     $busca = $conn->real_escape_string($_GET['busca']);
+    // Busca no nome, descrição (longa ou curta) ou categoria
     $sql = "SELECT * FROM `$table` 
             WHERE name LIKE '%$busca%' 
             OR descricao LIKE '%$busca%' 
+            OR (short_desc LIKE '%$busca%')
             OR category LIKE '%$busca%' 
             ORDER BY id DESC";
 } else {
     $sql = "SELECT * FROM `$table` ORDER BY id DESC";
 }
+
 $products_res = $conn->query($sql);
 ?>
 
- <nav class="navbar scrolled" id="navbar">
+<nav class="navbar scrolled" id="navbar">
     <div class="nav-container">
         <form action="produtos.php" method="GET" class="nav-search">
             <input type="text" name="busca" placeholder="Pesquisar..." aria-label="Pesquisar" 
@@ -76,44 +105,36 @@ $products_res = $conn->query($sql);
                 <li><a href="contato.php" class="nav-link <?php echo is_active('contato.php', $current); ?>">Contato</a></li>
             </ul>
             <div class="nav-icons">
-                    <div class="profile-dropdown-wrapper">
-                        <?php if (!isset($_SESSION)) { session_start(); } ?>
-                        <?php if (!isset($_SESSION['user_id'])): ?>
-                        <a href="login.php" class="nav-icon-link" aria-label="Login">
-                        <i class="fas fa-user"></i>
-                        </a>
-                       <div class="profile-dropdown-menu">
+                <div class="profile-dropdown-wrapper">
+                    <?php if (!isset($_SESSION)) { session_start(); } ?>
+                    <?php if (!isset($_SESSION['user_id'])): ?>
+                        <a href="login.php" class="nav-icon-link" aria-label="Login"><i class="fas fa-user"></i></a>
+                        <div class="profile-dropdown-menu">
                             <ul class="dropdown-links">
-                                <li class="dropdown-link-item">
-                                <a href="../php/registro.php"><i class="fas fa-user-plus"></i> Registrar</a>
-                                </li>
-                                <li class="dropdown-link-item">
-                                    <a href="../php/login.php"><i class="fas fa-sign-in-alt"></i> Login</a>
-                                </li>
+                                <li class="dropdown-link-item"><a href="../php/registro.php"><i class="fas fa-user-plus"></i> Registrar</a></li>
+                                <li class="dropdown-link-item"><a href="../php/login.php"><i class="fas fa-sign-in-alt"></i> Login</a></li>
                             </ul>
                         </div>
                     <?php else: ?>
-                    <a href="#" class="nav-icon-link" aria-label="Perfil">
-                    <img src="<?php echo $_SESSION['foto']; ?>"
-                    class="dropdown-avatar"
-                    style="width:28px; height:28px; border-radius:50%; object-fit:cover;">
-                    </a>
-<div class="profile-dropdown-menu">
-<div class="dropdown-header">
-<img src="<?php echo $_SESSION['foto']; ?>" alt="Avatar" class="dropdown-avatar">
-<div>
-<div class="dropdown-user-name"><?php echo $_SESSION['nome']; ?></div>
-<div class="dropdown-user-email"><?php echo $_SESSION['email']; ?></div>
-</div>
-</div>
-<ul class="dropdown-links">
-<li class="dropdown-link-item"><a href="../php/perfil.php"><i class="fas fa-id-card"></i> Visualizar Perfil</a></li>
-<li class="dropdown-link-item"><a href="../php/configuracoes.php"><i class="fas fa-cog"></i> Configurações</a></li>
-<li class="dropdown-link-item"><a href="../php/logout.php"><i class="fas fa-sign-out-alt"></i> Sair</a></li>
-</ul>
-</div>
-<?php endif; ?>
-</div>
+                        <a href="#" class="nav-icon-link" aria-label="Perfil">
+                            <img src="<?php echo $_SESSION['foto']; ?>" class="dropdown-avatar" style="width:28px; height:28px; border-radius:50%; object-fit:cover;">
+                        </a>
+                        <div class="profile-dropdown-menu">
+                            <div class="dropdown-header">
+                                <img src="<?php echo $_SESSION['foto']; ?>" alt="Avatar" class="dropdown-avatar">
+                                <div>
+                                    <div class="dropdown-user-name"><?php echo $_SESSION['nome']; ?></div>
+                                    <div class="dropdown-user-email"><?php echo $_SESSION['email']; ?></div>
+                                </div>
+                            </div>
+                            <ul class="dropdown-links">
+                                <li class="dropdown-link-item"><a href="../php/perfil.php"><i class="fas fa-id-card"></i> Visualizar Perfil</a></li>
+                                <li class="dropdown-link-item"><a href="../php/configuracoes.php"><i class="fas fa-cog"></i> Configurações</a></li>
+                                <li class="dropdown-link-item"><a href="../php/logout.php"><i class="fas fa-sign-out-alt"></i> Sair</a></li>
+                            </ul>
+                        </div>
+                    <?php endif; ?>
+                </div>
                 <a href="carrinho.php" class="nav-icon-link" aria-label="Carrinho"><i class="fas fa-shopping-bag"></i></a>
             </div>
         </div>
@@ -121,32 +142,37 @@ $products_res = $conn->query($sql);
     </div>
 </nav>
 
+<!-- Banner -->
 <section class="promo-banner-section">
-    <img src="../assets/img/Produtos1.png" alt="Banner promocional da nova coleção" class="promo-banner-image" style="pointer-events: none; cursor: default;">
+    <img src="../assets/img/Produtos1.png" alt="Banner promocional" class="promo-banner-image" style="pointer-events: none; cursor: default;">
 </section>
 
-    <section class="page-header">
-        <div class="container"><h1 class="page-title">Nossos Produtos</h1><p class="page-subtitle">Descubra algum dos nossos produtos destaque</p></div>
-    </section>
+<!-- Page Header -->
+<section class="page-header">
+    <div class="container"><h1 class="page-title">Nossos Produtos</h1><p class="page-subtitle">Desperte seu poder interior com estilo único.</p></div>
+</section>
 
-    <section class="filters-section">
-        <div class="container">
-            <div class="filters">
-                <button class="filter-btn active" data-filter="all">Todos</button>
-                <button class="filter-btn" data-filter="camisetas">Camisas</button>
-                <button class="filter-btn" data-filter="moletons">Moletons</button>
-                <button class="filter-btn" data-filter="calcas">Calças</button>
-                <button class="filter-btn" data-filter="acessorios">Acessórios</button>
-            </div>
+<!-- Filters -->
+<section class="filters-section">
+    <div class="container">
+        <div class="filters">
+            <button class="filter-btn active" data-filter="all">Todos</button>
+            <button class="filter-btn" data-filter="camisetas">Camisas</button>
+            <button class="filter-btn" data-filter="moletons">Moletons</button>
+            <button class="filter-btn" data-filter="calcas">Calças</button>
+            <button class="filter-btn" data-filter="acessorios">Acessórios</button>
         </div>
-    </section>
+    </div>
+</section>
 
-    <section class="products-section">
-        <section class="featured-products">
+<!-- Products Grid -->
+<section class="products-section">
+    <section class="featured-products">
         <div class="sakura-container">
-            <div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div>
-            <div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div>
-            <div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div>
+            <div class="petal"></div><div class="petal"></div><div class="petal"></div>
+            <div class="petal"></div><div class="petal"></div><div class="petal"></div>
+            <div class="petal"></div><div class="petal"></div><div class="petal"></div>
+            <div class="petal"></div><div class="petal"></div><div class="petal"></div>
         </div>
         <div class="container">
             <div class="products-grid">
@@ -157,7 +183,7 @@ $products_res = $conn->query($sql);
                             $p_cat = htmlspecialchars($p['category']);
                             $p_price = number_format($p['price'], 2, ',', '.');
                             
-                            // ESTOQUE
+                            // --- ESTOQUE (Do Código B) ---
                             $qtd_estoque = 0;
                             if (isset($p['estoque'])) {
                                 $qtd_estoque = $p['estoque'];
@@ -165,43 +191,56 @@ $products_res = $conn->query($sql);
                                 $qtd_estoque = $p['stock'];
                             }
 
-                            // IMAGEM
+                            // --- TRATAMENTO DE IMAGEM (Unificado: Suporta múltiplas imagens do Código B) ---
                             $img = '../assets/img/placeholder.png';
-                            
-                            // Pega o valor do banco
                             $raw_db_images = $p['image'] ?? '';
-                            $images_array = explode('|', $raw_db_images);
                             
-                            // Pega a primeira imagem para ser a capa
+                            // Tenta explodir se houver separador (feature do amigo)
+                            $images_array = explode('|', $raw_db_images);
                             $first_image = !empty($images_array) ? $images_array[0] : '';
-
+                            
                             if (!empty($first_image)) {
                                 if (strpos($first_image, '://') !== false) {
-                                    $img = $first_image; 
-                                } elseif (substr($first_image, 0, 3) === '../') {
-                                    $img = $first_image; 
+                                    $img = $first_image;
+                                } elseif (substr($first_image, 0, 2) === '..') {
+                                    $img = $first_image;
                                 } elseif (substr($first_image, 0, 1) === '/') {
-                                    $img = '..' . $first_image; 
+                                    $img = '..' . $first_image;
                                 } else {
                                     $img = '../' . ltrim($first_image, './');
                                 }
                             } else {
+                                // Fallback por categoria
                                 $cat = strtolower($p['category']);
                                 if (strpos($cat, 'camis') !== false) $img = '../assets/img/camisabr.png';
                                 elseif (strpos($cat, 'moleton') !== false || strpos($cat, 'moletons') !== false) $img = '../assets/img/moletomroxo.png';
                                 elseif (strpos($cat, 'cal') !== false) $img = '../assets/img/jortscinza.png';
                                 elseif (strpos($cat, 'acessor') !== false) $img = '../assets/img/bonebarra.png';
                             }
+
+                            // --- DESCRIÇÕES (Do Código A - Mais robusto para separar card/modal) ---
+                            // 1. Descrição Completa
+                            $rawLong = isset($p['descricao']) ? $p['descricao'] : (isset($p['description']) ? $p['description'] : '');
+                            if (empty($rawLong) && !empty($p['short_desc'])) $rawLong = $p['short_desc'];
+                            
+                            // 2. Descrição Curta
+                            $rawShort = isset($p['short_desc']) ? $p['short_desc'] : '';
+                            if (empty($rawShort) && !empty($rawLong)) {
+                                $rawShort = mb_strimwidth($rawLong, 0, 100, '...');
+                            }
+                            
+                            $displayLong = htmlspecialchars($rawLong);
+                            $displayShort = htmlspecialchars($rawShort);
                         ?>
-                            <!-- AQUI FOI CORRIGIDO: Removi o comentário HTML de dentro da tag DIV -->
-                            <div class="product-card" data-category="<?php echo $p_cat; ?>"
-                                data-name="<?php echo $p_name; ?>" 
-                                data-price="<?php echo $p['price']; ?>" 
-                                data-img="<?php echo $img; ?>"
-                                data-stock="<?php echo $qtd_estoque; ?>" 
-                                data-imgs="<?php echo htmlspecialchars($raw_db_images); ?>" 
-                                data-sizes="<?php echo isset($p['sizes']) && trim($p['sizes']) !== '' ? htmlspecialchars($p['sizes']) : ''; ?>"
-                                data-longdesc="<?php echo isset($p['description']) ? htmlspecialchars($p['description']) : (isset($p['descricao']) ? htmlspecialchars($p['descricao']) : ''); ?>">
+                        <div class="product-card" 
+                            data-category="<?php echo $p_cat; ?>"
+                            data-name="<?php echo $p_name; ?>" 
+                            data-price="<?php echo $p['price']; ?>" 
+                            data-img="<?php echo $img; ?>"
+                            data-stock="<?php echo $qtd_estoque; /* Feature Código B */ ?>" 
+                            data-imgs="<?php echo htmlspecialchars($raw_db_images); /* Feature Código B */ ?>" 
+                            data-sizes="<?php echo isset($p['sizes']) && trim($p['sizes']) !== '' ? htmlspecialchars($p['sizes']) : ''; ?>"
+                            data-longdesc="<?php echo $displayLong; ?>">
                             
                             <div class="card-image">
                                 <img src="<?php echo $img; ?>" alt="<?php echo $p_name; ?>">
@@ -212,96 +251,77 @@ $products_res = $conn->query($sql);
                             
                             <div class="card-content">
                                 <h3><?php echo $p_name; ?></h3>
-                                <p class="product-desc"><?php echo isset($p['short_desc']) ? htmlspecialchars($p['short_desc']) : (isset($p['description']) ? htmlspecialchars(mb_strimwidth($p['description'],0,140,'...')) : (isset($p['descricao']) ? htmlspecialchars(mb_strimwidth($p['descricao'],0,140,'...')) : '')); ?></p>
+                                <!-- Exibindo a Descrição Curta -->
+                                <p class="product-desc"><?php echo $displayShort; ?></p>
                                 <p class="price">R$ <?php echo $p_price; ?></p>
                                 
+                                <!-- Botão com Lógica de Estoque (Do Código B) -->
                                 <?php if ($qtd_estoque > 0): ?>
                                     <button class="btn btn-add-cart">Adicionar ao Carrinho</button>
                                 <?php else: ?>
                                     <button class="btn btn-disabled" disabled>Esgotado</button>
                                 <?php endif; ?>
-                                
                             </div>
                         </div>
                     <?php endwhile; ?>
                 <?php else: ?>
-                    <p>Nenhum produto disponível.</p>
+                    <p>Nenhum produto encontrado.</p>
                 <?php endif; ?>
             </div>
         </div>
     </section>
+</section>
 
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <div class="footer-logo"><h3>須佐能乎</h3><span>SUSANOO</span></div>
-                    <p>Desperte seu poder interior com estilo único e elegância oriental.</p>
-                    <div class="social-links">
-                        <a href="#" class="social-link">Instagram</a>
-                        <a href="#" class="social-link">Facebook</a>
-                        <a href="#" class="social-link">X</a>
-                    </div>
-                </div>
-                <div class="footer-section">
-                    <h4>Navegação</h4>
-                    <ul>
-                        <li><a href="../index.php">Home</a></li>
-                        <li><a href="produtos.php">Produtos</a></li>
-                        <li><a href="colecoes.php">Coleções</a></li>
-                        <li><a href="sobre.php">Sobre Nós</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>Atendimento</h4>
-                    <ul>
-                        <li><a href="contato.php">Contato</a></li>
-                        <li><a href="#">FAQ</a></li>
-                        <li><a href="#">Trocas e Devoluções</a></li>
-                        <li><a href="#">Política de Privacidade</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>Newsletter</h4>
-                    <p>Receba novidades e ofertas exclusivas</p>
-                    <form class="newsletter-form">
-                        <input type="email" placeholder="Seu email" required>
-                        <button type="submit" class="btn btn-primary">Inscrever</button>
-                    </form>
+<!-- Footer -->
+<footer class="footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-section">
+                <div class="footer-logo"><h3>須佐能乎</h3><span>SUSANOO</span></div>
+                <p>Desperte seu poder interior com estilo único e elegância oriental.</p>
+                <div class="social-links">
+                    <a href="#" class="social-link">Instagram</a>
+                    <a href="#" class="social-link">Facebook</a>
+                    <a href="#" class="social-link">X</a>
                 </div>
             </div>
-            <div class="footer-bottom">
-                <p>&copy; <?php echo date('Y'); ?> Susanoo. Todos os direitos reservados.</p>
+            <div class="footer-section">
+                <h4>Navegação</h4>
+                <ul>
+                    <li><a href="../index.php">Home</a></li>
+                    <li><a href="produtos.php">Produtos</a></li>
+                    <li><a href="colecoes.php">Coleções</a></li>
+                    <li><a href="sobre.php">Sobre Nós</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Atendimento</h4>
+                <ul>
+                    <li><a href="contato.php">Contato</a></li>
+                    <li><a href="#">FAQ</a></li>
+                    <li><a href="#">Trocas e Devoluções</a></li>
+                    <li><a href="#">Política de Privacidade</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Newsletter</h4>
+                <p>Receba novidades e ofertas exclusivas</p>
+                <form class="newsletter-form">
+                    <input type="email" placeholder="Seu email" required>
+                    <button type="submit" class="btn btn-primary">Inscrever</button>
+                </form>
             </div>
         </div>
-    </footer>
-<style>
-        .promo-banner-section {
-            width: 100vw;
-            position: relative;
-            left: 50%;
-            right: 50%;
-            margin-left: -50vw;
-            margin-right: -50vw;
-            margin-top: -11px;
-            height: 550px; 
-            margin-bottom: -180px;
-            overflow: hidden;
-        }
-        
-        .promo-banner-image {
-            width: 100%;
-            height: 100%;
-            display: block;
-            object-fit: cover;
-            object-position: center;
-        }
-    
-</style>
-    <button id="backToTop" class="back-to-top"><span>↑</span></button>
+        <div class="footer-bottom">
+            <p>&copy; <?php echo date('Y'); ?> Susanoo. Todos os direitos reservados.</p>
+        </div>
+    </div>
+</footer>
 
-    <script src="../js/cart.js"></script>
-    <script src="../js/script.js"></script>
-    <script src="../js/theme.js"></script>
+<button id="backToTop" class="back-to-top"><span>↑</span></button>
+
+<script src="../js/cart.js"></script>
+<script src="../js/script.js"></script>
+<script src="../js/theme.js"></script>
 </body>
 </html>
