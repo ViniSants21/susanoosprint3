@@ -157,11 +157,13 @@ if (!function_exists('is_active')) {
 
     <!-- Banner -->
 <section class="promo-banner-section">
-    <a href="#" class="promo-banner-link" aria-label="Ver promoção especial">
-        <img src="../assets/img/sublimec.png" alt="Banner promocional da nova coleção" class="promo-banner-image">
-    </a>
-
+    <img src="../assets/img/sublimec.png"
+         alt="Banner promocional da nova coleção"
+         class="promo-banner-image"
+         style="pointer-events: none; cursor: default;">
 </section>
+
+
 
     <!-- Cabeçalho -->
     <section class="page-header">
