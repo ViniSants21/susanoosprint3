@@ -48,6 +48,130 @@ if (!function_exists('is_active')) {
 		.nav-search input[type="text"]{padding:.45rem .75rem;border-radius:24px;border:1px solid rgba(0,0,0,.08);background:transparent;color:inherit;min-width:160px}
 		.nav-search .nav-search-btn{border:none;background:transparent;padding:.35rem;border-radius:50%;cursor:pointer;color:inherit;display:inline-flex;align-items:center;justify-content:center}
 		.nav-search .nav-search-btn .fa-search{font-size:0.95rem}
+        /* --- CSS ADICIONAL PARA AVALIAÇÕES E BENEFÍCIOS --- */
+    
+    /* Seção de Avaliações */
+    .testimonials-section {
+        padding: 5rem 0;
+        background: linear-gradient(to bottom, transparent, rgba(0,0,0,0.8));
+    }
+
+    .testimonials-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-top: 3rem;
+    }
+
+    .testimonial-card {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 2rem;
+        border-radius: 12px;
+        transition: transform 0.3s ease, border-color 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .testimonial-card:hover {
+        transform: translateY(-5px);
+        border-color: rgba(138, 43, 226, 0.4); /* Roxo sutil ao passar o mouse */
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+
+    .testimonial-stars {
+        color: #FFD700; /* Dourado */
+        margin-bottom: 1rem;
+        font-size: 0.9rem;
+    }
+
+    .testimonial-text {
+        font-family: 'Noto Sans JP', sans-serif;
+        font-style: italic;
+        color: rgba(255,255,255,0.8);
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
+        font-size: 0.95rem;
+    }
+
+    .testimonial-author {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        border-top: 1px solid rgba(255,255,255,0.1);
+        padding-top: 1rem;
+    }
+
+    .author-avatar {
+        width: 45px;
+        height: 45px;
+        background: linear-gradient(45deg, #333, #555);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: #fff;
+    }
+
+    .author-info h4 {
+        font-size: 1rem;
+        margin: 0;
+        color: #fff;
+    }
+
+    .author-info span {
+        font-size: 0.8rem;
+        color: rgba(255,255,255,0.5);
+    }
+
+    /* Seção de Benefícios */
+    .benefits-section {
+        padding: 4rem 0;
+        border-top: 1px solid rgba(255,255,255,0.05);
+        background-color: #0a0a0a; /* Quase preto */
+    }
+
+    .benefits-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 2rem;
+        text-align: center;
+    }
+
+    .benefit-item {
+        padding: 1.5rem;
+    }
+
+    .benefit-icon {
+        font-size: 2rem;
+        color: #fff; /* Ícone Branco */
+        margin-bottom: 1rem;
+        /* Um brilho suave roxo atrás do ícone */
+        text-shadow: 0 0 15px rgba(138, 43, 226, 0.6); 
+    }
+
+    .benefit-item h3 {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.2rem;
+        margin-bottom: 0.5rem;
+        color: #fff;
+    }
+
+    .benefit-item p {
+        font-size: 0.9rem;
+        color: rgba(255,255,255,0.6);
+        line-height: 1.5;
+    }
+
+    /* Responsividade */
+    @media (max-width: 768px) {
+        .testimonials-grid, .benefits-grid {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+    }
 	</style>
 </head> 
 
@@ -56,10 +180,13 @@ if (!function_exists('is_active')) {
     <!-- Navbar -->
     <nav class="navbar" id="navbar">
         <div class="nav-container">
-            <div class="nav-search">
-                <input type="text" placeholder="Pesquisar..." aria-label="Pesquisar">
-                <button class="nav-search-btn" aria-label="Pesquisar"><i class="fas fa-search"></i></button>
-            </div>
+            <!-- Localize a div class="nav-search" e SUBSTITUA por este código: -->
+<form action="php/produtos.php" method="GET" class="nav-search">
+    <input type="text" name="busca" placeholder="Pesquisar..." aria-label="Pesquisar">
+    <button type="submit" class="nav-search-btn" aria-label="Pesquisar">
+        <i class="fas fa-search"></i>
+    </button>
+</form>
             <div class="nav-logo"><a href="index.php"><img src="assets/img/LOGOSUSANOO.png" alt="LOGOSUSANOO"></a></div>
             <div class="nav-right-group">
                 <ul class="nav-menu" id="nav-menu">
@@ -209,6 +336,36 @@ if (!function_exists('is_active')) {
             <div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div>
             <div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div>
         </div>
+        <section class="benefits-section">
+        <div class="container">
+            <div class="benefits-grid">
+                <!-- Benefício 1 -->
+                <div class="benefit-item">
+                    <div class="benefit-icon"><i class="fas fa-shipping-fast"></i></div>
+                    <h3>Envio Rápido</h3>
+                    <p>Entrega agilizada para todo o Brasil com rastreamento em tempo real.</p>
+                </div>
+                <!-- Benefício 2 -->
+                <div class="benefit-item">
+                    <div class="benefit-icon"><i class="fas fa-shield-alt"></i></div>
+                    <h3>Compra Segura</h3>
+                    <p>Seus dados protegidos com criptografia de ponta a ponta.</p>
+                </div>
+                <!-- Benefício 3 -->
+                <div class="benefit-item">
+                    <div class="benefit-icon"><i class="fas fa-gem"></i></div>
+                    <h3>Qualidade Premium</h3>
+                    <p>Tecidos selecionados e acabamento de alta costura.</p>
+                </div>
+                <!-- Benefício 4 -->
+                <div class="benefit-item">
+                    <div class="benefit-icon"><i class="fas fa-undo-alt"></i></div>
+                    <h3>Troca Fácil</h3>
+                    <p>Primeira troca grátis em até 7 dias após o recebimento.</p>
+                </div>
+            </div>
+        </div>
+    </section>
         <div class="container">
             <div class="section-header">
                 <h2 class="section-title">Produtos em Destaque</h2>
@@ -250,7 +407,69 @@ if (!function_exists('is_active')) {
             </div>
         </div>
     </section>
+<!-- ========================================= -->
+    <!-- NOVA SEÇÃO: AVALIAÇÕES (PROVA SOCIAL)     -->
+    <!-- ========================================= -->
+    <section class="testimonials-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">O Que Dizem Nossos Clientes</h2>
+                <p class="section-subtitle">A experiência de quem já veste a essência Susanoo</p>
+            </div>
+            
+            <div class="testimonials-grid">
+                <!-- Avaliação 1 -->
+                <div class="testimonial-card">
+                    <div class="testimonial-stars">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                    <p class="testimonial-text">"A qualidade do tecido é surreal. O caimento da Camisa Susanoo Preta ficou perfeito, exatamente o estilo oversized que eu procurava. Chegou super rápido!"</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">
+                            <span>G</span> <!-- Letra inicial ou foto -->
+                        </div>
+                        <div class="author-info">
+                            <h4>Gabriel M.</h4>
+                            <span>Comprou: Camisa Susanoo</span>
+                        </div>
+                    </div>
+                </div>
 
+                <!-- Avaliação 2 -->
+                <div class="testimonial-card">
+                    <div class="testimonial-stars">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                    <p class="testimonial-text">"Estava com receio sobre o tamanho, mas a tabela de medidas ajudou muito. O bordado do boné é muito detalhado. Com certeza comprarei a coleção de inverno."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">
+                            <span>L</span>
+                        </div>
+                        <div class="author-info">
+                            <h4>Lucas S.</h4>
+                            <span>Comprou: Boné Amaterasu</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Avaliação 3 -->
+                <div class="testimonial-card">
+                    <div class="testimonial-stars">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
+                    </div>
+                    <p class="testimonial-text">"Peças com identidade única. É difícil achar streetwear com essa pegada oriental no Brasil. O atendimento foi excelente quando tive dúvidas."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">
+                            <span>B</span>
+                        </div>
+                        <div class="author-info">
+                            <h4>Beatriz K.</h4>
+                            <span>Comprou: Calça Baggy</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     <!-- Coleções Especiais -->
     <section class="collections-preview">
         <div class="container">
@@ -262,10 +481,18 @@ if (!function_exists('is_active')) {
                 <div class="collection-card"><img src="assets/img/susanoo inverno.png" alt="Coleção Tempestade"><div class="collection-overlay"><div class="collection-content"><h3>Linha de Inverno</h3><p>Esquente-se com estilo</p><a href="php/colecao_inverno.php" class="btn btn-outline">Explorar</a></div></div></div>
                 <div class="collection-card"><img src="assets/img/inverno shibuya (1).png" alt="Linha Dragão"><div class="collection-overlay"><div class="collection-content"><h3>Linha de Verão</h3><p>Força e elegância</p><a href="php/colecao_verao.php" class="btn btn-outline">Ver Mais</a></div></div></div>
                 <div class="collection-card"><img src="assets/img/sublime.png" alt="Sakura"><div class="collection-overlay"><div class="collection-content"><h3>Coleção Sublime</h3><p>Delicadeza oriental</p><a href="php/colecao_sublime.php" class="btn btn-outline">Descobrir</a></div></div></div>
+                
+                
             </div>
         </div>
     </section>
+    
+    </section>
 
+    <!-- ========================================= -->
+    <!-- NOVA SEÇÃO: BENEFÍCIOS (POR QUE COMPRAR)  -->
+    <!-- ========================================= -->
+    
     <!-- Footer -->
     <footer class="footer">
         <div class="container">

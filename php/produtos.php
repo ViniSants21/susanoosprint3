@@ -37,17 +37,39 @@ function find_products_table($conn) {
     }
     return 'products';
 }
+// ... código anterior de conexão ...
 $table = find_products_table($conn);
-$products_res = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
+
+// LÓGICA DE PESQUISA DO BANCO DE DADOS
+if (isset($_GET['busca']) && !empty($_GET['busca'])) {
+    $busca = $conn->real_escape_string($_GET['busca']);
+    // Busca no nome, descrição ou categoria
+    $sql = "SELECT * FROM `$table` 
+            WHERE name LIKE '%$busca%' 
+            OR descricao LIKE '%$busca%' 
+            OR category LIKE '%$busca%' 
+            ORDER BY id DESC";
+} else {
+    // Se não tiver busca, traz tudo
+    $sql = "SELECT * FROM `$table` ORDER BY id DESC";
+}
+
+$products_res = $conn->query($sql);
+
 ?>
 
  <nav class="navbar scrolled" id="navbar">
     <div class="nav-container">
         <!-- Substitua/inserir aqui o campo de pesquisa -->
-        <div class="nav-search">
-            <input type="text" placeholder="Pesquisar..." aria-label="Pesquisar">
-            <button class="nav-search-btn" aria-label="Pesquisar"><i class="fas fa-search"></i></button>
-        </div>
+        <!-- Dentro do produtos.php, substitua a div nav-search por: -->
+<form action="produtos.php" method="GET" class="nav-search">
+    <!-- Repare que mantemos o valor preenchido se já houver busca -->
+    <input type="text" name="busca" placeholder="Pesquisar..." aria-label="Pesquisar" 
+           value="<?php echo isset($_GET['busca']) ? htmlspecialchars($_GET['busca']) : ''; ?>">
+    <button type="submit" class="nav-search-btn" aria-label="Pesquisar">
+        <i class="fas fa-search"></i>
+    </button>
+</form>
         <div class="nav-logo"><a href="../index.php"><img src="../assets/img/LOGOSUSANOO.png" alt="LOGOSUSANOO"></a></div>
         <div class="nav-right-group">
             <ul class="nav-menu" id="nav-menu">
