@@ -13,7 +13,7 @@ $msg_sucesso = "";
 $msg_erro = "";
 
 // ==========================================
-// BUSCAR DADOS ATUAIS (CORRIGIDO PARA SUAS COLUNAS)
+// BUSCAR DADOS ATUAIS
 // ==========================================
 $sql_u = "SELECT * FROM users WHERE id = $user_id";
 $res_u = $conn->query($sql_u);
@@ -21,11 +21,11 @@ $res_u = $conn->query($sql_u);
 if ($res_u && $res_u->num_rows > 0) {
     $user_data = $res_u->fetch_assoc();
     
-    // Pega os dados direto do banco (assim o nome sempre aparece)
+    // Pega os dados direto do banco
     $nome_exibir = $user_data['nome']; 
     $email_exibir = $user_data['email'];
     
-    // Verifica a coluna 'foto' (conforme sua imagem)
+    // Verifica a coluna 'foto'
     $foto_db = isset($user_data['foto']) ? $user_data['foto'] : '';
     
     // Se tiver foto no banco, usa ela. Se não, usa o placeholder.
@@ -55,12 +55,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $sql = "UPDATE users SET nome = '$novo_nome', email = '$novo_email' WHERE id = $user_id";
         
         if ($conn->query($sql)) {
-            // Atualiza variáveis da tela
             $nome_exibir = $novo_nome;
             $email_exibir = $novo_email;
             $_SESSION['nome'] = $novo_nome;
             $_SESSION['email'] = $novo_email;
-            
             $msg_sucesso = "Dados atualizados com sucesso!";
         } else {
             $msg_erro = "Erro ao atualizar dados: " . $conn->error;
@@ -73,18 +71,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $nova_senha = $_POST['new_password'];
         $confirma_senha = $_POST['confirm_password'];
 
-        // Busca a senha atual na coluna 'senha'
         $sql_pass = "SELECT senha FROM users WHERE id = $user_id";
         $res_pass = $conn->query($sql_pass);
         $row_pass = $res_pass->fetch_assoc();
 
-        // Verifica a senha atual
         if (password_verify($senha_atual, $row_pass['senha'])) {
             if ($nova_senha === $confirma_senha) {
                 if (strlen($nova_senha) >= 8) {
                     $hash_nova = password_hash($nova_senha, PASSWORD_DEFAULT);
-                    
-                    // Atualiza na coluna 'senha'
                     $conn->query("UPDATE users SET senha = '$hash_nova' WHERE id = $user_id");
                     $msg_sucesso = "Senha alterada com sucesso!";
                 } else {
@@ -107,15 +101,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $novo_nome_arquivo = "user_" . $user_id . "_" . time() . "." . $extensao;
             $diretorio_destino = "../assets/uploads/";
             
-            // Cria a pasta se não existir
             if (!is_dir($diretorio_destino)) {
                 mkdir($diretorio_destino, 0777, true);
             }
 
             if (move_uploaded_file($_FILES['avatar']['tmp_name'], $diretorio_destino . $novo_nome_arquivo)) {
                 $caminho_db = "../assets/uploads/" . $novo_nome_arquivo;
-                
-                // Atualiza a coluna 'foto' (conforme seu banco)
                 $conn->query("UPDATE users SET foto = '$caminho_db' WHERE id = $user_id");
                 
                 $foto_exibir = $caminho_db;
@@ -133,15 +124,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // Buscar Histórico de Pedidos
 $sql_orders = "SELECT * FROM pedidos WHERE cliente_email = '$email_exibir' ORDER BY data_pedido DESC";
 $res_orders = $conn->query($sql_orders);
-
-// Função Active Link
-$current = basename($_SERVER['PHP_SELF']);
-if (!function_exists('is_active')) {
-    function is_active($href, $current) {
-        $base = basename(parse_url($href, PHP_URL_PATH));
-        return $base === $current ? 'active' : '';
-    }
-}
 ?>
 
 <!DOCTYPE html>
@@ -163,6 +145,44 @@ if (!function_exists('is_active')) {
         .alert { padding: 15px; margin-bottom: 20px; border-radius: 8px; font-weight: 500; }
         .alert-success { background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
         .alert-error { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
+
+        /* === ESTILOS DA FOTO DE PERFIL === */
+        .avatar-settings-group {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .avatar-preview-img {
+            width: 180px;         /* Tamanho fixo */
+            height: 180px;        /* Altura igual à largura para formar o círculo */
+            border-radius: 50%;   /* Transforma o quadrado em círculo */
+            object-fit: cover;    /* Garante que a imagem preencha sem distorcer */
+            border: 4px solid #2d2d44; /* Borda opcional para destaque */
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3); /* Sombra suave */
+        }
+
+        .avatar-upload-label {
+            display: inline-block;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #fff;
+        }
+
+        .avatar-upload-label:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: #a78bfa;
+        }
+        
+        /* Esconde o input file original que é feio */
+        input[type="file"] {
+            display: none;
+        }
 	</style>
 </head>
 <body class="settings-page-body">
@@ -278,8 +298,12 @@ if (!function_exists('is_active')) {
                         <h2>Minha Foto de Perfil</h2>
                         <form id="avatar-form" method="POST" action="perfil.php" enctype="multipart/form-data">
                             <div class="form-group-settings avatar-settings-group">
+                                <!-- IMAGEM REDONDA -->
                                 <img src="<?php echo $foto_exibir; ?>" alt="Avatar" class="avatar-preview-img" id="avatarPreview">
-                                <label for="avatarUpload" class="avatar-upload-label">Trocar Foto</label>
+                                
+                                <label for="avatarUpload" class="avatar-upload-label">
+                                    <i class="fas fa-camera"></i> Trocar Foto
+                                </label>
                                 <input type="file" id="avatarUpload" name="avatar" accept="image/*" required>
                             </div>
                             <div class="panel-footer">
