@@ -4,7 +4,7 @@ require 'conexao.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = $_POST['email'];
-    $senha = $_POST['password']; // CORRIGIDO: O nome no HTML é 'password'
+    $senha = $_POST['password']; 
 
     $stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
     $stmt->bind_param("s", $email);
@@ -14,21 +14,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($result->num_rows === 1) {
         $user = $result->fetch_assoc();
 
-        // Verifica a senha (a coluna no banco é 'senha')
         if (password_verify($senha, $user['senha'])) {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['nome'] = $user['nome'];
             $_SESSION['email'] = $user['email'];
             
-            // Garante que pega a foto. Se vazia, define padrão.
-            // Verifica se a coluna é 'foto' ou 'foto_perfil' (baseado na sua img anterior era 'foto')
+            // Lógica da foto
             $fotoDB = isset($user['foto']) ? $user['foto'] : (isset($user['foto_perfil']) ? $user['foto_perfil'] : '');
-            
             if (empty($fotoDB)) {
                 $_SESSION['foto'] = '../assets/img/placeholder-user.png';
             } else {
                 $_SESSION['foto'] = $fotoDB;
             }
+
+            // === REDIRECIONAMENTO ADMIN ===
+            if ($user['email'] === 'admin@susanoo.com') {
+                // Redireciona para o admin.php (estão na mesma pasta php/)
+                header("Location: admin.php");
+                exit;
+            }
+            // =============================
 
             header("Location: ../index.php");
             exit;
@@ -40,6 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
