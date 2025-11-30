@@ -2,29 +2,46 @@
 session_start();
 require 'conexao.php';
 
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-$nome = $_POST['nome'];
-$email = $_POST['email'];
-$senha = password_hash($_POST['senha'], PASSWORD_DEFAULT);
+    // 1. Pegando os nomes corretos do HTML
+    $nome = $_POST['name']; 
+    $email = $_POST['email'];
+    $senha = password_hash($_POST['password'], PASSWORD_DEFAULT);
 
+    // 2. Definindo foto padrão (caso não envie imagem)
+    // Atenção: Certifique-se de que esse arquivo existe ou use um caminho válido
+    $fotoCaminho = "../assets/img/placeholder-user.png"; 
 
-// Upload da imagem
-$fotoNome = time() . "_" . basename($_FILES['foto']['name']);
-$fotoCaminho = "uploads/" . $fotoNome;
+    // 3. Processando o Upload (Se houver)
+    if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === 0) {
+        $extensao = pathinfo($_FILES['avatar']['name'], PATHINFO_EXTENSION);
+        $novoNome = "user_" . time() . "." . $extensao;
+        
+        // Caminho físico para salvar o arquivo
+        $diretorioFisico = "../assets/uploads/";
+        
+        // Cria a pasta se não existir
+        if (!is_dir($diretorioFisico)) {
+            mkdir($diretorioFisico, 0777, true);
+        }
 
+        if (move_uploaded_file($_FILES['avatar']['tmp_name'], $diretorioFisico . $novoNome)) {
+            // Caminho para salvar no Banco (igual ao perfil.php)
+            $fotoCaminho = "../assets/uploads/" . $novoNome;
+        }
+    }
 
-move_uploaded_file($_FILES['foto']['tmp_name'], "../" . $fotoCaminho);
-
-
-// Inserção no banco
-$stmt = $conn->prepare("INSERT INTO users(nome,email,senha,foto) VALUES(?,?,?,?)");
-$stmt->bind_param("ssss", $nome, $email, $senha, $fotoCaminho);
-$stmt->execute();
-
-
-header("Location: login.php");
-exit;
+    // 4. Inserção no banco
+    // Certifique-se que as colunas no banco são: nome, email, senha, foto
+    $stmt = $conn->prepare("INSERT INTO users (nome, email, senha, foto) VALUES (?, ?, ?, ?)");
+    $stmt->bind_param("ssss", $nome, $email, $senha, $fotoCaminho);
+    
+    if ($stmt->execute()) {
+        header("Location: login.php?msg=criada");
+        exit;
+    } else {
+        echo "Erro ao registrar: " . $conn->error;
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -33,19 +50,15 @@ exit;
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Criar Conta - Susanoo</title>
-
-    <!-- Usamos exatamente os mesmos arquivos CSS da página de login -->
     <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="../css/login-style.css">
-    
-    <!-- Ícones e Fontes -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <script>(function(){const theme=localStorage.getItem('theme');if(theme==='light'){document.documentElement.classList.add('light-mode');}})();</script>
 </head>
 <body class="login-body">
 
 <?php
-// Bloco PHP para a lógica da navbar
 $current = basename($_SERVER['PHP_SELF']);
 if (!function_exists('is_active')) {
     function is_active($href, $current) {
@@ -55,7 +68,6 @@ if (!function_exists('is_active')) {
 }
 ?>
 
-<!-- Navbar Padrão de Páginas Internas -->
 <nav class="navbar scrolled" id="navbar">
     <div class="nav-container">
         <div class="nav-search"><input type="text" placeholder="Pesquisar..."></div>
@@ -77,17 +89,15 @@ if (!function_exists('is_active')) {
     </div>
 </nav>
 
-    <!-- Conteúdo Principal -->
     <main class="login-wrap">
         <section class="login-card">
-
-            <!-- Lado Esquerdo: Formulário de Registro -->
             <div class="card-left">
                 <div class="avatar-wrap">
-                    <img id="avatarPreview" src="../assets/img/avatar.png" alt="Avatar" class="avatar-default">
+                    <!-- Preview da imagem -->
+                    <img id="avatarPreview" src="../assets/img/avatar.png" alt="Avatar" class="avatar-default" style="object-fit: cover;">
                 </div>
 
-                <form method="post" action="registro.php" enctype="multipart/form-data" novalidate>
+                <form method="post" action="registro.php" enctype="multipart/form-data">
                     <label class="field">
                         <span class="label-title">Nome Completo</span>
                         <div class="input-wrap">
@@ -105,21 +115,16 @@ if (!function_exists('is_active')) {
                     <label class="field">
                         <span class="label-title">Crie uma Senha</span>
                         <div class="input-wrap">
-                            <input type="password" name="password">
+                            <input type="password" name="password" required>
                             <i class="fas fa-lock icon"></i>
                         </div>
                     </label>
-                    <label class="field">
-                        <span class="label-title">Confirme a Senha</span>
-                        <div class="input-wrap">
-                            <input type="password" name="password_confirm">
-                            <i class="fas fa-check-double icon"></i>
-                        </div>
-                    </label>
+                    <!-- Campo de Foto -->
                     <label class="field file-field">
                         <span class="label-title">Subir foto de perfil (opcional)</span>
                         <input id="avatarInput" type="file" name="avatar" accept="image/*">
                     </label>
+                    
                     <button type="submit" class="btn-login">Criar Conta</button>
                     <div class="form-footer">
                         <a class="link" href="login.php">Já tem uma conta? Entrar</a>
@@ -127,7 +132,6 @@ if (!function_exists('is_active')) {
                 </form>
             </div>
 
-            <!-- Lado Direito: Imagem -->
             <div class="card-right">
                 <img class="card-right-bg-image" src="../assets/img/vermelhoroupa.png" alt="Modelo Susanoo">
                 <div class="card-right-content">
@@ -135,17 +139,16 @@ if (!function_exists('is_active')) {
                     <p>Salve seus pedidos, crie listas de desejos e finalize suas compras mais rápido.</p>
                 </div>
             </div>
-
         </section>
     </main>
 
-    <!-- Footer Padrão do Site -->
     <footer class="footer">
-        <!-- Cole aqui o código HTML completo do seu footer -->
+       <!-- Footer Conteudo -->
     </footer>
 
+<script src="../js/script.js"></script>
 <script>
-// O mesmo script de preview do avatar funciona aqui
+// Script para mostrar o preview da imagem selecionada
 const avatarInput = document.getElementById('avatarInput');
 const avatarPreview = document.getElementById('avatarPreview');
 if (avatarInput) {
@@ -158,6 +161,5 @@ if (avatarInput) {
     });
 }
 </script>
-<script src="../js/theme.js"></script> <!-- ou ../js/theme.js para páginas internas -->
 </body>
 </html>

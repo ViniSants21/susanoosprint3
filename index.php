@@ -1,3 +1,31 @@
+<?php
+// ==========================================
+// 1. PHP NO INÍCIO DO ARQUIVO
+// ==========================================
+session_start();
+
+// Lógica para corrigir o caminho da foto na Index
+$foto_perfil = 'assets/img/placeholder-user.png'; // Foto padrão
+
+if (isset($_SESSION['foto']) && !empty($_SESSION['foto'])) {
+    $foto_perfil = $_SESSION['foto'];
+    
+    // CORREÇÃO CRUCIAL:
+    // Se a foto foi salva como "../assets/...", removemos o "../" para funcionar na index
+    if (substr($foto_perfil, 0, 3) == '../') {
+        $foto_perfil = substr($foto_perfil, 3);
+    }
+}
+
+// Função para classe 'active' no menu
+$current = basename($_SERVER['PHP_SELF']);
+if (!function_exists('is_active')) {
+    function is_active($href, $current) {
+        $base = basename(parse_url($href, PHP_URL_PATH));
+        return $base === $current ? 'active' : '';
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -14,25 +42,17 @@
     
     <!-- Script para Carregamento do Tema -->
     <script>(function(){const theme=localStorage.getItem('theme');if(theme==='light'){document.documentElement.classList.add('light-mode');}})();</script>
-</head> 
-
-<body class="home">
-    <?php
-    // Bloco PHP para definir a classe 'active' no link de navegação atual
-    $current = basename($_SERVER['PHP_SELF']);
-    if (!function_exists('is_active')) {
-        function is_active($href, $current) {
-            $base = basename(parse_url($href, PHP_URL_PATH));
-            return $base === $current ? 'active' : '';
-        }
-    }
-    ?>
-<style>
+    
+    <style>
 		.nav-search{display:flex;align-items:center;gap:.5rem;}
 		.nav-search input[type="text"]{padding:.45rem .75rem;border-radius:24px;border:1px solid rgba(0,0,0,.08);background:transparent;color:inherit;min-width:160px}
 		.nav-search .nav-search-btn{border:none;background:transparent;padding:.35rem;border-radius:50%;cursor:pointer;color:inherit;display:inline-flex;align-items:center;justify-content:center}
 		.nav-search .nav-search-btn .fa-search{font-size:0.95rem}
 	</style>
+</head> 
+
+<body class="home">
+
     <!-- Navbar -->
     <nav class="navbar" id="navbar">
         <div class="nav-container">
@@ -51,18 +71,17 @@
                 </ul>
                 <div class="nav-icons">
                     <div class="profile-dropdown-wrapper">
-                        <?php if (!isset($_SESSION)) { session_start(); } ?>
-                        <?php if (!isset($_SESSION['user_id'])): ?>
-                    <!-- USUÁRIO DESLOGADO -->
+                        
+                    <?php if (!isset($_SESSION['user_id'])): ?>
+                        <!-- USUÁRIO DESLOGADO -->
                         <a href="php/login.php" class="nav-icon-link" aria-label="Login">
-                        <i class="fas fa-user"></i>
+                            <i class="fas fa-user"></i>
                         </a>
-
 
                         <div class="profile-dropdown-menu">
                             <ul class="dropdown-links">
                                 <li class="dropdown-link-item">
-                                <a href="php/registro.php"><i class="fas fa-user-plus"></i> Registrar</a>
+                                    <a href="php/registro.php"><i class="fas fa-user-plus"></i> Registrar</a>
                                 </li>
                                 <li class="dropdown-link-item">
                                     <a href="php/login.php"><i class="fas fa-sign-in-alt"></i> Login</a>
@@ -70,38 +89,34 @@
                             </ul>
                         </div>
 
-
                     <?php else: ?>
-                    <!-- USUÁRIO LOGADO -->
-                    <a href="#" class="nav-icon-link" aria-label="Perfil">
-                    <img src="<?php echo $_SESSION['foto']; ?>"
-                    class="dropdown-avatar"
-                    style="width:28px; height:28px; border-radius:50%; object-fit:cover;">
-                    </a>
+                        <!-- USUÁRIO LOGADO -->
+                        <a href="#" class="nav-icon-link" aria-label="Perfil">
+                            <!-- AQUI ESTÁ A CORREÇÃO DA FOTO -->
+                            <img src="<?php echo $foto_perfil; ?>" class="dropdown-avatar" style="width:28px; height:28px; border-radius:50%; object-fit:cover;">
+                        </a>
 
+                        <div class="profile-dropdown-menu">
+                            <div class="dropdown-header">
+                                <!-- FOTO CORRIGIDA TAMBÉM AQUI -->
+                                <img src="<?php echo $foto_perfil; ?>" alt="Avatar" class="dropdown-avatar">
+                                <div>
+                                    <div class="dropdown-user-name"><?php echo $_SESSION['nome']; ?></div>
+                                    <div class="dropdown-user-email"><?php echo $_SESSION['email']; ?></div>
+                                </div>
+                            </div>
 
-<div class="profile-dropdown-menu">
-<div class="dropdown-header">
-<img src="<?php echo $_SESSION['foto']; ?>" alt="Avatar" class="dropdown-avatar">
-<div>
-<div class="dropdown-user-name"><?php echo $_SESSION['nome']; ?></div>
-<div class="dropdown-user-email"><?php echo $_SESSION['email']; ?></div>
-</div>
-</div>
+                            <ul class="dropdown-links">
+                                <li class="dropdown-link-item"><a href="php/perfil.php"><i class="fas fa-id-card"></i> Visualizar Perfil</a></li>
+                                <li class="dropdown-link-item"><a href="php/configuracoes.php"><i class="fas fa-cog"></i> Configurações</a></li>
+                                <li class="dropdown-link-item"><a href="php/logout.php"><i class="fas fa-sign-out-alt"></i> Sair</a></li>
+                            </ul>
+                        </div>
+                    <?php endif; ?>
+                    </div>
 
-
-<ul class="dropdown-links">
-<li class="dropdown-link-item"><a href="php/perfil.php"><i class="fas fa-id-card"></i> Visualizar Perfil</a></li>
-<li class="dropdown-link-item"><a href="php/configuracoes.php"><i class="fas fa-cog"></i> Configurações</a></li>
-<li class="dropdown-link-item"><a href="php/logout.php"><i class="fas fa-sign-out-alt"></i> Sair</a></li>
-</ul>
-</div>
-<?php endif; ?>
-</div>
-
-
-<a href="php/carrinho.php" class="nav-icon-link" aria-label="Carrinho"><i class="fas fa-shopping-bag"></i></a>
-</div>
+                    <a href="php/carrinho.php" class="nav-icon-link" aria-label="Carrinho"><i class="fas fa-shopping-bag"></i></a>
+                </div>
             </div>
             <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
         </div>
@@ -109,40 +124,31 @@
 
     <!-- NOVO BANNER DE LANÇAMENTOS -->
     <section class="new-arrival-banner">
-        <!-- Coluna de Imagem 1 -->
-        <div class="banner-image-placeholder img-1">
-            <!-- As imagens são definidas como background no seu arquivo style.css -->
-        </div>
-        <!-- Coluna de Imagem 2 -->
+        <div class="banner-image-placeholder img-1"></div>
         <div class="banner-image-placeholder img-2"></div>
         
-        <!-- Coluna de Conteúdo Central -->
         <div class="banner-center-content">
-            <!-- SUBSTITUA O CÓDIGO DA LANTERNA ESQUERDA POR ISTO -->
-<!-- CÓDIGO ATUALIZADO PARA O CARROSSEL ESQUERDO (SÓ LETRAS) -->
-<div class="decorative-crosses crosses-left">
-    <div class="icon-carousel">
-        <div class="carousel-track">
-            <!-- Lista de Caracteres Originais -->
-           <div class="carousel-icon" data-icon="kanji">桜</div> <!-- Sakura -->
-            <div class="carousel-icon" data-icon="kanji">和</div> <!-- Harmonia -->
-            <div class="carousel-icon" data-icon="kanji">〶</div> <!-- Sonho -->
-            <div class="carousel-icon" data-icon="kanji">美</div> <!-- Beleza -->
-            <div class="carousel-icon" data-icon="kanji">㋶</div> <!-- Amor -->
-            <div class="carousel-icon" data-icon="kanji">光</div> <!-- Luz -->
-            <div class="carousel-icon" data-icon="kanji">水</div> <!-- Shinobi / Ninja -->
-
-            <!-- Lista Duplicada para o Loop Infinito -->
-             <div class="carousel-icon" data-icon="kanji">丧</div>
-            <div class="carousel-icon" data-icon="kanji">㋭</div>
-            <div class="carousel-icon" data-icon="kanji">夢</div>
-            <div class="carousel-icon" data-icon="kanji">⿕</div>
-            <div class="carousel-icon" data-icon="kanji">愛</div>
-            <div class="carousel-icon" data-icon="kanji">光</div>
-            <div class="carousel-icon" data-icon="kanji">⽗</div>
-        </div>
-    </div>
-</div>
+            <div class="decorative-crosses crosses-left">
+                <div class="icon-carousel">
+                    <div class="carousel-track">
+                        <div class="carousel-icon" data-icon="kanji">桜</div>
+                        <div class="carousel-icon" data-icon="kanji">和</div>
+                        <div class="carousel-icon" data-icon="kanji">〶</div>
+                        <div class="carousel-icon" data-icon="kanji">美</div>
+                        <div class="carousel-icon" data-icon="kanji">㋶</div>
+                        <div class="carousel-icon" data-icon="kanji">光</div>
+                        <div class="carousel-icon" data-icon="kanji">水</div>
+                        <!-- Duplicata -->
+                        <div class="carousel-icon" data-icon="kanji">丧</div>
+                        <div class="carousel-icon" data-icon="kanji">㋭</div>
+                        <div class="carousel-icon" data-icon="kanji">夢</div>
+                        <div class="carousel-icon" data-icon="kanji">⿕</div>
+                        <div class="carousel-icon" data-icon="kanji">愛</div>
+                        <div class="carousel-icon" data-icon="kanji">光</div>
+                        <div class="carousel-icon" data-icon="kanji">⽗</div>
+                    </div>
+                </div>
+            </div>
             <h2>Susanoo</h2>
             <a href="php/produtos.php" class="btn-shop">Compre Agora</a>
             <div class="banner-social-icons">
@@ -150,36 +156,30 @@
                 <a href="https://www.instagram.com/xz.assis" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
                 <a href="#" aria-label="X (Twitter)"><i class="fa-brands fa-x-twitter"></i></a>
             </div>
-            <!-- SUBSTITUA O CÓDIGO DA LANTERNA DIREITA POR ISTO -->
-<!-- CÓDIGO ATUALIZADO PARA O CARROSSEL DIREITO (SÓ LETRAS) -->
-<div class="decorative-crosses crosses-right">
-    <div class="icon-carousel">
-        <div class="carousel-track">
-            <!-- Lista de Caracteres Originais -->
-            <div class="carousel-icon" data-icon="kanji">桜</div> <!-- Sakura -->
-            <div class="carousel-icon" data-icon="kanji">和</div> <!-- Harmonia -->
-            <div class="carousel-icon" data-icon="kanji">〶</div> <!-- Sonho -->
-            <div class="carousel-icon" data-icon="kanji">美</div> <!-- Beleza -->
-            <div class="carousel-icon" data-icon="kanji">㋶</div> <!-- Amor -->
-            <div class="carousel-icon" data-icon="kanji">光</div> <!-- Luz -->
-            <div class="carousel-icon" data-icon="kanji">水</div> <!-- Água -->
-
-            <!-- Lista Duplicada para o Loop Infinito -->
-            <div class="carousel-icon" data-icon="kanji">丧</div>
-            <div class="carousel-icon" data-icon="kanji">㋭</div>
-            <div class="carousel-icon" data-icon="kanji">夢</div>
-            <div class="carousel-icon" data-icon="kanji">⿕</div>
-            <div class="carousel-icon" data-icon="kanji">愛</div>
-            <div class="carousel-icon" data-icon="kanji">光</div>
-            <div class="carousel-icon" data-icon="kanji">⽗</div>
-        </div>
-    </div>
-</div>
+            <div class="decorative-crosses crosses-right">
+                <div class="icon-carousel">
+                    <div class="carousel-track">
+                        <div class="carousel-icon" data-icon="kanji">桜</div>
+                        <div class="carousel-icon" data-icon="kanji">和</div>
+                        <div class="carousel-icon" data-icon="kanji">㋶</div>
+                        <div class="carousel-icon" data-icon="kanji">美</div>
+                        <div class="carousel-icon" data-icon="kanji">㋶</div>
+                        <div class="carousel-icon" data-icon="kanji">光</div>
+                        <div class="carousel-icon" data-icon="kanji">水</div>
+                        <!-- Duplicata -->
+                        <div class="carousel-icon" data-icon="kanji">丧</div>
+                        <div class="carousel-icon" data-icon="kanji">㋭</div>
+                        <div class="carousel-icon" data-icon="kanji">夢</div>
+                        <div class="carousel-icon" data-icon="kanji">⿕</div>
+                        <div class="carousel-icon" data-icon="kanji">愛</div>
+                        <div class="carousel-icon" data-icon="kanji">光</div>
+                        <div class="carousel-icon" data-icon="kanji">⽗</div>
+                    </div>
+                </div>
+            </div>
         </div>
         
-        <!-- Coluna de Imagem 3 -->
         <div class="banner-image-placeholder img-3"></div>
-        <!-- Coluna de Imagem 4 -->
         <div class="banner-image-placeholder img-4"></div>
     </section>
 
@@ -205,19 +205,10 @@
     <!-- Produtos em Destaque -->
     <section class="featured-products">
         <div class="sakura-container">
-        <div class="petal"></div>
-        <div class="petal"></div>
-        <div class="petal"></div>
-        <div class="petal"></div>
-        <div class="petal"></div>
-        <div class="petal"></div>
-        <div class="petal"></div>
-        <div class="petal"></div>
-        <div class="petal"></div>
-        <div class="petal"></div>
-        <div class="petal"></div>
-        <div class="petal"></div>
-    </div>
+            <div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div>
+            <div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div>
+            <div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div>
+        </div>
         <div class="container">
             <div class="section-header">
                 <h2 class="section-title">Produtos em Destaque</h2>
@@ -225,11 +216,10 @@
             </div>
             <div class="products-grid">
                 
-
                 <!-- PRODUTO 1 -->
                 <div class="product-card" data-category="camisas"
-                    data-name="Camisa Susanoo - Preta" data-price="109.99" data-img="../assets/img/camisajpnsred.png"
-                    data-imgs="../assets/img/camisajpnsred.png|../assets/img/camisajpnsredback.png|../assets/img/camisajpnsreddetailbeside.png|../assets/img/camisajpnsreddetail.png" data-sizes="P|M|G|GG|XG"
+                    data-name="Camisa Susanoo - Preta" data-price="109.99" data-img="assets/img/camisajpnsred.png"
+                    data-imgs="assets/img/camisajpnsred.png|assets/img/camisajpnsredback.png|assets/img/camisajpnsreddetailbeside.png|assets/img/camisajpnsreddetail.png" data-sizes="P|M|G|GG|XG"
                     data-longdesc="Camisa Susanoo Preta: Estilo e cultura japonesa, algodão premium, modelagem confortável.">
                     <div class="card-image"><img src="assets/img/costafoto.png" alt="Camisa Preta"><div class="card-overlay"><button class="btn-quick-view">Ver Detalhes</button></div></div>
                     <div class="card-content"><h3>Camisa Susanoo - Preta</h3><p class="product-desc">Estilo e cultura japonesa</p><p class="price">R$ 109,99</p><button class="btn btn-add-cart">Adicionar ao Carrinho</button></div>
@@ -238,7 +228,7 @@
                 <!-- PRODUTO 2 -->
                 <div class="product-card" data-category="calcas"
                     data-name="Calça Baggy Susanoo Cinza" data-price="67.99" data-img="assets/img/calca.png"
-                    data-imgs="../assets/img/calca.png|../assets/img/calcadetail.png|../assets/img/calcadetail2.png" data-sizes="P|M|G|GG|XG"
+                    data-imgs="assets/img/calca.png|assets/img/calcadetail.png|assets/img/calcadetail2.png" data-sizes="P|M|G|GG|XG"
                     data-longdesc="Calça Baggy Susanoo Cinza: Cor discreta, estilo que destaca, tecido leve e resistente.">
                     <div class="card-image"><img src="assets/img/calca.png" alt="Calça Cinza"><div class="card-overlay"><button class="btn-quick-view">Ver Detalhes</button></div></div>
                     <div class="card-content"><h3>Calça Baggy Susanoo Cinza</h3><p class="product-desc">Cor discreta, estilo que destaca</p><p class="price">R$ 67,99</p><button class="btn btn-add-cart">Adicionar ao Carrinho</button></div>
@@ -247,7 +237,7 @@
                 <!-- PRODUTO 3 -->
                 <div class="product-card" data-category="acessorios"
                     data-name="Boné Amaterasu" data-price="39.90" data-img="assets/img/bone.png"
-                    data-imgs="../assets/img/boneoldschool.png|../assets/img/boneoldschool2.png|../assets/img/boneoldschool3.png" data-sizes="Único"
+                    data-imgs="assets/img/boneoldschool.png|assets/img/boneoldschool2.png|assets/img/boneoldschool3.png" data-sizes="Único"
                     data-longdesc="Boné Old School: Aba curva, bordado exclusivo, ajuste confortável, inspiração japonesa.">
                     <div class="card-image"><img src="assets/img/bone.png" alt="Boné Amaterasu"><div class="card-overlay"><button class="btn-quick-view">Ver Detalhes</button></div></div>
                     <div class="card-content"><h3>Boné Old School</h3><p class="product-desc">Aba curva, bordado exclusivo, ajuste confortável</p><p class="price">R$ 39,90</p><button class="btn btn-add-cart">Adicionar ao Carrinho</button></div>

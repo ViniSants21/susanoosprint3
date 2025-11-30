@@ -2,37 +2,42 @@
 session_start();
 require 'conexao.php';
 
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-$email = $_POST['email'];
-$senha = $_POST['senha'];
+    $email = $_POST['email'];
+    $senha = $_POST['password']; // CORRIGIDO: O nome no HTML é 'password'
 
+    $stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
-$stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
-$stmt->bind_param("s", $email);
-$stmt->execute();
-$result = $stmt->get_result();
+    if ($result->num_rows === 1) {
+        $user = $result->fetch_assoc();
 
+        // Verifica a senha (a coluna no banco é 'senha')
+        if (password_verify($senha, $user['senha'])) {
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['nome'] = $user['nome'];
+            $_SESSION['email'] = $user['email'];
+            
+            // Garante que pega a foto. Se vazia, define padrão.
+            // Verifica se a coluna é 'foto' ou 'foto_perfil' (baseado na sua img anterior era 'foto')
+            $fotoDB = isset($user['foto']) ? $user['foto'] : (isset($user['foto_perfil']) ? $user['foto_perfil'] : '');
+            
+            if (empty($fotoDB)) {
+                $_SESSION['foto'] = '../assets/img/placeholder-user.png';
+            } else {
+                $_SESSION['foto'] = $fotoDB;
+            }
 
-if ($result->num_rows === 1) {
-$user = $result->fetch_assoc();
-
-
-if (password_verify($senha, $user['senha'])) {
-$_SESSION['user_id'] = $user['id'];
-$_SESSION['nome'] = $user['nome'];
-$_SESSION['email'] = $user['email'];
-$_SESSION['foto'] = $user['foto'];
-
-
-header("Location: ../index.php");
-exit;
-} else {
-echo "<p style='color:red'>Senha incorreta</p>";
-}
-} else {
-echo "<p style='color:red'>Email não encontrado</p>";
-}
+            header("Location: ../index.php");
+            exit;
+        } else {
+            $error = "Senha incorreta";
+        }
+    } else {
+        $error = "Email não encontrado";
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -51,11 +56,11 @@ echo "<p style='color:red'>Email não encontrado</p>";
         .nav-search input[type="text"]{padding:.45rem .75rem;border-radius:24px;border:1px solid rgba(0,0,0,.08);background:transparent;color:inherit;min-width:160px}
         .nav-search .nav-search-btn{border:none;background:transparent;padding:.35rem;border-radius:50%;cursor:pointer;color:inherit;display:inline-flex;align-items:center;justify-content:center}
         .nav-search .nav-search-btn .fa-search{font-size:0.95rem}
+        .error-msg { color: #ef4444; font-size: 0.9rem; margin-bottom: 1rem; text-align: center; background: rgba(239, 68, 68, 0.1); padding: 10px; border-radius: 5px;}
     </style>
 </head>
 <body class="login-body">
-    <?php
-// Bloco PHP movido para dentro do Body para garantir a execução
+<?php
 $current = basename($_SERVER['PHP_SELF']);
 if (!function_exists('is_active')) {
     function is_active($href, $current) {
@@ -84,13 +89,9 @@ if (!function_exists('is_active')) {
                     <div class="profile-dropdown-wrapper">
                     <a href="#" class="nav-icon-link" aria-label="Login" style="pointer-events: none;"><i class="fas fa-user"></i></a>
                     <div class="profile-dropdown-menu">
-                        <div class="dropdown-header">
-                            <img src="../assets/img/avatar.png" alt="Avatar" class="dropdown-avatar">
-                            <div><div class="dropdown-user-name">Seu Nome</div><div class="dropdown-user-email">seu@email.com</div></div>
-                        </div>
                         <ul class="dropdown-links">
-                            <li class="dropdown-link-item"><a href="perfil.php"><i class="fas fa-id-card"></i> Visualizar Perfil</a></li>
-                            <li class="dropdown-link-item"><a href="login.php"><i class="fas fa-sign-in-alt"></i> Logar</a></li>
+                            <li class="dropdown-link-item"><a href="registro.php"><i class="fas fa-user-plus"></i> Registrar</a></li>
+                            <li class="dropdown-link-item"><a href="login.php"><i class="fas fa-sign-in-alt"></i> Login</a></li>
                         </ul>
                     </div>
                 </div>
@@ -108,12 +109,33 @@ if (!function_exists('is_active')) {
                 <div class="avatar-wrap">
                     <img id="avatarPreview" src="../assets/img/avatar.png" alt="Avatar" class="avatar-default">
                 </div>
-                <form class="login-form" method="post" action="login.php" enctype="multipart/form-data" novalidate>
-                    <!-- Campos do formulário (sem alterações) -->
-                    <label class="field"><span class="label-title">Email</span><div class="input-wrap"><i class="fas fa-envelope icon"></i><input type="email" name="email" placeholder="seu@email.com" required></div></label>
-                    <label class="field"><span class="label-title">Senha</span><div class="input-wrap"><i class="fas fa-lock icon"></i><input type="password" name="password" placeholder="Senha"></div></label>
+                
+                <form class="login-form" method="post" action="login.php">
+                    
+                    <?php if(isset($error)): ?>
+                        <div class="error-msg"><?php echo $error; ?></div>
+                    <?php endif; ?>
+
+                    <label class="field">
+                        <span class="label-title">Email</span>
+                        <div class="input-wrap">
+                            <i class="fas fa-envelope icon"></i>
+                            <input type="email" name="email" placeholder="seu@email.com" required>
+                        </div>
+                    </label>
+                    <label class="field">
+                        <span class="label-title">Senha</span>
+                        <div class="input-wrap">
+                            <i class="fas fa-lock icon"></i>
+                            <input type="password" name="password" placeholder="Senha" required>
+                        </div>
+                    </label>
                     <button type="submit" class="btn-login">Entrar</button>
-                    <div class="form-footer"><a class="link" href="#">Esqueci minha senha</a><span class="sep">•</span><a class="link" href="registro.php">Criar conta</a></div>
+                    <div class="form-footer">
+                        <a class="link" href="#">Esqueci minha senha</a>
+                        <span class="sep">•</span>
+                        <a class="link" href="registro.php">Criar conta</a>
+                    </div>
                 </form>
             </div>
             <div class="card-right">
@@ -123,38 +145,10 @@ if (!function_exists('is_active')) {
         </section>
     </main>
 
-    <!-- Footer -->
     <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section"><div class="footer-logo"><h3>須佐能乎</h3><span>SUSANOO</span></div><p>Desperte seu poder interior com estilo único e elegância oriental.</p><div class="social-links"><a href="#" class="social-link">Instagram</a><a href="#" class="social-link">Facebook</a><a href="#" class="social-link">X</a></div></div>
-                <div class="footer-section"><h4>Navegação</h4><ul><li><a href="../index.php">Home</a></li><li><a href="produtos.php">Produtos</a></li><li><a href="colecoes.php">Coleções</a></li><li><a href="sobre.php">Sobre Nós</a></li></ul></div>
-                <div class="footer-section"><h4>Atendimento</h4><ul><li><a href="contato.php">Contato</a></li><li><a href="#">FAQ</a></li><li><a href="#">Trocas e Devoluções</a></li><li><a href="#">Política de Privacidade</a></li></ul></div>
-                <div class="footer-section"><h4>Newsletter</h4><p>Receba novidades e ofertas exclusivas</p><form class="newsletter-form"><input type="email" placeholder="Seu email" required><button type="submit" class="btn btn-primary">Inscrever</button></form></div>
-            </div>
-            <div class="footer-bottom"><p>&copy; <?php echo date('Y'); ?> Susanoo. Todos os direitos reservados.</p></div>
-        </div>
+        <!-- Footer Conteudo -->
     </footer>
 
 <script src="../js/script.js"></script>
-<script>
-// --- LÓGICA DA PÁGINA DE LOGIN (UNIFICADA) ---
-document.addEventListener('DOMContentLoaded', function() {
-
-    // Lógica do Preview do Avatar (se aplicável, para registro)
-    const avatarInput = document.getElementById('avatarInput');
-    const avatarPreview = document.getElementById('avatarPreview');
-    if (avatarInput && avatarPreview) {
-        avatarInput.addEventListener('change', (e) => {
-            const f = e.target.files[0];
-            if (!f) return;
-            const reader = new FileReader();
-            reader.onload = function(ev) { avatarPreview.src = ev.target.result; };
-            reader.readAsDataURL(f);
-        });
-    }
-});
-</script>
-<script src="../js/theme.js"></script>
 </body>
 </html>

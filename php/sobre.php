@@ -53,14 +53,14 @@
                         <i class="fas fa-user"></i>
                         </a>
 
-
+ 
                         <div class="profile-dropdown-menu">
                             <ul class="dropdown-links">
                                 <li class="dropdown-link-item">
-                                <a href="../php/registro.php"><i class="fas fa-user-plus"></i> Registrar</a>
+                                <a href="php/registro.php"><i class="fas fa-user-plus"></i> Registrar</a>
                                 </li>
                                 <li class="dropdown-link-item">
-                                    <a href="../php/login.php"><i class="fas fa-sign-in-alt"></i> Login</a>
+                                    <a href="php/login.php"><i class="fas fa-sign-in-alt"></i> Login</a>
                                 </li>
                             </ul>
                         </div>
@@ -86,7 +86,7 @@
 
 
 <ul class="dropdown-links">
-<li class="dropdown-link-item"><a href="php/perfil.php"><i class="fas fa-id-card"></i> Visualizar Perfil</a></li>
+<li class="dropdown-link-item"><a href="../php/perfil.php"><i class="fas fa-id-card"></i> Visualizar Perfil</a></li>
 <li class="dropdown-link-item"><a href="php/configuracoes.php"><i class="fas fa-cog"></i> Configurações</a></li>
 <li class="dropdown-link-item"><a href="../php/logout.php"><i class="fas fa-sign-out-alt"></i> Sair</a></li>
 </ul>
