@@ -1,3 +1,46 @@
+<?php
+session_start();
+require_once 'conexao.php'; // Garanta que este caminho está correto
+
+// Verifica se o usuário está logado
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit;
+}
+
+// --- LÓGICA DE EXCLUSÃO DE CONTA ---
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'delete_account') {
+    $user_id = $_SESSION['user_id'];
+
+    // Prepara a exclusão
+    $stmt = $conn->prepare("DELETE FROM users WHERE id = ?");
+    $stmt->bind_param("i", $user_id);
+
+    if ($stmt->execute()) {
+        // Se deletou com sucesso:
+        $stmt->close();
+        
+        // Destrói a sessão e limpa os dados
+        session_unset();
+        session_destroy();
+
+        // Redireciona para a home com mensagem (opcional)
+        header("Location: ../index.php?msg=conta_excluida");
+        exit;
+    } else {
+        $erro_msg = "Erro ao excluir a conta: " . $conn->error;
+    }
+}
+
+// Funções auxiliares de visualização
+$current = basename($_SERVER['PHP_SELF']);
+if (!function_exists('is_active')) {
+    function is_active($href, $current) {
+        $base = basename(parse_url($href, PHP_URL_PATH));
+        return $base === $current ? 'active' : '';
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -7,7 +50,14 @@
     <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="../css/configuracoes-style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <script>(function(){const theme=localStorage.getItem('theme');if(theme==='light'){document.documentElement.classList.add('light-mode');}})();</script>
+    <script>
+        (function(){
+            const theme = localStorage.getItem('theme');
+            if(theme === 'light'){
+                document.documentElement.classList.add('light-mode');
+            }
+        })();
+    </script>
     <style>
 		.nav-search{display:flex;align-items:center;gap:.5rem;}
 		.nav-search input[type="text"]{padding:.45rem .75rem;border-radius:24px;border:1px solid rgba(0,0,0,.08);background:transparent;color:inherit;min-width:160px}
@@ -16,16 +66,6 @@
 	</style>
 </head>
 <body class="settings-page-body">
-
-<?php
-$current = basename($_SERVER['PHP_SELF']);
-if (!function_exists('is_active')) {
-    function is_active($href, $current) {
-        $base = basename(parse_url($href, PHP_URL_PATH));
-        return $base === $current ? 'active' : '';
-    }
-}
-?>
 
     <!-- ========== Navbar ========== -->
     <nav class="navbar scrolled" id="navbar">
@@ -45,53 +85,33 @@ if (!function_exists('is_active')) {
                 </ul>
                 <div class="nav-icons">
                     <div class="profile-dropdown-wrapper">
-                        <?php if (!isset($_SESSION)) { session_start(); } ?>
-                        <?php if (!isset($_SESSION['user_id'])): ?>
-                    <!-- USUÁRIO DESLOGADO -->
-                        <a href="php/login.php" class="nav-icon-link" aria-label="Login">
-                        <i class="fas fa-user"></i>
-                        </a>
-
-
-                        <div class="profile-dropdown-menu">
-                            <ul class="dropdown-links">
-                                <li class="dropdown-link-item">
-                                <a href="../php/registro.php"><i class="fas fa-user-plus"></i> Registrar</a>
-                                </li>
-                                <li class="dropdown-link-item">
-                                    <a href="../php/login.php"><i class="fas fa-sign-in-alt"></i> Login</a>
-                                </li>
-                            </ul>
-                        </div>
-
-
-                    <?php else: ?>
-                    <!-- USUÁRIO LOGADO -->
+                        
+                    <!-- USUÁRIO LOGADO (Já verificado no PHP acima) -->
                     <a href="#" class="nav-icon-link" aria-label="Perfil">
-                    <img src="<?php echo $_SESSION['foto']; ?>"
-                    class="dropdown-avatar"
-                    style="width:28px; height:28px; border-radius:50%; object-fit:cover;">
+                        <?php 
+                            // Fallback para foto caso a sessão esteja sem
+                            $fotoPerfil = isset($_SESSION['foto']) && !empty($_SESSION['foto']) ? $_SESSION['foto'] : '../assets/img/placeholder-user.png';
+                        ?>
+                        <img src="<?php echo htmlspecialchars($fotoPerfil); ?>" class="dropdown-avatar" style="width:28px; height:28px; border-radius:50%; object-fit:cover;">
                     </a>
 
+                    <div class="profile-dropdown-menu">
+                        <div class="dropdown-header">
+                            <img src="<?php echo htmlspecialchars($fotoPerfil); ?>" alt="Avatar" class="dropdown-avatar">
+                            <div>
+                                <div class="dropdown-user-name"><?php echo htmlspecialchars($_SESSION['nome']); ?></div>
+                                <div class="dropdown-user-email"><?php echo htmlspecialchars($_SESSION['email']); ?></div>
+                            </div>
+                        </div>
 
-<div class="profile-dropdown-menu">
-<div class="dropdown-header">
-<img src="<?php echo $_SESSION['foto']; ?>" alt="Avatar" class="dropdown-avatar">
-<div>
-<div class="dropdown-user-name"><?php echo $_SESSION['nome']; ?></div>
-<div class="dropdown-user-email"><?php echo $_SESSION['email']; ?></div>
-</div>
-</div>
+                        <ul class="dropdown-links">
+                            <li class="dropdown-link-item"><a href="perfil.php"><i class="fas fa-id-card"></i> Visualizar Perfil</a></li>
+                            <li class="dropdown-link-item"><a href="configuracoes.php"><i class="fas fa-cog"></i> Configurações</a></li>
+                            <li class="dropdown-link-item"><a href="logout.php"><i class="fas fa-sign-out-alt"></i> Sair</a></li>
+                        </ul>
+                    </div>
 
-
-<ul class="dropdown-links">
-<li class="dropdown-link-item"><a href="php/perfil.php"><i class="fas fa-id-card"></i> Visualizar Perfil</a></li>
-<li class="dropdown-link-item"><a href="php/configuracoes.php"><i class="fas fa-cog"></i> Configurações</a></li>
-<li class="dropdown-link-item"><a href="../php/logout.php"><i class="fas fa-sign-out-alt"></i> Sair</a></li>
-</ul>
-</div>
-<?php endif; ?>
-</div>
+                    </div>
                     <a href="carrinho.php" class="nav-icon-link" aria-label="Carrinho"><i class="fas fa-shopping-bag"></i></a>
                 </div>
             </div>
@@ -112,6 +132,13 @@ if (!function_exists('is_active')) {
                 </aside>
                 
                 <div class="settings-content">
+                    
+                    <?php if(isset($erro_msg)): ?>
+                        <div style="background: rgba(239,68,68,0.2); color: #ef4444; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid rgba(239,68,68,0.3);">
+                            <?php echo $erro_msg; ?>
+                        </div>
+                    <?php endif; ?>
+
                     <!-- Seção de Aparência -->
                     <section class="settings-panel active">
                         <h2>Aparência</h2>
@@ -144,8 +171,6 @@ if (!function_exists('is_active')) {
                         </div>
                     </section>
 
-                  
-
                     <!-- Zona de Perigo -->
                     <section class="settings-panel active danger-zone">
                         <h2>Zona de Perigo</h2>
@@ -153,6 +178,11 @@ if (!function_exists('is_active')) {
                             <p>Esta ação é permanente e removerá todos os seus dados, incluindo histórico de pedidos. Não pode ser desfeita.</p>
                         </div>
                         <div class="panel-footer">
+                            <!-- FORMULÁRIO OCULTO PARA EXCLUSÃO -->
+                            <form id="delete-form" method="POST" action="configuracoes.php" style="display: none;">
+                                <input type="hidden" name="action" value="delete_account">
+                            </form>
+                            
                             <button type="button" class="btn btn-danger" id="delete-account-btn">Excluir Minha Conta</button>
                         </div>
                     </section>
@@ -160,8 +190,6 @@ if (!function_exists('is_active')) {
             </div>
         </div>
     </main>
-    
-    
     
     <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -171,20 +199,24 @@ if (!function_exists('is_active')) {
             document.documentElement.classList.toggle('light-mode', !themeSwitch.checked);
             localStorage.setItem('theme', themeSwitch.checked ? 'dark' : 'light');
         }
-        themeSwitch.checked = localStorage.getItem('theme') !== 'light';
-        themeSwitch.addEventListener('change', handleThemeChange);
+        
+        // Verifica null check para evitar erros se o elemento não existir
+        if (themeSwitch) {
+            themeSwitch.checked = localStorage.getItem('theme') !== 'light';
+            themeSwitch.addEventListener('change', handleThemeChange);
+        }
 
         // --- Lógica para o botão de EXCLUIR CONTA ---
         const deleteBtn = document.getElementById('delete-account-btn');
         if (deleteBtn) {
             deleteBtn.addEventListener('click', function() {
-                const confirmation = prompt("Esta ação é irreversível. Para confirmar, digite 'EXCLUIR' e clique em OK.");
+                const confirmation = prompt("ATENÇÃO: Essa ação não pode ser desfeita!\n\nPara confirmar a exclusão da sua conta, digite a palavra 'EXCLUIR' abaixo e clique em OK.");
+                
                 if (confirmation === 'EXCLUIR') {
-                    alert('Sua conta foi excluída com sucesso.');
-                    // Aqui você redirecionaria o usuário para a página inicial
-                    // window.location.href = '../index.php';
-                } else {
-                    alert('Ação cancelada.');
+                    // Se o usuário digitou corretamente, submete o formulário oculto
+                    document.getElementById('delete-form').submit();
+                } else if (confirmation !== null) {
+                    alert('A palavra de confirmação estava incorreta. A conta NÃO foi excluída.');
                 }
             });
         }
@@ -192,15 +224,19 @@ if (!function_exists('is_active')) {
         // --- Lógica para salvar preferências de notificação ---
         const notificationCheckboxes = document.querySelectorAll('.settings-panel input[type="checkbox"]');
         notificationCheckboxes.forEach(checkbox => {
+            // Ignora o switch de tema
+            if (checkbox.parentElement.classList.contains('theme-switch')) return;
+
             // Carregar preferências salvas
-            const savedValue = localStorage.getItem(checkbox.parentElement.textContent.trim());
+            const key = 'pref_' + checkbox.parentElement.textContent.trim();
+            const savedValue = localStorage.getItem(key);
             if (savedValue !== null) {
                 checkbox.checked = savedValue === 'true';
             }
 
             // Salvar quando alterado
             checkbox.addEventListener('change', function() {
-                localStorage.setItem(this.parentElement.textContent.trim(), this.checked);
+                localStorage.setItem(key, this.checked);
             });
         });
     });
