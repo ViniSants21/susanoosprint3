@@ -285,7 +285,7 @@ if (!function_exists('is_active')) {
                         
                         <?php if (!isset($_SESSION['user_id'])): ?>
                     <!-- USUÁRIO DESLOGADO -->
-                        <a href="php/login.php" class="nav-icon-link" aria-label="Login">
+                        <a href="login.php" class="nav-icon-link" aria-label="Login">
                         <i class="fas fa-user"></i>
                         </a>
 

@@ -49,7 +49,7 @@
                         <?php if (!isset($_SESSION)) { session_start(); } ?>
                         <?php if (!isset($_SESSION['user_id'])): ?>
                     <!-- USUÁRIO DESLOGADO -->
-                        <a href="php/login.php" class="nav-icon-link" aria-label="Login">
+                        <a href="login.php" class="nav-icon-link" aria-label="Login">
                         <i class="fas fa-user"></i>
                         </a>
 
@@ -57,10 +57,10 @@
                         <div class="profile-dropdown-menu">
                             <ul class="dropdown-links">
                                 <li class="dropdown-link-item">
-                                <a href="php/registro.php"><i class="fas fa-user-plus"></i> Registrar</a>
+                                <a href="registro.php"><i class="fas fa-user-plus"></i> Registrar</a>
                                 </li>
                                 <li class="dropdown-link-item">
-                                    <a href="php/login.php"><i class="fas fa-sign-in-alt"></i> Login</a>
+                                    <a href="login.php"><i class="fas fa-sign-in-alt"></i> Login</a>
                                 </li>
                             </ul>
                         </div>
