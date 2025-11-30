@@ -14,12 +14,21 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <script>(function(){const theme=localStorage.getItem('theme');if(theme==='light'){document.documentElement.classList.add('light-mode');}})();</script>
 
-    <!-- Estilos locais para o ícone de pesquisa -->
+    <!-- Estilos locais -->
     <style>
         .nav-search{display:flex;align-items:center;gap:.5rem;}
         .nav-search input[type="text"]{padding:.45rem .75rem;border-radius:24px;border:1px solid rgba(0,0,0,.08);background:transparent;color:inherit;min-width:160px}
         .nav-search .nav-search-btn{border:none;background:transparent;padding:.35rem;border-radius:50%;cursor:pointer;color:inherit;display:inline-flex;align-items:center;justify-content:center}
         .nav-search .nav-search-btn .fa-search{font-size:0.95rem}
+        
+        /* Estilo extra para a linha de desconto */
+        .summary-discount {
+            color: #10B981; /* Verde */
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body class="cart-page-body">
@@ -35,10 +44,9 @@ if (!function_exists('is_active')) {
 }
 ?>
 
-<!-- Navbar Padrão de Páginas Internas com Dropdown -->
+<!-- Navbar Padrão -->
 <nav class="navbar scrolled" id="navbar">
     <div class="nav-container">
-        <!-- Substitua/inserir aqui o campo de pesquisa -->
         <div class="nav-search">
             <input type="text" placeholder="Pesquisar..." aria-label="Pesquisar">
             <button class="nav-search-btn" aria-label="Pesquisar"><i class="fas fa-search"></i></button>
@@ -53,54 +61,40 @@ if (!function_exists('is_active')) {
                 <li><a href="contato.php" class="nav-link <?php echo is_active('contato.php', $current); ?>">Contato</a></li>
             </ul>
             <div class="nav-icons">
-                    <div class="profile-dropdown-wrapper">
-                        <?php if (!isset($_SESSION)) { session_start(); } ?>
-                        <?php if (!isset($_SESSION['user_id'])): ?>
+                <div class="profile-dropdown-wrapper">
+                    <?php if (!isset($_SESSION)) { session_start(); } ?>
+                    <?php if (!isset($_SESSION['user_id'])): ?>
                     <!-- USUÁRIO DESLOGADO -->
                         <a href="php/login.php" class="nav-icon-link" aria-label="Login">
                         <i class="fas fa-user"></i>
                         </a>
-
-
                         <div class="profile-dropdown-menu">
                             <ul class="dropdown-links">
-                                <li class="dropdown-link-item">
-                                <a href="../php/registro.php"><i class="fas fa-user-plus"></i> Registrar</a>
-                                </li>
-                                <li class="dropdown-link-item">
-                                    <a href="../php/login.php"><i class="fas fa-sign-in-alt"></i> Login</a>
-                                </li>
+                                <li class="dropdown-link-item"><a href="../php/registro.php"><i class="fas fa-user-plus"></i> Registrar</a></li>
+                                <li class="dropdown-link-item"><a href="../php/login.php"><i class="fas fa-sign-in-alt"></i> Login</a></li>
                             </ul>
                         </div>
-
-
                     <?php else: ?>
                     <!-- USUÁRIO LOGADO -->
                     <a href="#" class="nav-icon-link" aria-label="Perfil">
-                    <img src="<?php echo $_SESSION['foto']; ?>"
-                    class="dropdown-avatar"
-                    style="width:28px; height:28px; border-radius:50%; object-fit:cover;">
+                    <img src="<?php echo $_SESSION['foto']; ?>" class="dropdown-avatar" style="width:28px; height:28px; border-radius:50%; object-fit:cover;">
                     </a>
-
-
-<div class="profile-dropdown-menu">
-<div class="dropdown-header">
-<img src="<?php echo $_SESSION['foto']; ?>" alt="Avatar" class="dropdown-avatar">
-<div>
-<div class="dropdown-user-name"><?php echo $_SESSION['nome']; ?></div>
-<div class="dropdown-user-email"><?php echo $_SESSION['email']; ?></div>
-</div>
-</div>
-
-
-<ul class="dropdown-links">
-<li class="dropdown-link-item"><a href="php/perfil.php"><i class="fas fa-id-card"></i> Visualizar Perfil</a></li>
-<li class="dropdown-link-item"><a href="php/configuracoes.php"><i class="fas fa-cog"></i> Configurações</a></li>
-<li class="dropdown-link-item"><a href="../php/logout.php"><i class="fas fa-sign-out-alt"></i> Sair</a></li>
-</ul>
-</div>
-<?php endif; ?>
-</div>
+                    <div class="profile-dropdown-menu">
+                        <div class="dropdown-header">
+                            <img src="<?php echo $_SESSION['foto']; ?>" alt="Avatar" class="dropdown-avatar">
+                            <div>
+                                <div class="dropdown-user-name"><?php echo $_SESSION['nome']; ?></div>
+                                <div class="dropdown-user-email"><?php echo $_SESSION['email']; ?></div>
+                            </div>
+                        </div>
+                        <ul class="dropdown-links">
+                            <li class="dropdown-link-item"><a href="php/perfil.php"><i class="fas fa-id-card"></i> Visualizar Perfil</a></li>
+                            <li class="dropdown-link-item"><a href="php/configuracoes.php"><i class="fas fa-cog"></i> Configurações</a></li>
+                            <li class="dropdown-link-item"><a href="../php/logout.php"><i class="fas fa-sign-out-alt"></i> Sair</a></li>
+                        </ul>
+                    </div>
+                    <?php endif; ?>
+                </div>
                 <a href="carrinho.php" class="nav-icon-link" aria-label="Carrinho"><i class="fas fa-shopping-bag"></i></a>
             </div>
         </div>
@@ -108,199 +102,260 @@ if (!function_exists('is_active')) {
     </div>
 </nav>
 
-    <!-- Conteúdo Principal do Carrinho -->
-    <main class="cart-main-content">
-        <div class="container">
-            <div class="cart-header">
-                <h1 class="cart-title">Seu Carrinho</h1>
-                <a href="produtos.php" class="continue-shopping">Continuar Comprando <i class="fas fa-arrow-right"></i></a>
+<!-- Conteúdo Principal do Carrinho -->
+<main class="cart-main-content">
+    <div class="container">
+        <div class="cart-header">
+            <h1 class="cart-title">Seu Carrinho</h1>
+            <a href="produtos.php" class="continue-shopping">Continuar Comprando <i class="fas fa-arrow-right"></i></a>
+        </div>
+
+        <div class="cart-layout">
+            <!-- Coluna Esquerda: Itens do Carrinho -->
+            <div class="cart-items-wrapper">
+               <!-- Itens inseridos via JS -->
             </div>
 
-            <div class="cart-layout">
-                <!-- Coluna Esquerda: Itens do Carrinho -->
-                <div class="cart-items-wrapper">
+            <!-- Coluna Direita: Resumo do Pedido -->
+            <div class="order-summary-wrapper">
+                <div class="order-summary-card">
+                    <h2 class="summary-title">Resumo do Pedido</h2>
                     
-                   
-
-                </div>
-
-                <!-- Coluna Direita: Resumo do Pedido -->
-                <div class="order-summary-wrapper">
-                    <div class="order-summary-card">
-                        <h2 class="summary-title">Resumo do Pedido</h2>
-                        <div class="summary-row">
-                            <span>Subtotal (2 itens)</span>
-                            <span class="summary-value">R$ 499,80</span>
-                        </div>
-                        <div class="summary-row">
-                            <span>Frete</span>
-                            <span class="summary-value">A calcular</span>
-                        </div>
-                        <div class="summary-total">
-                            <span>Total</span>
-                            <span class="summary-value total-price">R$ 499,80</span>
-                        </div>
-                        <div class="coupon-section">
-                            <label for="coupon">Cupom de Desconto</label>
-                            <div class="coupon-input-group">
-                                <input type="text" id="coupon" placeholder="Insira o código">
-                                <button class="btn btn-secondary">Aplicar</button>
-                            </div>
-                        </div>
-                        <a href="../php/checkout.php"><button class="btn btn-primary btn-checkout">Ir para Checkout</button></a>
+                    <div class="summary-row">
+                        <span>Subtotal</span>
+                        <span class="summary-value" id="summary-subtotal">R$ 0,00</span>
                     </div>
-                </div>
+                    
+                    <!-- Linha do Desconto (Criada dinamicamente) -->
+                    <div class="summary-row summary-discount" id="summary-discount-row" style="display:none;">
+                        <span>Desconto</span>
+                        <span class="summary-value" id="summary-discount-val">- R$ 0,00</span>
+                    </div>
 
+                    <div class="summary-row">
+                        <span>Frete</span>
+                        <span class="summary-value">A calcular</span>
+                    </div>
+                    
+                    <div class="summary-total">
+                        <span>Total</span>
+                        <span class="summary-value total-price" id="summary-total">R$ 0,00</span>
+                    </div>
+                    
+                    <div class="coupon-section">
+                        <label for="coupon">Cupom de Desconto</label>
+                        <div class="coupon-input-group">
+                            <input type="text" id="coupon" placeholder="Insira o código">
+                            <button id="apply-coupon-btn" class="btn btn-secondary">Aplicar</button>
+                        </div>
+                    </div>
+                    <a href="checkout.php"><button class="btn btn-primary btn-checkout">Ir para Checkout</button></a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</main>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-section">
+                <div class="footer-logo"><h3>須佐能乎</h3><span>SUSANOO</span></div>
+                <p>Desperte seu poder interior com estilo único e elegância oriental.</p>
+                <div class="social-links">
+                    <a href="#" class="social-link">Instagram</a>
+                    <a href="#" class="social-link">Facebook</a>
+                    <a href="#" class="social-link">X</a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h4>Navegação</h4>
+                <ul>
+                    <li><a href="../index.php">Home</a></li>
+                    <li><a href="produtos.php">Produtos</a></li>
+                    <li><a href="colecoes.php">Coleções</a></li>
+                    <li><a href="sobre.php">Sobre Nós</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Atendimento</h4>
+                <ul>
+                    <li><a href="contato.php">Contato</a></li>
+                    <li><a href="#">FAQ</a></li>
+                    <li><a href="#">Trocas e Devoluções</a></li>
+                    <li><a href="#">Política de Privacidade</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Newsletter</h4>
+                <p>Receba novidades e ofertas exclusivas</p>
+                <form class="newsletter-form">
+                    <input type="email" placeholder="Seu email" required>
+                    <button type="submit" class="btn btn-primary">Inscrever</button>
+                </form>
             </div>
         </div>
-    </main>
+        <div class="footer-bottom"><p>&copy; 2024 Susanoo. Todos os direitos reservados.</p></div>
+    </div>
+</footer>
 
-    
-        <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <div class="footer-logo">
-                        <h3>須佐能乎</h3>
-                        <span>SUSANOO</span>
-                    </div>
-                    <p>Desperte seu poder interior com estilo único e elegância oriental.</p>
-                    <div class="social-links">
-                        <a href="#" class="social-link">Instagram</a>
-                        <a href="#" class="social-link">Facebook</a>
-                        <a href="#" class="social-link">X</a>
-                    </div>
-                </div>
-                
-                <div class="footer-section">
-                    <h4>Navegação</h4>
-                    <ul>
-                        <li><a href="../index.php">Home</a></li>
-                        <li><a href="produtos.php">Produtos</a></li>
-                        <li><a href="colecoes.php">Coleções</a></li>
-                        <li><a href="sobre.php">Sobre Nós</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-section">
-                    <h4>Atendimento</h4>
-                    <ul>
-                        <li><a href="contato.php">Contato</a></li>
-                        <li><a href="#">FAQ</a></li>
-                        <li><a href="#">Trocas e Devoluções</a></li>
-                        <li><a href="#">Política de Privacidade</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-section">
-                    <h4>Newsletter</h4>
-                    <p>Receba novidades e ofertas exclusivas</p>
-                    <form class="newsletter-form">
-                        <input type="email" placeholder="Seu email" required>
-                        <button type="submit" class="btn btn-primary">Inscrever</button>
-                    </form>
-                </div>
-            </div>
+<script src="../js/cart.js"></script>
+<script src="../js/script.js"></script>
+<script src="../js/theme.js"></script>
+
+<!-- Script de Lógica do Carrinho + Cupom -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const cartWrapper = document.querySelector('.cart-items-wrapper');
+        const summarySubtotal = document.getElementById('summary-subtotal');
+        const summaryTotal = document.getElementById('summary-total');
+        const summaryItemCountSpan = document.querySelector('.summary-row span:first-child');
+        
+        // Elementos do Cupom
+        const couponInput = document.getElementById('coupon');
+        const applyCouponBtn = document.getElementById('apply-coupon-btn');
+        const discountRow = document.getElementById('summary-discount-row');
+        const discountVal = document.getElementById('summary-discount-val');
+
+        // Formata Moeda
+        function formatMoney(value) {
+            return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        }
+
+        function getCart() {
+            return JSON.parse(localStorage.getItem('susanooCart')) || [];
+        }
+
+        function saveCart(cart) {
+            localStorage.setItem('susanooCart', JSON.stringify(cart));
+        }
+
+        // Função Principal de Renderização
+        function renderCart() {
+            const cart = getCart();
+            cartWrapper.innerHTML = ''; 
+
+            if (cart.length === 0) {
+                cartWrapper.innerHTML = '<p class="empty-cart-message">Seu carrinho está vazio.</p>';
+                summarySubtotal.textContent = 'R$ 0,00';
+                summaryTotal.textContent = 'R$ 0,00';
+                summaryItemCountSpan.textContent = 'Subtotal (0 itens)';
+                // Remove cupom se carrinho vazio
+                localStorage.removeItem('susanooDiscount');
+                discountRow.style.display = 'none';
+                return;
+            }
             
-            <div class="footer-bottom">
-                <p>&copy; 2024 Susanoo. Todos os direitos reservados.</p>
-            </div>
-        </div>
-    </footer>
-    
-<!-- ... seu footer ... -->
+            let subtotal = 0;
 
-    <script src="../js/cart.js"></script> <!-- <<< ADICIONE O SCRIPT DO CARRINHO -->
-    
-    <!-- Novo script para popular a página do carrinho -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const cartWrapper = document.querySelector('.cart-items-wrapper');
-            const summarySubtotal = document.querySelector('.summary-row .summary-value');
-            const summaryTotal = document.querySelector('.summary-total .total-price');
-            const summaryItemCount = document.querySelector('.summary-row span:first-child');
-
-            function renderCart() {
-                const cart = getCart();
-                cartWrapper.innerHTML = ''; // Limpa a lista antes de renderizar
-
-                if (cart.length === 0) {
-                    cartWrapper.innerHTML = '<p class="empty-cart-message">Seu carrinho está vazio.</p>';
-                    summarySubtotal.textContent = 'R$ 0,00';
-                    summaryTotal.textContent = 'R$ 0,00';
-                    summaryItemCount.textContent = 'Subtotal (0 itens)';
-                    return;
-                }
+            cart.forEach(item => {
+                subtotal += item.price * item.quantity;
                 
-                let subtotal = 0;
+                // Correção de caminho da imagem se necessário
+                let imgSrc = item.image;
+                if(imgSrc.startsWith('assets/')) imgSrc = '../' + imgSrc;
 
-                cart.forEach(item => {
-                    subtotal += item.price * item.quantity;
-                    const itemHTML = `
-                        <div class="cart-item" data-item-id="${item.id}">
-                            <img src="${item.image}" alt="${item.name}" class="item-image">
-                            <div class="item-details">
-                                <h3 class="item-name">${item.name}</h3>
-                                <p class="item-category">Tamanho: ${item.size}</p>
-                                <div class="quantity-control">
-                                    <button class="quantity-btn minus">-</button>
-                                    <input type="number" class="quantity-input" value="${item.quantity}" min="1">
-                                    <button class="quantity-btn plus">+</button>
-                                </div>
-                            </div>
-                            <div class="item-price-remove">
-                                <p class="item-price">R$ ${(item.price * item.quantity).toFixed(2).replace('.', ',')}</p>
-                                <button class="remove-item"><i class="fas fa-trash-alt"></i></button>
+                const itemHTML = `
+                    <div class="cart-item" data-item-id="${item.id}">
+                        <img src="${imgSrc}" alt="${item.name}" class="item-image" onerror="this.src='../assets/img/placeholder.png'">
+                        <div class="item-details">
+                            <h3 class="item-name">${item.name}</h3>
+                            <p class="item-category">Tamanho: ${item.size}</p>
+                            <div class="quantity-control">
+                                <button class="quantity-btn minus">-</button>
+                                <input type="number" class="quantity-input" value="${item.quantity}" min="1" readonly>
+                                <button class="quantity-btn plus">+</button>
                             </div>
                         </div>
-                    `;
-                    cartWrapper.insertAdjacentHTML('beforeend', itemHTML);
-                });
+                        <div class="item-price-remove">
+                            <p class="item-price">${formatMoney(item.price * item.quantity)}</p>
+                            <button class="remove-item"><i class="fas fa-trash-alt"></i></button>
+                        </div>
+                    </div>
+                `;
+                cartWrapper.insertAdjacentHTML('beforeend', itemHTML);
+            });
 
-                // Atualiza o resumo do pedido
-                const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-                summarySubtotal.textContent = `R$ ${subtotal.toFixed(2).replace('.', ',')}`;
-                summaryTotal.textContent = `R$ ${subtotal.toFixed(2).replace('.', ',')}`;
-                summaryItemCount.textContent = `Subtotal (${totalItems} itens)`;
+            // Totais
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            summarySubtotal.textContent = formatMoney(subtotal);
+            summaryItemCountSpan.textContent = `Subtotal (${totalItems} itens)`;
+
+            // --- LÓGICA DO CUPOM ---
+            let finalTotal = subtotal;
+            const activeCoupon = localStorage.getItem('susanooDiscount');
+            
+            if (activeCoupon === 'SUSANOO30') {
+                const discountAmount = subtotal * 0.30; // 30%
+                finalTotal = subtotal - discountAmount;
+                
+                discountRow.style.display = 'flex';
+                discountVal.textContent = `- ${formatMoney(discountAmount)}`;
+                if(couponInput && couponInput.value === '') couponInput.value = 'SUSANOO30';
+            } else {
+                discountRow.style.display = 'none';
             }
 
-            // Lógica para os botões de quantidade e remoção
-            cartWrapper.addEventListener('click', function(e) {
-                const target = e.target;
-                const cartItem = target.closest('.cart-item');
-                if (!cartItem) return;
+            summaryTotal.textContent = formatMoney(finalTotal);
+        }
 
-                const itemId = cartItem.dataset.itemId;
-                let cart = getCart();
-                const itemIndex = cart.findIndex(item => item.id === itemId);
-                if (itemIndex === -1) return;
+        // Evento: Aplicar Cupom
+        if (applyCouponBtn) {
+            applyCouponBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const code = couponInput.value.trim().toUpperCase();
+                
+                if (code === 'SUSANOO30') {
+                    localStorage.setItem('susanooDiscount', 'SUSANOO30');
+                    alert('Cupom de 30% aplicado com sucesso!');
+                    renderCart();
+                } else if (code === '') {
+                    localStorage.removeItem('susanooDiscount');
+                    alert('Cupom removido.');
+                    renderCart();
+                } else {
+                    alert('Cupom inválido ou expirado.');
+                    localStorage.removeItem('susanooDiscount');
+                    renderCart();
+                }
+            });
+        }
 
-                if (target.classList.contains('plus')) {
-                    cart[itemIndex].quantity++;
-                } else if (target.classList.contains('minus')) {
-                    if (cart[itemIndex].quantity > 1) {
-                        cart[itemIndex].quantity--;
-                    } else {
-                        // Se a quantidade for 1 e clicar em menos, remove o item
-                        cart.splice(itemIndex, 1);
-                    }
-                } else if (target.closest('.remove-item')) {
+        // Lógica dos botões +/- e remover
+        cartWrapper.addEventListener('click', function(e) {
+            const target = e.target;
+            const cartItem = target.closest('.cart-item');
+            if (!cartItem) return;
+
+            const itemId = cartItem.dataset.itemId;
+            let cart = getCart();
+            const itemIndex = cart.findIndex(item => item.id === itemId);
+            if (itemIndex === -1) return;
+
+            if (target.closest('.plus')) {
+                cart[itemIndex].quantity++;
+            } else if (target.closest('.minus')) {
+                if (cart[itemIndex].quantity > 1) {
+                    cart[itemIndex].quantity--;
+                } else {
                     cart.splice(itemIndex, 1);
                 }
+            } else if (target.closest('.remove-item')) {
+                cart.splice(itemIndex, 1);
+            } else {
+                return; // Clicou fora dos botões
+            }
 
-                saveCart(cart);
-                renderCart(); // Re-renderiza o carrinho com os novos dados
-                updateCartIcon(); // Atualiza o ícone na navbar
-            });
-            
-            // Renderiza o carrinho assim que a página carrega
-            renderCart();
+            saveCart(cart);
+            renderCart(); 
+            if(typeof updateCartIcon === 'function') updateCartIcon();
         });
-    </script>
-</body>
-</html>
-    <script src="../js/script.js"></script>
-    <script src="../js/theme.js"></script> <!-- ou ../js/theme.js para páginas internas -->
+        
+        // Renderiza ao carregar
+        renderCart();
+    });
+</script>
 </body>
 </html>

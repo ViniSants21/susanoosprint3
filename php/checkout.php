@@ -1,3 +1,20 @@
+<?php
+// ==========================================================
+// 1. O PHP DEVE FICAR NO TOPO ABSOLUTO (ANTES DO HTML)
+// ==========================================================
+if (!isset($_SESSION)) {
+    session_start();
+}
+
+// Lógica para o link ativo do menu
+$current = basename($_SERVER['PHP_SELF']);
+if (!function_exists('is_active')) {
+    function is_active($href, $current) {
+        $base = basename(parse_url($href, PHP_URL_PATH));
+        return $base === $current ? 'active' : '';
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -22,20 +39,34 @@
         .nav-search input[type="text"]{padding:.45rem .75rem;border-radius:24px;border:1px solid rgba(0,0,0,.08);background:transparent;color:inherit;min-width:160px}
         .nav-search .nav-search-btn{border:none;background:transparent;padding:.35rem;border-radius:50%;cursor:pointer;color:inherit;display:inline-flex;align-items:center;justify-content:center}
         .nav-search .nav-search-btn .fa-search{font-size:0.95rem}
+
+        /* --- CSS EXTRA: CORREÇÃO VISUAL DO RESUMO (DARK MODE) --- */
+        .summary-item {
+            display: flex !important;
+            align-items: center !important;
+            padding: 15px 0 !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+            gap: 15px !important;
+        }
+        .summary-item > div:first-child { width: 64px !important; height: 64px !important; flex-shrink: 0; position: relative; }
+        .summary-item img { border-radius: 8px !important; border: 1px solid rgba(255, 255, 255, 0.1); width:100%; height:100%; object-fit:cover; }
+        .summary-item span[class*="qty"] {
+            background: #8B5CF6 !important; color: #fff !important;
+            width: 20px !important; height: 20px !important;
+            top: -8px !important; right: -8px !important;
+            position: absolute; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-size: 11px !important;
+        }
+        .summary-item h4 { font-size: 0.95rem !important; color: inherit !important; margin: 0; }
+        .summary-item p { font-size: 0.85rem !important; color: #a0a0a0 !important; margin: 0; }
+        .summary-item > span:last-child { font-size: 0.95rem !important; font-weight: 700 !important; color: #fff !important; white-space: nowrap; margin-left: auto; }
+        .summary-items-list { max-height: 350px; overflow-y: auto; padding-right: 5px; }
+        
+        /* Estilo da Linha de Desconto */
+        #summary-discount-row { color: #10B981; font-weight: bold; display: flex; justify-content: space-between; margin-bottom: 10px; }
     </style>
 </head>
 <body class="checkout-page-body">
-
-<?php
-// Bloco PHP para a lógica da navbar
-$current = basename($_SERVER['PHP_SELF']);
-if (!function_exists('is_active')) {
-    function is_active($href, $current) {
-        $base = basename(parse_url($href, PHP_URL_PATH));
-        return $base === $current ? 'active' : '';
-    }
-}
-?>
 
 <!-- Navbar -->
 <nav class="navbar scrolled" id="navbar">
@@ -55,53 +86,37 @@ if (!function_exists('is_active')) {
             </ul>
             <div class="nav-icons">
                     <div class="profile-dropdown-wrapper">
-                        <?php if (!isset($_SESSION)) { session_start(); } ?>
-                        <?php if (!isset($_SESSION['user_id'])): ?>
-                    <!-- USUÁRIO DESLOGADO -->
-                        <a href="php/login.php" class="nav-icon-link" aria-label="Login">
-                        <i class="fas fa-user"></i>
-                        </a>
-
-
+                        <?php 
+                        // A sessão já foi iniciada lá no topo, então só verificamos
+                        if (!isset($_SESSION['user_id'])): 
+                        ?>
+                        <a href="php/login.php" class="nav-icon-link" aria-label="Login"><i class="fas fa-user"></i></a>
                         <div class="profile-dropdown-menu">
                             <ul class="dropdown-links">
-                                <li class="dropdown-link-item">
-                                <a href="../php/registro.php"><i class="fas fa-user-plus"></i> Registrar</a>
-                                </li>
-                                <li class="dropdown-link-item">
-                                    <a href="../php/login.php"><i class="fas fa-sign-in-alt"></i> Login</a>
-                                </li>
+                                <li class="dropdown-link-item"><a href="../php/registro.php"><i class="fas fa-user-plus"></i> Registrar</a></li>
+                                <li class="dropdown-link-item"><a href="../php/login.php"><i class="fas fa-sign-in-alt"></i> Login</a></li>
                             </ul>
                         </div>
-
-
                     <?php else: ?>
-                    <!-- USUÁRIO LOGADO -->
                     <a href="#" class="nav-icon-link" aria-label="Perfil">
-                    <img src="<?php echo $_SESSION['foto']; ?>"
-                    class="dropdown-avatar"
-                    style="width:28px; height:28px; border-radius:50%; object-fit:cover;">
+                    <img src="<?php echo $_SESSION['foto']; ?>" class="dropdown-avatar" style="width:28px; height:28px; border-radius:50%; object-fit:cover;">
                     </a>
-
-
-<div class="profile-dropdown-menu">
-<div class="dropdown-header">
-<img src="<?php echo $_SESSION['foto']; ?>" alt="Avatar" class="dropdown-avatar">
-<div>
-<div class="dropdown-user-name"><?php echo $_SESSION['nome']; ?></div>
-<div class="dropdown-user-email"><?php echo $_SESSION['email']; ?></div>
-</div>
-</div>
-
-
-<ul class="dropdown-links">
-<li class="dropdown-link-item"><a href="php/perfil.php"><i class="fas fa-id-card"></i> Visualizar Perfil</a></li>
-<li class="dropdown-link-item"><a href="php/configuracoes.php"><i class="fas fa-cog"></i> Configurações</a></li>
-<li class="dropdown-link-item"><a href="../php/logout.php"><i class="fas fa-sign-out-alt"></i> Sair</a></li>
-</ul>
-</div>
-<?php endif; ?>
-</div>
+                    <div class="profile-dropdown-menu">
+                        <div class="dropdown-header">
+                        <img src="<?php echo $_SESSION['foto']; ?>" alt="Avatar" class="dropdown-avatar">
+                        <div>
+                            <div class="dropdown-user-name"><?php echo $_SESSION['nome']; ?></div>
+                            <div class="dropdown-user-email"><?php echo $_SESSION['email']; ?></div>
+                        </div>
+                        </div>
+                        <ul class="dropdown-links">
+                            <li class="dropdown-link-item"><a href="php/perfil.php"><i class="fas fa-id-card"></i> Visualizar Perfil</a></li>
+                            <li class="dropdown-link-item"><a href="php/configuracoes.php"><i class="fas fa-cog"></i> Configurações</a></li>
+                            <li class="dropdown-link-item"><a href="../php/logout.php"><i class="fas fa-sign-out-alt"></i> Sair</a></li>
+                        </ul>
+                    </div>
+                    <?php endif; ?>
+                </div>
                 <a href="carrinho.php" class="nav-icon-link" aria-label="Carrinho"><i class="fas fa-shopping-bag"></i></a>
             </div>
         </div>
@@ -134,19 +149,14 @@ if (!function_exists('is_active')) {
 
                 <section class="checkout-section">
                     <h2><i class="fas fa-map-marker-alt"></i> Endereço de Entrega</h2>
-                    
-                    <!-- CEP COMO PRIMEIRO CAMPO -->
                     <div class="form-group">
                         <label for="zip">CEP</label>
                         <input type="text" id="zip" placeholder="00000-000" required maxlength="9">
                     </div>
-
                     <div class="form-group">
                         <label for="address">Endereço</label>
                         <input type="text" id="address" placeholder="Rua, Avenida, etc." required>
                     </div>
-
-                    <!-- NOVOS CAMPOS: NÚMERO E COMPLEMENTO -->
                     <div class="form-row">
                         <div class="form-group">
                             <label for="number">Número</label>
@@ -157,7 +167,6 @@ if (!function_exists('is_active')) {
                             <input type="text" id="complement" placeholder="Apto, Bloco, etc. (Opcional)">
                         </div>
                     </div>
-
                     <div class="form-row">
                         <div class="form-group">
                             <label for="city">Cidade</label>
@@ -194,6 +203,13 @@ if (!function_exists('is_active')) {
                         <span>Subtotal</span>
                         <span id="summary-subtotal">R$ 0,00</span>
                     </div>
+                    
+                    <!-- LINHA DO CUPOM NO CHECKOUT -->
+                    <div class="summary-row" id="summary-discount-row" style="display:none; color: #10B981;">
+                        <span>Desconto (Cupom)</span>
+                        <span id="summary-discount-val">- R$ 0,00</span>
+                    </div>
+
                     <div class="summary-row">
                         <span>Frete</span>
                         <span id="summary-shipping">R$ 25,00</span>
@@ -251,10 +267,7 @@ if (!function_exists('is_active')) {
     <div class="container">
         <div class="footer-content">
             <div class="footer-section">
-                <div class="footer-logo">
-                    <h3>須佐能乎</h3>
-                    <span>SUSANOO</span>
-                </div>
+                <div class="footer-logo"><h3>須佐能乎</h3><span>SUSANOO</span></div>
                 <p>Desperte seu poder interior com estilo único e elegância oriental.</p>
                 <div class="social-links">
                     <a href="#" class="social-link">Instagram</a>
@@ -289,24 +302,19 @@ if (!function_exists('is_active')) {
                 </form>
             </div>
         </div>
-        <div class="footer-bottom">
-            <p>&copy; 2024 Susanoo. Todos os direitos reservados.</p>
-        </div>
+        <div class="footer-bottom"><p>&copy; 2024 Susanoo. Todos os direitos reservados.</p></div>
     </div>
 </footer>
 
-<!-- Scripts -->
 <script src="../js/cart.js"></script>
-
 <script src="../js/script.js"></script>
 <script src="../js/theme.js"></script>
 
-<!-- SCRIPT DE CHECKOUT INTEGRADO (Para evitar erros de cache/caminho) -->
+<!-- SCRIPT DE CHECKOUT + CUPOM -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    console.log(">>> O Script de Checkout iniciou! <<<");
+    console.log(">>> Checkout Iniciado <<<");
 
-    // --- 1. SELETORES ---
     const summaryItemsList = document.querySelector('.summary-items-list');
     const subtotalEl = document.getElementById('summary-subtotal');
     const shippingEl = document.getElementById('summary-shipping');
@@ -314,59 +322,44 @@ document.addEventListener('DOMContentLoaded', function() {
     const shippingOptions = document.querySelectorAll('input[name="shipping"]');
     const paymentOptions = document.querySelectorAll('input[name="payment"]');
     const checkoutForm = document.getElementById('checkout-form');
+    
+    // Elementos de Desconto
+    const discountRow = document.getElementById('summary-discount-row');
+    const discountValEl = document.getElementById('summary-discount-val');
 
     let subtotal = 0;
 
-    // --- 2. FUNÇÕES DO CARRINHO ---
-
+    // --- FUNÇÕES DE CARRINHO E FORMATO ---
     function getCart() {
-        // Tenta ler 'susanooCart'
         const raw = localStorage.getItem('susanooCart');
-        console.log("Lendo localStorage 'susanooCart':", raw); // Debug
-
         if (!raw) return [];
-        try {
-            return JSON.parse(raw);
-        } catch (e) {
-            console.error("Erro ao converter JSON:", e);
-            return [];
-        }
+        try { return JSON.parse(raw); } catch (e) { return []; }
     }
 
     function formatCurrency(value) {
-        return `R$ ${value.toFixed(2).replace('.', ',')}`;
+        return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
     }
 
     function fixImagePath(imagePath) {
         if (!imagePath) return '../assets/img/placeholder.png';
-        // Se já tem http ou ../, devolve igual
         if (imagePath.startsWith('http') || imagePath.startsWith('../')) return imagePath;
-        // Se começa com assets/, adiciona ../
         if (imagePath.startsWith('assets/')) return '../' + imagePath;
-        // Remove ./ e adiciona ../
         return '../' + imagePath.replace(/^\.\//, '');
     }
 
+    // --- RENDERIZAR ITENS ---
     function renderSummary() {
         const cart = getCart();
         
-        // Verifica se o elemento HTML existe
-        if (!summaryItemsList) {
-            console.error("ERRO CRÍTICO: Não encontrei a div .summary-items-list no HTML!");
-            return;
-        }
-
+        if (!summaryItemsList) return;
         summaryItemsList.innerHTML = '';
         subtotal = 0;
 
         if (cart.length === 0) {
-            console.log("O carrinho está vazio.");
-            summaryItemsList.innerHTML = '<div style="padding:1rem; color:#666;">Seu carrinho está vazio.</div>';
+            summaryItemsList.innerHTML = '<div style="padding:1rem; color:#888;">Seu carrinho está vazio.</div>';
             updateTotals();
             return;
         }
-
-        console.log("Renderizando " + cart.length + " itens...");
 
         cart.forEach(item => {
             const itemTotal = item.price * item.quantity;
@@ -374,16 +367,16 @@ document.addEventListener('DOMContentLoaded', function() {
             const imageSrc = fixImagePath(item.image);
 
             const itemHTML = `
-                <div class="summary-item" style="display:flex; gap:10px; margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">
-                    <div style="position:relative; width:60px; height:60px;">
-                        <img src="${imageSrc}" alt="${item.name}" style="width:100%; height:100%; object-fit:cover; border-radius:5px;">
-                        <span style="position:absolute; top:-5px; right:-5px; background:#7c3aed; color:white; border-radius:50%; width:20px; height:20px; font-size:12px; display:flex; align-items:center; justify-content:center;">${item.quantity}</span>
+                <div class="summary-item">
+                    <div>
+                        <img src="${imageSrc}" alt="${item.name}">
+                        <span class="qty">${item.quantity}</span>
                     </div>
                     <div style="flex:1;">
-                        <h4 style="margin:0; font-size:0.9rem;">${item.name}</h4>
-                        <p style="margin:0; font-size:0.8rem; color:#666;">Tam: ${item.size}</p>
+                        <h4>${item.name}</h4>
+                        <p>Tam: ${item.size}</p>
                     </div>
-                    <span style="font-weight:bold; font-size:0.9rem;">${formatCurrency(itemTotal)}</span>
+                    <span>${formatCurrency(itemTotal)}</span>
                 </div>
             `;
             summaryItemsList.insertAdjacentHTML('beforeend', itemHTML);
@@ -392,21 +385,37 @@ document.addEventListener('DOMContentLoaded', function() {
         updateTotals();
     }
 
+    // --- CÁLCULO TOTAL + CUPOM ---
     function updateTotals() {
         let shippingCost = 0;
+        let discountAmount = 0;
+
+        // 1. Frete
         const selectedShipping = document.querySelector('input[name="shipping"]:checked');
         if (selectedShipping) {
             shippingCost = parseFloat(selectedShipping.value);
         }
-        const total = subtotal + shippingCost;
+
+        // 2. Cupom SUSANOO30
+        const activeCoupon = localStorage.getItem('susanooDiscount');
+        if (activeCoupon === 'SUSANOO30') {
+            discountAmount = subtotal * 0.30; // 30%
+            if(discountRow) {
+                discountRow.style.display = 'flex';
+                discountValEl.textContent = `- ${formatCurrency(discountAmount)}`;
+            }
+        } else {
+            if(discountRow) discountRow.style.display = 'none';
+        }
+
+        const total = subtotal + shippingCost - discountAmount;
 
         if (subtotalEl) subtotalEl.textContent = formatCurrency(subtotal);
         if (shippingEl) shippingEl.textContent = formatCurrency(shippingCost);
         if (totalEl) totalEl.textContent = formatCurrency(total);
     }
 
-    // --- 3. PAGAMENTO E FORMULÁRIO ---
-
+    // --- PAGAMENTO E FORMULÁRIO ---
     function togglePaymentDetails() {
         const selectedOption = document.querySelector('input[name="payment"]:checked');
         if (!selectedOption) return;
@@ -428,7 +437,6 @@ document.addEventListener('DOMContentLoaded', function() {
         checkoutForm.addEventListener('submit', function(e) {
             e.preventDefault();
             
-            // Validações básicas
             const email = document.getElementById('email').value;
             const name = document.getElementById('name').value;
             const address = document.getElementById('address').value;
@@ -439,31 +447,57 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
 
-            // Simula finalização
-            Swal.fire({
-                title: 'Pedido Confirmado!',
-                text: 'Sucesso!',
-                icon: 'success'
-            }).then(() => {
-                localStorage.removeItem('susanooCart'); // Limpa carrinho correto
-                window.location.href = '../index.php';
-            });
+            // Simula Pagamento
+            const selectedPayment = document.querySelector('input[name="payment"]:checked').value;
+            if (selectedPayment === 'pix') {
+                const fakePixKey = '00020126360014BR.GOV.BCB.PIX...'; 
+                Swal.fire({
+                    title: "Pagamento via PIX",
+                    html: `
+                        <p>Copie a chave abaixo:</p>
+                        <input type="text" value="${fakePixKey}" readonly style="width:100%; padding:8px; text-align:center;">
+                    `,
+                    confirmButtonText: "Já realizei o pagamento",
+                    confirmButtonColor: '#10B981'
+                }).then((r) => { if(r.isConfirmed) finalizeOrder(); });
+            } else {
+                Swal.fire({
+                    title: 'Processando...',
+                    timer: 1500,
+                    didOpen: () => Swal.showLoading()
+                }).then(() => finalizeOrder());
+            }
         });
     }
 
-    // --- 4. VIACEP (Simplificado) ---
+    function finalizeOrder() {
+        Swal.fire({
+            title: 'Pedido Confirmado!',
+            text: 'Obrigado por comprar na Susanoo!',
+            icon: 'success',
+            confirmButtonColor: '#8B5CF6'
+        }).then(() => {
+            localStorage.removeItem('susanooCart'); // Limpa carrinho
+            localStorage.removeItem('susanooDiscount'); // Limpa cupom
+            window.location.href = '../index.php';
+        });
+    }
+
+    // --- CEP (ViaCEP) ---
     const cepInput = document.getElementById('zip');
     if (cepInput) {
-        cepInput.addEventListener('blur', function() {
-            const cep = this.value.replace(/\D/g, '');
-            if (cep.length === 8) {
-                fetch(`https://viacep.com.br/ws/${cep}/json/`)
-                    .then(r => r.json())
-                    .then(data => {
-                        if(!data.erro) {
-                            document.getElementById('address').value = data.logradouro;
-                            document.getElementById('city').value = data.localidade;
-                            document.getElementById('state').value = data.uf;
+        cepInput.addEventListener('input', function(e) {
+            let val = e.target.value.replace(/\D/g, '');
+            if(val.length > 5) val = val.slice(0,5)+'-'+val.slice(5,8);
+            e.target.value = val;
+            if(val.replace(/\D/g,'').length === 8) {
+                fetch(`https://viacep.com.br/ws/${val.replace(/\D/g,'')}/json/`)
+                    .then(r=>r.json())
+                    .then(d => {
+                        if(!d.erro) {
+                            document.getElementById('address').value = d.logradouro;
+                            document.getElementById('city').value = d.localidade;
+                            document.getElementById('state').value = d.uf;
                             document.getElementById('number').focus();
                         }
                     });
@@ -471,13 +505,11 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // --- INICIALIZAÇÃO ---
+    // --- INIT ---
     renderSummary();
-    
-    // Event Listeners
     shippingOptions.forEach(opt => opt.addEventListener('change', updateTotals));
     paymentOptions.forEach(opt => opt.addEventListener('change', togglePaymentDetails));
-    togglePaymentDetails(); // Estado inicial
+    togglePaymentDetails();
 });
 </script>
 </body>
