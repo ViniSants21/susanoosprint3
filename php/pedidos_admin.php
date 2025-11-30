@@ -170,25 +170,7 @@ function getStatusClass($status) {
 </head>
 <body class="admin-dashboard">
 
-<!-- Navbar -->
-<nav class="navbar scrolled" id="navbar">
-    <div class="nav-container">
-        <div class="nav-search">
-            <input type="text" placeholder="Pesquisar...">
-        </div>
-        <div class="nav-logo">
-            <img src="../assets/img/LOGOSUSANOO.png" alt="Susanoo" style="height:40px;">
-        </div>
-        <div class="nav-right-group">
-            <ul class="nav-menu">
-                <li><a href="../index.php" class="nav-link">Início</a></li>
-                <li><a href="produtos.php" class="nav-link">Produtos</a></li>
-                <li><a href="sobre.php" class="nav-link">Sobre</a></li>
-                <li><a href="contato.php" class="nav-link">Contato</a></li>
-            </ul>
-        </div>
-    </div>
-</nav>
+
 
 <div class="admin-container">
     <!-- Sidebar -->
@@ -202,7 +184,7 @@ function getStatusClass($status) {
             <li><a href="produtos_admin.php"><i class="fas fa-box"></i> Produtos</a></li>
             <li><a href="usuarios_admin.php"><i class="fas fa-users"></i> Usuários</a></li>
             <li><a href="pedidos_admin.php" class="active"><i class="fas fa-shopping-cart"></i> Pedidos</a></li>
-            <li><a href="relatorios_admin.php" class="active"><i class="fas fa-comment"></i>Mensagens</a></li>
+            <li><a href="relatorios_admin.php"><i class="fas fa-comment"></i>Mensagens</a></li>
             
             <li><a href="../index.php"><i class="fas fa-sign-out-alt"></i> Voltar ao Site</a></li>
         </ul>
@@ -214,9 +196,7 @@ function getStatusClass($status) {
             <h1 class="admin-title">Gerenciar Pedidos</h1>
             <div class="admin-actions">
                 <!-- Botão de exemplo -->
-                <button class="btn btn-secondary" id="export-orders" onclick="alert('Funcionalidade em desenvolvimento')">
-                    <i class="fas fa-download"></i> Exportar
-                </button>
+                
             </div>
         </div>
 

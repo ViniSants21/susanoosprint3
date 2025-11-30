@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/conexao.php';
 
-// Handle deletion request via GET parameter delete_id (simple approach)
+// --- LÓGICA DE EXCLUSÃO ---
 if (isset($_GET['delete_id'])) {
     $delete_id = intval($_GET['delete_id']);
     if ($delete_id > 0) {
@@ -24,7 +24,7 @@ if (isset($_GET['delete_id'])) {
     }
 }
 
-// Fetch users
+// --- BUSCAR USUÁRIOS ---
 $users = [];
 $sql = "SELECT id, nome, email, foto, created_at FROM users ORDER BY created_at DESC";
 $res = $conn->query($sql);
@@ -52,7 +52,6 @@ if ($res) {
         })();
     </script>
     <style>
-        /* Copiado do estilo usado em produtos_admin.php para manter consistência visual */
         /* ===== ESTILOS DO PAINEL ADMIN ===== */
         .admin-dashboard {
             background-color: var(--bg-primary);
@@ -157,12 +156,6 @@ if ($res) {
             margin: 0;
         }
         
-        .admin-actions {
-            display: flex;
-            gap: 1rem;
-        }
-        
-        /* Usuários (ajustes específicos) */
         .products-header {
             display: flex;
             justify-content: space-between;
@@ -249,11 +242,6 @@ if ($res) {
             font-size: 0.9rem;
         }
         
-        .btn-edit {
-            background: rgba(59, 130, 246, 0.1);
-            color: #3b82f6;
-        }
-        
         .btn-delete {
             background: rgba(239, 68, 68, 0.1);
             color: var(--error);
@@ -264,12 +252,11 @@ if ($res) {
             color: var(--primary-purple);
         }
         
-        .btn-edit:hover { background: #3b82f6; color: white; }
         .btn-delete:hover { background: var(--error); color: white; }
         .btn-view:hover { background: var(--primary-purple); color: white; }
 
         .user-info { display:flex; align-items:center }
-        .user-avatar { width:50px; height:50px; border-radius:10px; object-fit:cover; margin-right:1rem }
+        .user-avatar { width:50px; height:50px; border-radius:10px; object-fit:cover; margin-right:1rem; background-color: #f0f0f0; }
         .user-details h4 { margin:0 0 0.2rem 0; color:var(--text-primary) }
         .user-details span { font-size:0.85rem; color:var(--text-muted) }
 
@@ -280,8 +267,6 @@ if ($res) {
     </style>
 </head>
 <body class="admin-dashboard">
-
-
 
 <div class="admin-container">
     <!-- Sidebar -->
@@ -295,8 +280,7 @@ if ($res) {
             <li><a href="produtos_admin.php"><i class="fas fa-box"></i> Produtos</a></li>
             <li><a href="usuarios_admin.php" class="active"><i class="fas fa-users"></i> Usuários</a></li>
             <li><a href="pedidos_admin.php"><i class="fas fa-shopping-cart"></i> Pedidos</a></li>
-            <li><a href="relatorios_admin.php" class="active"><i class="fas fa-comment"></i>Mensagens</a></li>
-            
+            <li><a href="relatorios_admin.php"><i class="fas fa-comment"></i> Mensagens</a></li>
             <li><a href="../index.php"><i class="fas fa-sign-out-alt"></i> Voltar ao Site</a></li>
         </ul>
     </aside>
@@ -305,9 +289,6 @@ if ($res) {
     <main class="admin-main">
         <div class="admin-header">
             <h1 class="admin-title">Gerenciar Usuários</h1>
-            <div class="admin-actions">
-                <!-- ações futuras -->
-            </div>
         </div>
 
         <div class="products-header">
@@ -318,12 +299,18 @@ if ($res) {
         </div>
 
         <div class="data-table">
-            <?php if (!empty(isset($_GET['msg']) && $_GET['msg'] === 'deleted')): ?>
-                <div style="padding:12px;color:green">Usuário excluído com sucesso.</div>
+            <?php if (!empty($_GET['msg']) && $_GET['msg'] === 'deleted'): ?>
+                <div style="padding:15px; color: #10b981; background: rgba(16, 185, 129, 0.1); border-radius: 8px; margin-bottom: 1rem;">
+                    <i class="fas fa-check-circle"></i> Usuário excluído com sucesso.
+                </div>
             <?php endif; ?>
+            
             <?php if (!empty($error_msg)): ?>
-                <div style="padding:12px;color:#b91c1c"><?php echo htmlspecialchars($error_msg); ?></div>
+                <div style="padding:15px; color: #ef4444; background: rgba(239, 68, 68, 0.1); border-radius: 8px; margin-bottom: 1rem;">
+                    <i class="fas fa-exclamation-circle"></i> <?php echo htmlspecialchars($error_msg); ?>
+                </div>
             <?php endif; ?>
+
             <table>
                 <thead>
                     <tr>
@@ -335,17 +322,54 @@ if ($res) {
                 </thead>
                 <tbody>
                     <?php if (count($users) === 0): ?>
-                        <tr><td colspan="4">Nenhum usuário encontrado.</td></tr>
+                        <tr><td colspan="4" style="text-align:center; padding: 2rem;">Nenhum usuário encontrado.</td></tr>
                     <?php else: ?>
                         <?php foreach ($users as $u): ?>
                             <?php
-                                $foto = $u['foto'] ? $u['foto'] : '';
-                                $imgSrc = $foto ? '../' . ltrim($foto, '/\\') : '../assets/img/no-avatar.png';
+                                // --- LÓGICA INTELIGENTE DE IMAGEM ---
+                                $fotoDB = $u['foto'];
+                                $nomeUrl = urlencode($u['nome']);
+                                
+                                // Avatar padrão (iniciais coloridas) caso a imagem falhe ou não exista
+                                $avatarPadrao = "https://ui-avatars.com/api/?name={$nomeUrl}&background=random&color=fff&size=128&bold=true";
+                                
+                                $imgSrc = $avatarPadrao;
+
+                                if (!empty($fotoDB)) {
+                                    // 1. Se já começa com '../', confia no caminho do banco (uploads novos)
+                                    if (strpos($fotoDB, '../') === 0) {
+                                        $imgSrc = $fotoDB;
+                                    }
+                                    // 2. Se começa com 'assets/', volta um nível para sair da pasta php
+                                    elseif (strpos($fotoDB, 'assets/') === 0) {
+                                        $imgSrc = '../' . $fotoDB;
+                                    }
+                                    // 3. Se começa com 'uploads/', tenta apontar para assets/uploads
+                                    elseif (strpos($fotoDB, 'uploads/') === 0) {
+                                        $imgSrc = '../assets/' . $fotoDB;
+                                    }
+                                    // 4. Caso genérico
+                                    else {
+                                        $imgSrc = '../assets/uploads/' . $fotoDB;
+                                    }
+                                }
+
+                                // Formatação da data para BR
+                                $dataCriacao = date('d/m/Y', strtotime($u['created_at']));
                             ?>
                             <tr>
                                 <td>
                                     <div class="user-info">
-                                        <img src="<?php echo htmlspecialchars($imgSrc); ?>" alt="avatar" class="user-avatar" onerror="this.src='../assets/img/no-avatar.png'">
+                                        <!-- 
+                                            O onerror é essencial: se o link gerado estiver errado 
+                                            ou o arquivo não tiver extensão (caso dos usuários antigos),
+                                            ele carrega automaticamente o avatar de letras.
+                                        -->
+                                        <img src="<?php echo htmlspecialchars($imgSrc); ?>" 
+                                             alt="avatar" 
+                                             class="user-avatar" 
+                                             onerror="this.onerror=null; this.src='<?php echo $avatarPadrao; ?>';">
+                                        
                                         <div class="user-details">
                                             <h4><?php echo htmlspecialchars($u['nome']); ?></h4>
                                             <span>ID: <?php echo intval($u['id']); ?></span>
@@ -353,11 +377,18 @@ if ($res) {
                                     </div>
                                 </td>
                                 <td><?php echo htmlspecialchars($u['email']); ?></td>
-                                <td><?php echo htmlspecialchars($u['created_at']); ?></td>
+                                <td><?php echo $dataCriacao; ?></td>
                                 <td>
                                     <div class="action-buttons">
-                                        <a href="mailto:<?php echo htmlspecialchars($u['email']); ?>" class="btn-icon btn-view" title="Enviar email"><i class="fas fa-envelope"></i></a>
-                                        <a href="?delete_id=<?php echo intval($u['id']); ?>" onclick="return confirm('Confirmar exclusão deste usuário?');" class="btn-icon btn-delete" title="Excluir"><i class="fas fa-trash"></i></a>
+                                        <a href="mailto:<?php echo htmlspecialchars($u['email']); ?>" class="btn-icon btn-view" title="Enviar Email">
+                                            <i class="fas fa-envelope"></i>
+                                        </a>
+                                        <a href="?delete_id=<?php echo intval($u['id']); ?>" 
+                                           onclick="return confirm('Tem certeza que deseja excluir o usuário <?php echo htmlspecialchars($u['nome']); ?>?');" 
+                                           class="btn-icon btn-delete" 
+                                           title="Excluir Usuário">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
                                     </div>
                                 </td>
                             </tr>
@@ -371,14 +402,25 @@ if ($res) {
 
 <script src="../js/script.js"></script>
 <script>
-    // Pesquisa client-side rápida
+    // Filtro de pesquisa em tempo real
     document.getElementById('search-users').addEventListener('input', function(){
-        const q = this.value.toLowerCase();
-        document.querySelectorAll('.data-table tbody tr').forEach(row => {
-            const name = row.querySelector('.user-details h4') ? row.querySelector('.user-details h4').textContent.toLowerCase() : '';
-            const email = row.cells[1] ? row.cells[1].textContent.toLowerCase() : '';
-            if (name.includes(q) || email.includes(q)) row.style.display = '';
-            else row.style.display = 'none';
+        const query = this.value.toLowerCase();
+        const rows = document.querySelectorAll('.data-table tbody tr');
+        
+        rows.forEach(row => {
+            const nameEl = row.querySelector('.user-details h4');
+            const emailEl = row.cells[1];
+            
+            if (nameEl && emailEl) {
+                const nameText = nameEl.textContent.toLowerCase();
+                const emailText = emailEl.textContent.toLowerCase();
+                
+                if (nameText.includes(query) || emailText.includes(query)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            }
         });
     });
 </script>
