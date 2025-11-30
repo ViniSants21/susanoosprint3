@@ -26,25 +26,93 @@
 		.nav-search input[type="text"]{padding:.45rem .75rem;border-radius:24px;border:1px solid rgba(0,0,0,.08);background:transparent;color:inherit;min-width:160px}
 		.nav-search .nav-search-btn{border:none;background:transparent;padding:.35rem;border-radius:50%;cursor:pointer;color:inherit;display:inline-flex;align-items:center;justify-content:center}
 		.nav-search .nav-search-btn .fa-search{font-size:0.95rem}
+
+        /* Estilo para o botão esgotado */
+        .btn-disabled {
+            background-color: #2a2a2a !important;
+            color: #777 !important;
+            cursor: not-allowed !important;
+            border: 1px solid #444 !important;
+            pointer-events: none;
+            width: 100%;
+            padding: 15px;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        /* Ajuste para garantir que as miniaturas apareçam */
+        .thumbs-col {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 500px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+        .thumb {
+            width: 60px;
+            height: 60px;
+            background-size: cover;
+            background-position: center;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: border-color 0.3s;
+            border-radius: 4px;
+        }
+        .thumb.active, .thumb:hover {
+            border-color: #8B5CF6; /* Cor roxa do tema */
+        }
 	</style>
 </head>
 <body class="detalhes-page">
 
 <?php
+// Captura os dados da URL
 $name = htmlspecialchars($_GET['name'] ?? 'Produto');
 $shortDesc = htmlspecialchars($_GET['desc'] ?? 'Descrição não disponível.');
 $price = htmlspecialchars($_GET['price'] ?? '');
-$img = htmlspecialchars($_GET['img'] ?? '');
 $category = htmlspecialchars($_GET['category'] ?? '');
-$imgs_raw = $_GET['imgs'] ?? '';
 $sizes_raw = $_GET['sizes'] ?? '';
 $longdesc_raw = $_GET['longdesc'] ?? '';
+$stock = isset($_GET['stock']) ? (int)$_GET['stock'] : (isset($_GET['estoque']) ? (int)$_GET['estoque'] : 0);
 
-$imgs = $imgs_raw ? array_map('htmlspecialchars', explode('|', $imgs_raw)) : [];
-if (empty($imgs) && $img) $imgs[] = $img;
+// --- LÓGICA DE IMAGENS CORRIGIDA ---
+// 1. Tenta pegar de 'imgs' (plural) ou 'img' (singular)
+$raw_img_string = $_GET['imgs'] ?? ($_GET['img'] ?? '');
 
+// 2. Transforma em array separando por '|'
+$imgs_temp = [];
+if (!empty($raw_img_string)) {
+    $imgs_temp = explode('|', $raw_img_string);
+}
+
+// 3. Processa os caminhos (adiciona ../ se faltar)
+$imgs = [];
+foreach ($imgs_temp as $path) {
+    $path = trim($path);
+    if (empty($path)) continue;
+
+    // Se for URL completa (http) ou já tiver ../, mantém
+    if (strpos($path, 'http') === 0 || strpos($path, '../') === 0) {
+        $imgs[] = htmlspecialchars($path);
+    } else {
+        // Se começar com assets/, adiciona ../
+        // Remove ./ ou / do início para padronizar
+        $clean_path = ltrim($path, './');
+        if (strpos($clean_path, '/') === 0) $clean_path = substr($clean_path, 1);
+        
+        $imgs[] = '../' . htmlspecialchars($clean_path);
+    }
+}
+
+// 4. Se não tiver nenhuma imagem válida, coloca o placeholder
+if (empty($imgs)) {
+    $imgs[] = '../assets/img/placeholder.png';
+}
+
+// Tamanhos
 $sizes = $sizes_raw ? array_map('htmlspecialchars', explode('|', $sizes_raw)) : [];
-// If no sizes provided from the product, provide sensible defaults by category
 if (empty($sizes)) {
 	$catLower = strtolower($category);
 	if (strpos($catLower, 'camis') !== false || strpos($catLower, 'camisa') !== false) {
@@ -142,15 +210,22 @@ if (!function_exists('is_active')) {
 <!-- Conteúdo Principal -->
 <main class="product-page container">
 	<div class="product-layout centered">
+		<!-- Coluna das Miniaturas -->
 		<aside class="thumbs-col" aria-label="Miniaturas do produto">
-			<?php if (!empty($imgs)): foreach ($imgs as $i => $u): ?>
-				<button type="button" class="thumb <?php echo $i===0 ? 'active' : ''; ?>" data-src="<?php echo $u; ?>" style="background-image:url('<?php echo $u; ?>')"></button>
-			<?php endforeach; endif; ?>
+			<?php if (!empty($imgs)): ?>
+                <?php foreach ($imgs as $i => $u): ?>
+				    <button type="button" class="thumb <?php echo $i===0 ? 'active' : ''; ?>" 
+                            data-src="<?php echo $u; ?>" 
+                            style="background-image:url('<?php echo $u; ?>')">
+                    </button>
+			    <?php endforeach; ?>
+            <?php endif; ?>
 		</aside>
 
+		<!-- Imagem Principal -->
 		<section class="image-col" aria-label="Imagem principal do produto">
 			<div class="image-figure">
-				<img id="mainImage" class="main-image" src="<?php echo $imgs[0] ?? '../assets/img/Camisapreta_essentials (1).png'; ?>" alt="<?php echo $name; ?>" />
+				<img id="mainImage" class="main-image" src="<?php echo $imgs[0]; ?>" alt="<?php echo $name; ?>" />
 			</div>
 		</section>
 
@@ -174,7 +249,13 @@ if (!function_exists('is_active')) {
 					</div>
 
 				<div class="actions">
-					<button type="submit" class="btn-cta">Adicionar ao carrinho</button>
+                    <!-- VERIFICAÇÃO DE ESTOQUE -->
+                    <?php if ($stock > 0): ?>
+					    <button type="submit" class="btn-cta">Adicionar ao carrinho</button>
+                    <?php else: ?>
+                        <button type="button" class="btn-cta btn-disabled" disabled>Esgotado</button>
+                    <?php endif; ?>
+
 					<button type="button" id="favBtn" class="btn-fav" aria-pressed="false" title="Favoritar">♡</button>
 				</div>	
 				<button type="button" class="btn-size-chart" id="openSizeChart">Ver Tabela de Tamanhos</button>
@@ -277,89 +358,9 @@ if (!function_exists('is_active')) {
 	</div>
 </footer>
 
-</body>
-<!-- JS -->
 <script src="../js/cart.js"></script>
 <script src="../js/script.js"></script>
 <script src="../js/theme.js"></script>
-</script>
-<style>
-/* Animação e cor para o coração de favorito */
-.btn-fav {
-  transition: color 0.2s;
-  font-size: 1.6em;
-  color: #888;
-  outline: none;
-  background: none;
-  border: none;
-  cursor: pointer;
-  vertical-align: middle;
-  will-change: transform;
-}
-.btn-fav.favorited {
-  color: #e63946;
-  animation: fav-pop 0.35s cubic-bezier(.4,2,.6,1) both;
-}
-@keyframes fav-pop {
-  0% { transform: scale(1); }
-  40% { transform: scale(1.4); }
-  60% { transform: scale(0.9); }
-  100% { transform: scale(1); }
-}
-
-/* Estilos para o modal da tabela de tamanhos */
-.size-chart-modal {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.8);
-  z-index: 1000;
-  justify-content: center;
-  align-items: center;
-}
-
-.size-chart-content {
-  background: #1e1e2e;
-  padding: 2rem;
-  border-radius: 8px;
-  position: relative;
-  max-width: 90%;
-  margin: 0 auto;
-  color: #e0e0e0;
-}
-
-.size-chart-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 1rem;
-}
-
-.size-chart-table th,
-.size-chart-table td {
-  padding: 0.75rem;
-  text-align: center;
-  border: 1px solid #444;
-}
-
-.size-chart-table th {
-  background: #333;
-  color: #f0f0f0;
-}
-
-.close-size-chart {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  background: none;
-  border: none;
-  color: #e63946;
-  font-size: 1.5rem;
-  cursor: pointer;
-}
-</style>
 <script>
 // Corrige adicionar ao carrinho, favoritar e troca de imagem
 document.addEventListener('DOMContentLoaded', function() {
@@ -375,11 +376,9 @@ document.addEventListener('DOMContentLoaded', function() {
 			const sizeInput = addToCartForm.querySelector('input[name="size"]:checked');
 			const size = sizeInput ? sizeInput.value : '';
 			const image = document.getElementById('mainImage')?.src || '';
-			// Cria um id único para o produto + tamanho
 			const id = (name + '-' + size).replace(/\s+/g, '-').toLowerCase();
 			if (typeof addToCart === 'function') {
 				addToCart({ id, name, price, image, size, category });
-				// Feedback visual
 				const btn = addToCartForm.querySelector('.btn-cta');
 				if (btn) {
 					const original = btn.textContent;
@@ -438,7 +437,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	if (openSizeChartBtn && sizeChartModal) {
 		openSizeChartBtn.addEventListener('click', function() {
-			// Show the table relevant to the product category
 			const cat = (sizeChartModal.dataset.category || '').toLowerCase();
 			const shirt = document.getElementById('shirtSizeChart');
 			const pants = document.getElementById('pantsSizeChart');
@@ -450,7 +448,6 @@ document.addEventListener('DOMContentLoaded', function() {
 				} else if (cat.includes('cal')) {
 					pants.style.display = '';
 				} else {
-					// se categoria indefinida, mostra ambas
 					shirt.style.display = '';
 					pants.style.display = '';
 				}
@@ -461,7 +458,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	if (closeSizeChartBtn && sizeChartModal) {
 		closeSizeChartBtn.addEventListener('click', function() {
-			// hide modal and its specific tables
 			const shirt = document.getElementById('shirtSizeChart');
 			const pants = document.getElementById('pantsSizeChart');
 			if (shirt) shirt.style.display = 'none';
@@ -470,7 +466,6 @@ document.addEventListener('DOMContentLoaded', function() {
 		});
 	}
 
-	// Fechar modal ao clicar fora do conteúdo
 	window.addEventListener('click', function(event) {
 		if (event.target === sizeChartModal) {
 			const shirt = document.getElementById('shirtSizeChart');
@@ -482,6 +477,5 @@ document.addEventListener('DOMContentLoaded', function() {
 	});
 });
 </script>
-</html>
 </body>
 </html>

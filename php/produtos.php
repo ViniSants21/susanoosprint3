@@ -8,18 +8,24 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
     <script>(function(){const theme=localStorage.getItem('theme');if(theme==='light'){document.documentElement.classList.add('light-mode');}})();</script>
-    <!-- Estilos locais para o ícone de pesquisa -->
     <style>
         .nav-search{display:flex;align-items:center;gap:.5rem;}
         .nav-search input[type="text"]{padding:.45rem .75rem;border-radius:24px;border:1px solid rgba(0,0,0,.08);background:transparent;color:inherit;min-width:160px}
         .nav-search .nav-search-btn{border:none;background:transparent;padding:.35rem;border-radius:50%;cursor:pointer;color:inherit;display:inline-flex;align-items:center;justify-content:center}
         .nav-search .nav-search-btn .fa-search{font-size:0.95rem}
+        
+        .btn-disabled {
+            background-color: #2a2a2a !important;
+            color: #777 !important;
+            cursor: not-allowed !important;
+            border: 1px solid #444 !important;
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
 
 <?php
-// Bloco PHP movido para dentro do Body para evitar erros de renderização
 $current = basename($_SERVER['PHP_SELF']);
 if (!function_exists('is_active')) {
     function is_active($href, $current) {
@@ -27,7 +33,6 @@ if (!function_exists('is_active')) {
         return $base === $current ? 'active' : '';
     }
 }
-// Conexão e busca de produtos
 require_once 'conexao.php';
 function find_products_table($conn) {
     $candidates = ['products', 'produtos'];
@@ -37,39 +42,30 @@ function find_products_table($conn) {
     }
     return 'products';
 }
-// ... código anterior de conexão ...
 $table = find_products_table($conn);
 
-// LÓGICA DE PESQUISA DO BANCO DE DADOS
 if (isset($_GET['busca']) && !empty($_GET['busca'])) {
     $busca = $conn->real_escape_string($_GET['busca']);
-    // Busca no nome, descrição ou categoria
     $sql = "SELECT * FROM `$table` 
             WHERE name LIKE '%$busca%' 
             OR descricao LIKE '%$busca%' 
             OR category LIKE '%$busca%' 
             ORDER BY id DESC";
 } else {
-    // Se não tiver busca, traz tudo
     $sql = "SELECT * FROM `$table` ORDER BY id DESC";
 }
-
 $products_res = $conn->query($sql);
-
 ?>
 
  <nav class="navbar scrolled" id="navbar">
     <div class="nav-container">
-        <!-- Substitua/inserir aqui o campo de pesquisa -->
-        <!-- Dentro do produtos.php, substitua a div nav-search por: -->
-<form action="produtos.php" method="GET" class="nav-search">
-    <!-- Repare que mantemos o valor preenchido se já houver busca -->
-    <input type="text" name="busca" placeholder="Pesquisar..." aria-label="Pesquisar" 
-           value="<?php echo isset($_GET['busca']) ? htmlspecialchars($_GET['busca']) : ''; ?>">
-    <button type="submit" class="nav-search-btn" aria-label="Pesquisar">
-        <i class="fas fa-search"></i>
-    </button>
-</form>
+        <form action="produtos.php" method="GET" class="nav-search">
+            <input type="text" name="busca" placeholder="Pesquisar..." aria-label="Pesquisar" 
+                   value="<?php echo isset($_GET['busca']) ? htmlspecialchars($_GET['busca']) : ''; ?>">
+            <button type="submit" class="nav-search-btn" aria-label="Pesquisar">
+                <i class="fas fa-search"></i>
+            </button>
+        </form>
         <div class="nav-logo"><a href="../index.php"><img src="../assets/img/LOGOSUSANOO.png" alt="LOGOSUSANOO"></a></div>
         <div class="nav-right-group">
             <ul class="nav-menu" id="nav-menu">
@@ -83,12 +79,9 @@ $products_res = $conn->query($sql);
                     <div class="profile-dropdown-wrapper">
                         <?php if (!isset($_SESSION)) { session_start(); } ?>
                         <?php if (!isset($_SESSION['user_id'])): ?>
-                    <!-- USUÁRIO DESLOGADO -->
                         <a href="login.php" class="nav-icon-link" aria-label="Login">
                         <i class="fas fa-user"></i>
                         </a>
-
-
                        <div class="profile-dropdown-menu">
                             <ul class="dropdown-links">
                                 <li class="dropdown-link-item">
@@ -99,17 +92,12 @@ $products_res = $conn->query($sql);
                                 </li>
                             </ul>
                         </div>
-
-
                     <?php else: ?>
-                    <!-- USUÁRIO LOGADO -->
                     <a href="#" class="nav-icon-link" aria-label="Perfil">
                     <img src="<?php echo $_SESSION['foto']; ?>"
                     class="dropdown-avatar"
                     style="width:28px; height:28px; border-radius:50%; object-fit:cover;">
                     </a>
-
-
 <div class="profile-dropdown-menu">
 <div class="dropdown-header">
 <img src="<?php echo $_SESSION['foto']; ?>" alt="Avatar" class="dropdown-avatar">
@@ -118,8 +106,6 @@ $products_res = $conn->query($sql);
 <div class="dropdown-user-email"><?php echo $_SESSION['email']; ?></div>
 </div>
 </div>
-
-
 <ul class="dropdown-links">
 <li class="dropdown-link-item"><a href="../php/perfil.php"><i class="fas fa-id-card"></i> Visualizar Perfil</a></li>
 <li class="dropdown-link-item"><a href="../php/configuracoes.php"><i class="fas fa-cog"></i> Configurações</a></li>
@@ -134,21 +120,15 @@ $products_res = $conn->query($sql);
         <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
     </div>
 </nav>
-   <!-- Banner -->
-<!-- Banner -->
+
 <section class="promo-banner-section">
     <img src="../assets/img/Produtos1.png" alt="Banner promocional da nova coleção" class="promo-banner-image" style="pointer-events: none; cursor: default;">
 </section>
 
-    </a>
-
-</section>
-    <!-- Page Header -->
     <section class="page-header">
         <div class="container"><h1 class="page-title">Nossos Produtos</h1><p class="page-subtitle">Descubra algum dos nossos produtos destaque</p></div>
     </section>
 
-    <!-- Filters -->
     <section class="filters-section">
         <div class="container">
             <div class="filters">
@@ -161,23 +141,13 @@ $products_res = $conn->query($sql);
         </div>
     </section>
 
-    <!-- Products Grid -->
     <section class="products-section">
         <section class="featured-products">
         <div class="sakura-container">
-        <div class="petal"></div>
-        <div class="petal"></div>
-        <div class="petal"></div>
-        <div class="petal"></div>
-        <div class="petal"></div>
-        <div class="petal"></div>
-        <div class="petal"></div>
-        <div class="petal"></div>
-        <div class="petal"></div>
-        <div class="petal"></div>
-        <div class="petal"></div>
-        <div class="petal"></div>
-    </div>
+            <div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div>
+            <div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div>
+            <div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div>
+        </div>
         <div class="container">
             <div class="products-grid">
                 <?php if ($products_res && $products_res->num_rows > 0): ?>
@@ -186,19 +156,34 @@ $products_res = $conn->query($sql);
                             $p_name = htmlspecialchars($p['name']);
                             $p_cat = htmlspecialchars($p['category']);
                             $p_price = number_format($p['price'], 2, ',', '.');
-                            // Use imagem salva no banco quando disponível
+                            
+                            // ESTOQUE
+                            $qtd_estoque = 0;
+                            if (isset($p['estoque'])) {
+                                $qtd_estoque = $p['estoque'];
+                            } elseif (isset($p['stock'])) {
+                                $qtd_estoque = $p['stock'];
+                            }
+
+                            // IMAGEM
                             $img = '../assets/img/placeholder.png';
-                            if (!empty($p['image'])) {
-                                // Normaliza o caminho salvo no DB — evita duplicar '../'
-                                $raw = $p['image'];
-                                if (strpos($raw, '://') !== false) {
-                                    $img = $raw; // URL absoluta
-                                } elseif (substr($raw, 0, 2) === '..') {
-                                    $img = $raw; // já relativo
-                                } elseif (substr($raw, 0, 1) === '/') {
-                                    $img = '..' . $raw; // /assets/... -> ../assets/...
+                            
+                            // Pega o valor do banco
+                            $raw_db_images = $p['image'] ?? '';
+                            $images_array = explode('|', $raw_db_images);
+                            
+                            // Pega a primeira imagem para ser a capa
+                            $first_image = !empty($images_array) ? $images_array[0] : '';
+
+                            if (!empty($first_image)) {
+                                if (strpos($first_image, '://') !== false) {
+                                    $img = $first_image; 
+                                } elseif (substr($first_image, 0, 3) === '../') {
+                                    $img = $first_image; 
+                                } elseif (substr($first_image, 0, 1) === '/') {
+                                    $img = '..' . $first_image; 
                                 } else {
-                                    $img = '../' . ltrim($raw, './');
+                                    $img = '../' . ltrim($first_image, './');
                                 }
                             } else {
                                 $cat = strtolower($p['category']);
@@ -208,12 +193,35 @@ $products_res = $conn->query($sql);
                                 elseif (strpos($cat, 'acessor') !== false) $img = '../assets/img/bonebarra.png';
                             }
                         ?>
+                            <!-- AQUI FOI CORRIGIDO: Removi o comentário HTML de dentro da tag DIV -->
                             <div class="product-card" data-category="<?php echo $p_cat; ?>"
-                                data-name="<?php echo $p_name; ?>" data-price="<?php echo $p['price']; ?>" data-img="<?php echo $img; ?>"
-                                data-imgs="<?php echo $img; ?>" data-sizes="<?php echo isset($p['sizes']) && trim($p['sizes']) !== '' ? htmlspecialchars($p['sizes']) : ''; ?>"
+                                data-name="<?php echo $p_name; ?>" 
+                                data-price="<?php echo $p['price']; ?>" 
+                                data-img="<?php echo $img; ?>"
+                                data-stock="<?php echo $qtd_estoque; ?>" 
+                                data-imgs="<?php echo htmlspecialchars($raw_db_images); ?>" 
+                                data-sizes="<?php echo isset($p['sizes']) && trim($p['sizes']) !== '' ? htmlspecialchars($p['sizes']) : ''; ?>"
                                 data-longdesc="<?php echo isset($p['description']) ? htmlspecialchars($p['description']) : (isset($p['descricao']) ? htmlspecialchars($p['descricao']) : ''); ?>">
-                            <div class="card-image"><img src="<?php echo $img; ?>" alt="<?php echo $p_name; ?>"><div class="card-overlay"><button class="btn-quick-view">Ver Detalhes</button></div></div>
-                            <div class="card-content"><h3><?php echo $p_name; ?></h3><p class="product-desc"><?php echo isset($p['short_desc']) ? htmlspecialchars($p['short_desc']) : (isset($p['description']) ? htmlspecialchars(mb_strimwidth($p['description'],0,140,'...')) : (isset($p['descricao']) ? htmlspecialchars(mb_strimwidth($p['descricao'],0,140,'...')) : '')); ?></p><p class="price">R$ <?php echo $p_price; ?></p><button class="btn btn-add-cart">Adicionar ao Carrinho</button></div>
+                            
+                            <div class="card-image">
+                                <img src="<?php echo $img; ?>" alt="<?php echo $p_name; ?>">
+                                <div class="card-overlay">
+                                    <button class="btn-quick-view">Ver Detalhes</button>
+                                </div>
+                            </div>
+                            
+                            <div class="card-content">
+                                <h3><?php echo $p_name; ?></h3>
+                                <p class="product-desc"><?php echo isset($p['short_desc']) ? htmlspecialchars($p['short_desc']) : (isset($p['description']) ? htmlspecialchars(mb_strimwidth($p['description'],0,140,'...')) : (isset($p['descricao']) ? htmlspecialchars(mb_strimwidth($p['descricao'],0,140,'...')) : '')); ?></p>
+                                <p class="price">R$ <?php echo $p_price; ?></p>
+                                
+                                <?php if ($qtd_estoque > 0): ?>
+                                    <button class="btn btn-add-cart">Adicionar ao Carrinho</button>
+                                <?php else: ?>
+                                    <button class="btn btn-disabled" disabled>Esgotado</button>
+                                <?php endif; ?>
+                                
+                            </div>
                         </div>
                     <?php endwhile; ?>
                 <?php else: ?>
@@ -223,7 +231,6 @@ $products_res = $conn->query($sql);
         </div>
     </section>
 
-    <!-- Footer -->
     <footer class="footer">
         <div class="container">
             <div class="footer-content">
@@ -269,7 +276,6 @@ $products_res = $conn->query($sql);
         </div>
     </footer>
 <style>
-    /* --- Banner Promocional --- */
         .promo-banner-section {
             width: 100vw;
             position: relative;
@@ -279,7 +285,7 @@ $products_res = $conn->query($sql);
             margin-right: -50vw;
             margin-top: -11px;
             height: 550px; 
-            margin-bottom: -180px; /* Sobrepõe o conteúdo principal levemente */
+            margin-bottom: -180px;
             overflow: hidden;
         }
         
@@ -292,11 +298,10 @@ $products_res = $conn->query($sql);
         }
     
 </style>
-    <!-- Back to Top Button -->
     <button id="backToTop" class="back-to-top"><span>↑</span></button>
 
     <script src="../js/cart.js"></script>
     <script src="../js/script.js"></script>
-    <script src="../js/theme.js"></script> <!-- ou ../js/theme.js para páginas internas -->
+    <script src="../js/theme.js"></script>
 </body>
 </html>

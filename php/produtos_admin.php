@@ -31,32 +31,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stock = isset($_POST['product-stock']) ? intval($_POST['product-stock']) : 0;
         $descricao = $_POST['product-description'] ?? '';
 
-        // -- Upload de Imagem --
-        $imagePathInDB = null;
+        // -- Upload de Múltiplas Imagens --
+        $imagePathsString = null;
+        $uploadedPaths = [];
 
-        if (isset($_FILES['product-image']) && $_FILES['product-image']['error'] === UPLOAD_ERR_OK) {
+        // Verifica se arquivos foram enviados no campo 'product-images'
+        if (isset($_FILES['product-images']) && is_array($_FILES['product-images']['name'])) {
             $uploadDir = __DIR__ . '/../assets/img/products/';
             if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
 
-            $ext = strtolower(pathinfo($_FILES['product-image']['name'], PATHINFO_EXTENSION));
-            $allowed = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+            $count = count($_FILES['product-images']['name']);
+            
+            // Loop por cada arquivo enviado
+            for ($i = 0; $i < $count; $i++) {
+                if ($_FILES['product-images']['error'][$i] === UPLOAD_ERR_OK) {
+                    $ext = strtolower(pathinfo($_FILES['product-images']['name'][$i], PATHINFO_EXTENSION));
+                    $allowed = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
 
-            if (in_array($ext, $allowed)) {
-                $newFileName = uniqid('prod_') . '.' . $ext;
-                $destination = $uploadDir . $newFileName;
-                if (move_uploaded_file($_FILES['product-image']['tmp_name'], $destination)) {
-                    $imagePathInDB = 'assets/img/products/' . $newFileName;
+                    if (in_array($ext, $allowed)) {
+                        // Gera nome único para cada imagem
+                        $newFileName = uniqid('prod_') . '_' . $i . '.' . $ext;
+                        $destination = $uploadDir . $newFileName;
+                        
+                        if (move_uploaded_file($_FILES['product-images']['tmp_name'][$i], $destination)) {
+                            // Adiciona ao array de caminhos
+                            $uploadedPaths[] = 'assets/img/products/' . $newFileName;
+                        }
+                    }
                 }
             }
         }
 
+        // Se houver novas imagens, cria a string separada por '|'
+        if (!empty($uploadedPaths)) {
+            $imagePathsString = implode('|', $uploadedPaths);
+        }
+
         if ($id) {
             // UPDATE
-            if ($imagePathInDB) {
+            if ($imagePathsString) {
+                // Se subiu novas imagens, substitui as antigas
                 $sql = "UPDATE `$table` SET name=?, category=?, collection=?, status=?, price=?, stock=?, descricao=?, image=?, updated_at=NOW() WHERE id=?";
                 $stmt = $conn->prepare($sql);
-                $stmt->bind_param("ssssdissi", $name, $category, $collection, $status, $price, $stock, $descricao, $imagePathInDB, $id);
+                $stmt->bind_param("ssssdissi", $name, $category, $collection, $status, $price, $stock, $descricao, $imagePathsString, $id);
             } else {
+                // Se não subiu imagens novas, mantém as atuais
                 $sql = "UPDATE `$table` SET name=?, category=?, collection=?, status=?, price=?, stock=?, descricao=?, updated_at=NOW() WHERE id=?";
                 $stmt = $conn->prepare($sql);
                 $stmt->bind_param("ssssdisi", $name, $category, $collection, $status, $price, $stock, $descricao, $id);
@@ -65,9 +84,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->close();
         } else {
             // INSERT
+            $finalImageString = $imagePathsString ?? ''; // Garante string vazia se nulo no insert
             $sql = "INSERT INTO `$table` (name, category, collection, status, price, stock, descricao, image, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())";
             $stmt = $conn->prepare($sql);
-            $stmt->bind_param("ssssdiss", $name, $category, $collection, $status, $price, $stock, $descricao, $imagePathInDB);
+            $stmt->bind_param("ssssdiss", $name, $category, $collection, $status, $price, $stock, $descricao, $finalImageString);
             $stmt->execute();
             $stmt->close();
         }
@@ -112,11 +132,10 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
         })();
     </script>
     <style>
-        /* ===== ESTILOS DO PAINEL ADMIN (Igual ao admin.php) ===== */
+        /* ===== ESTILOS DO PAINEL ADMIN ===== */
         .admin-dashboard { background-color: var(--bg-primary); min-height: 100vh; padding-top: 80px; }
         .admin-container { display: flex; max-width: 1400px; margin: 0 auto; padding: 0 20px; }
         
-        /* Sidebar atualizada */
         .admin-sidebar { width: 280px; background: var(--bg-card); border-radius: 20px; padding: 2rem 1.5rem; margin-right: 2rem; height: fit-content; position: sticky; top: 100px; box-shadow: var(--shadow-soft); border: 1px solid rgba(139, 92, 246, 0.1); }
         .admin-logo { text-align: center; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); }
         .admin-logo h2 { font-family: var(--font-display); color: var(--primary-purple); margin: 0; font-size: 1.8rem; }
@@ -134,28 +153,17 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
         
         .products-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; gap: 1rem; }
         
-        /* CSS DA PESQUISA */
         .search-box { position: relative; width: 300px; }
         .search-box input { width: 100%; padding: 0.8rem 1rem 0.8rem 2.5rem; border: 1px solid var(--border-color); border-radius: 10px; background: var(--bg-card); color: var(--text-primary); }
         .search-box i { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
         
-        /* CSS FILTRO DE CATEGORIA */
         .filter-options select {
             padding: 0.8rem 1.5rem 0.8rem 1rem;
             border: 1px solid var(--border-color);
             border-radius: 10px;
             background: var(--bg-card);
             color: var(--text-primary);
-            font-size: 0.95rem;
-            cursor: pointer;
-            outline: none;
-            transition: border-color 0.3s ease;
             min-width: 180px;
-            appearance: none;
-            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23888888%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
-            background-repeat: no-repeat;
-            background-position: right 0.7rem top 50%;
-            background-size: 0.65rem auto;
         }
 
         .data-table { width: 100%; background: var(--bg-card); border-radius: 15px; overflow: hidden; box-shadow: var(--shadow-soft); border: 1px solid rgba(139, 92, 246, 0.1); }
@@ -168,19 +176,7 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
         .status-active { background: rgba(16, 185, 129, 0.2); color: var(--success); }
         .status-inactive { background: rgba(239, 68, 68, 0.2); color: var(--error); }
         
-        /* ALERTA DE ESTOQUE */
-        .stock-alert {
-            background: rgba(239, 68, 68, 0.15);
-            color: #ef4444;
-            padding: 5px 10px;
-            border-radius: 6px;
-            font-weight: bold;
-            font-size: 0.85rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            border: 1px solid rgba(239, 68, 68, 0.2);
-        }
+        .stock-alert { background: rgba(239, 68, 68, 0.15); color: #ef4444; padding: 5px 10px; border-radius: 6px; font-weight: bold; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 5px; border: 1px solid rgba(239, 68, 68, 0.2); }
 
         .action-buttons { display: flex; gap: 0.5rem; }
         .btn-icon { width: 35px; height: 35px; border: none; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; }
@@ -190,9 +186,7 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
         .user-info { display: flex; align-items: center; }
         .user-avatar { width: 50px; height: 50px; border-radius: 10px; object-fit: cover; margin-right: 1rem; }
         .user-details h4 { margin: 0 0 0.2rem 0; color: var(--text-primary); }
-        .user-details span { font-size: 0.85rem; color: var(--text-muted); }
 
-        /* Modal */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 1000; align-items: center; justify-content: center; }
         .modal.active { display: flex; }
         .modal-content { background: var(--bg-card); border-radius: 20px; padding: 2rem; width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow-strong); }
@@ -207,13 +201,12 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
         .image-upload { border: 2px dashed var(--border-color); border-radius: 10px; padding: 2rem; text-align: center; cursor: pointer; transition: all 0.3s ease; }
 
         @media (max-width: 1024px) { .admin-container { flex-direction: column; } .admin-sidebar { width: 100%; position: static; margin-bottom: 2rem; } }
-        @media (max-width: 768px) { .admin-header, .products-header { flex-direction: column; align-items: flex-start; gap: 1rem; } .search-box, .filter-options, .filter-options select { width: 100%; } .data-table { overflow-x: auto; } .form-row { grid-template-columns: 1fr; } }
+        @media (max-width: 768px) { .admin-header, .products-header { flex-direction: column; align-items: flex-start; gap: 1rem; } .form-row { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body class="admin-dashboard">
 
 <div class="admin-container">
-    <!-- Sidebar SINCRONIZADA com admin.php -->
     <aside class="admin-sidebar">
         <div class="admin-logo">
             <h2>Susanoo Admin</h2>
@@ -225,7 +218,6 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
             <li><a href="usuarios_admin.php"><i class="fas fa-users"></i> Usuários</a></li>
             <li><a href="pedidos_admin.php"><i class="fas fa-shopping-cart"></i> Pedidos</a></li>
             <li><a href="relatorios_admin.php"><i class="fas fa-comment"></i>Mensagens</a></li>
-            
             <li><a href="../index.php"><i class="fas fa-sign-out-alt"></i> Voltar ao Site</a></li>
         </ul>
     </aside>
@@ -276,12 +268,19 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
                         <?php 
                             $statusClass = (strtolower($row['status']) === 'ativo') ? 'status-active' : 'status-inactive';
                             $price = number_format($row['price'], 2, ',', '.');
-                            $imgSrc = !empty($row['image']) ? '../' . $row['image'] : 'https://via.placeholder.com/50';
+                            
+                            // LÓGICA DE MÚLTIPLAS IMAGENS
+                            // Explode a string salva (img1|img2|img3) e pega a primeira
+                            $imagesArray = !empty($row['image']) ? explode('|', $row['image']) : [];
+                            $mainImage = !empty($imagesArray) ? $imagesArray[0] : '';
+                            $imgSrc = !empty($mainImage) ? '../' . $mainImage : 'https://via.placeholder.com/50';
+                            
+                            // Salva a string completa no data attribute para usar no modal de edição
+                            $dataImageString = isset($row['image']) ? htmlspecialchars($row['image']) : '';
+
                             $dataDescription = isset($row['descricao']) ? htmlspecialchars($row['descricao']) : '';
-                            $dataImage = isset($row['image']) ? htmlspecialchars($row['image']) : '';
                             $dataCollection = isset($row['collection']) ? htmlspecialchars($row['collection']) : '';
                             
-                            // LÓGICA DO ESTOQUE
                             $stock = intval($row['stock']);
                             if ($stock > 0) {
                                 $stockDisplay = $stock;
@@ -291,7 +290,7 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
                         ?>
                         <tr class="product-row"
                             data-id="<?php echo $row['id']; ?>" 
-                            data-image="<?php echo $dataImage; ?>" 
+                            data-image="<?php echo $dataImageString; ?>" 
                             data-description="<?php echo $dataDescription; ?>"
                             data-collection="<?php echo $dataCollection; ?>">
                             <td>
@@ -299,6 +298,10 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
                                     <img src="<?php echo $imgSrc; ?>" alt="Foto" class="user-avatar">
                                     <div class="user-details">
                                         <h4><?php echo htmlspecialchars($row['name']); ?></h4>
+                                        <!-- Mostra quantas fotos tem se for mais de 1 -->
+                                        <?php if(count($imagesArray) > 1): ?>
+                                            <span style="font-size:0.75rem; color:#888;">+<?php echo count($imagesArray)-1; ?> fotos</span>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
                             </td>
@@ -306,7 +309,6 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
                             <td><?php echo !empty($row['collection']) ? ucfirst($row['collection']) : '-'; ?></td>
                             <td><span class="status-badge <?php echo $statusClass; ?>"><?php echo htmlspecialchars($row['status']); ?></span></td>
                             <td>R$ <?php echo $price; ?></td>
-                            <!-- Exibição do estoque modificado -->
                             <td><?php echo $stockDisplay; ?></td>
                             <td>
                                 <div class="action-buttons">
@@ -338,11 +340,12 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
             <input type="hidden" name="product_id" id="product-id" value="">
             
             <div class="form-group">
-                <label for="product-image">Imagem do Produto</label>
+                <label for="product-images">Imagens do Produto (Selecione várias)</label>
                 <div class="image-upload" id="image-upload-area">
                     <i class="fas fa-cloud-upload-alt" id="upload-icon"></i>
-                    <p id="upload-text">Clique para escolher uma imagem</p>
-                    <input type="file" id="product-image" name="product-image" accept="image/*" style="display: none;">
+                    <p id="upload-text">Clique para escolher imagens (Ctrl + Clique para várias)</p>
+                    <!-- MUDANÇA IMPORTANTE: name="product-images[]" e attribute multiple -->
+                    <input type="file" id="product-images" name="product-images[]" accept="image/*" multiple style="display: none;">
                 </div>
             </div>
             
@@ -351,7 +354,6 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
                     <label for="product-name">Nome do Produto</label>
                     <input type="text" id="product-name" name="product-name" required>
                 </div>
-                <!-- Categoria -->
                 <div class="form-group">
                     <label for="product-category">Categoria (Tipo)</label>
                     <select id="product-category" name="product-category" required>
@@ -375,7 +377,6 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
                         <option value="verao">Coleção Verão</option>
                     </select>
                 </div>
-
                 <div class="form-group">
                     <label for="product-status">Status</label>
                     <select id="product-status" name="product-status" required>
@@ -411,7 +412,7 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
 
 <script src="../js/script.js"></script>
 <script>
-    // --- LÓGICA DE FILTRO E PESQUISA ---
+    // --- FILTRO ---
     const searchInput = document.getElementById('search-products');
     const categoryFilter = document.getElementById('category-filter');
     const tableRows = document.querySelectorAll('.data-table tbody tr.product-row');
@@ -438,12 +439,12 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
     searchInput.addEventListener('input', filterTable);
     categoryFilter.addEventListener('change', filterTable);
 
-    // --- MODAL E UPLOAD (Código Existente) ---
+    // --- MODAL ---
     const modal = document.getElementById('product-modal');
     const addProductBtn = document.getElementById('add-product');
     const closeModalBtns = document.querySelectorAll('.close-modal');
     const uploadArea = document.getElementById('image-upload-area');
-    const fileInput = document.getElementById('product-image');
+    const fileInput = document.getElementById('product-images'); // ID atualizado
     const uploadText = document.getElementById('upload-text');
     const uploadIcon = document.getElementById('upload-icon');
 
@@ -459,16 +460,23 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
     modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('active'); });
 
     uploadArea.addEventListener('click', () => fileInput.click());
+    
+    // ATUALIZAÇÃO: Contar quantos arquivos foram selecionados
     fileInput.addEventListener('change', (e) => {
         if (e.target.files.length > 0) {
-            uploadText.textContent = e.target.files[0].name;
+            const count = e.target.files.length;
+            if(count === 1) {
+                uploadText.textContent = e.target.files[0].name;
+            } else {
+                uploadText.textContent = count + " imagens selecionadas";
+            }
             uploadIcon.className = "fas fa-check-circle";
             uploadIcon.style.color = "var(--success)";
         }
     });
 
     function resetUploadPreview() {
-        uploadText.textContent = "Clique para escolher uma imagem";
+        uploadText.textContent = "Clique para escolher imagens (Ctrl + Clique para várias)";
         uploadIcon.className = "fas fa-cloud-upload-alt";
         uploadIcon.style.color = "";
     }
@@ -482,12 +490,14 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
             const collection = row.getAttribute('data-collection');
             const status = row.cells[3].textContent.trim().toLowerCase();
             const price = row.cells[4].textContent.replace('R$', '').replace('.', '').replace(',', '.').trim();
-            // Pega o número do estoque apenas se não tiver o span de alerta (para edição funcionar)
             let stock = row.cells[5].textContent.trim();
             if (row.cells[5].querySelector('.stock-alert')) stock = "0";
 
             const description = row.getAttribute('data-description');
-            const imageName = row.getAttribute('data-image');
+            
+            // Pega a string de imagens (img1|img2)
+            const imagesString = row.getAttribute('data-image');
+            const imagesCount = imagesString ? imagesString.split('|').length : 0;
 
             document.getElementById('modal-title').textContent = `Editar ${name}`;
             document.getElementById('product-id').value = id;
@@ -499,9 +509,9 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
             document.getElementById('product-stock').value = stock;
             document.getElementById('product-description').value = description;
 
-            if(imageName) {
-                uploadText.textContent = "Imagem atual: " + imageName.split('/').pop();
-                uploadIcon.className = "fas fa-image";
+            if(imagesCount > 0) {
+                uploadText.textContent = `${imagesCount} imagens salvas (Envie novas para substituir)`;
+                uploadIcon.className = "fas fa-images";
             } else {
                 resetUploadPreview();
             }

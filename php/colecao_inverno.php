@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Coleção Essencial</title>
+    <title>Coleção Inverno de Shibuya</title>
     <link rel="stylesheet" href="../css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -47,6 +47,15 @@
             object-position: center;
         }
 
+        /* Estilo para o botão esgotado */
+        .btn-disabled {
+            background-color: #2a2a2a !important;
+            color: #777 !important;
+            cursor: not-allowed !important;
+            border: 1px solid #444 !important;
+            pointer-events: none;
+        }
+
     </style>
 </head>
 
@@ -65,7 +74,7 @@ function find_products_table($conn) {
 }
 $table = find_products_table($conn);
 
-// Seleciona APENAS produtos da coleção Essencial
+// Seleciona APENAS produtos da coleção Inverno
 $stmt = $conn->prepare("SELECT * FROM `$table` WHERE collection = 'inverno' ORDER BY id DESC");
 $stmt->execute();
 $products_res = $stmt->get_result();
@@ -189,20 +198,54 @@ if (!function_exists('is_active')) {
                         $p_cat = htmlspecialchars($p['category']);
                         $p_price = number_format($p['price'], 2, ',', '.');
                         
-                        // Lógica de Imagem (Idêntica ao produtos.php)
+                        // --- LÓGICA DE ESTOQUE ---
+                        $qtd_estoque = 0;
+                        if (isset($p['estoque'])) {
+                            $qtd_estoque = $p['estoque'];
+                        } elseif (isset($p['stock'])) {
+                            $qtd_estoque = $p['stock'];
+                        }
+                        
+                        // --- LÓGICA DE DESCRIÇÃO ---
+                        $full_description = '';
+                        if (isset($p['descricao']) && !empty($p['descricao'])) {
+                            $full_description = $p['descricao'];
+                        } elseif (isset($p['description']) && !empty($p['description'])) {
+                            $full_description = $p['description'];
+                        }
+
+                        // --- LÓGICA DE TAMANHOS DINÂMICA ---
+                        $sizes_data = "P|M|G|GG"; 
+                        
+                        if (isset($p['sizes']) && !empty($p['sizes'])) {
+                            $sizes_data = $p['sizes'];
+                        } else {
+                            $cat_lower = strtolower($p['category']);
+                            if (strpos($cat_lower, 'cal') !== false) {
+                                $sizes_data = "38|40|42|44";
+                            } elseif (strpos($cat_lower, 'acessor') !== false || strpos($cat_lower, 'bone') !== false || strpos($cat_lower, 'anel') !== false || strpos($cat_lower, 'colar') !== false) {
+                                $sizes_data = "Único";
+                            }
+                        }
+
+                        // --- LÓGICA DE IMAGEM (MÚLTIPLAS) ---
                         $img = '../assets/img/placeholder.png';
-                        if (!empty($p['image'])) {
-                            $raw = $p['image'];
-                            if (strpos($raw, '://') !== false) {
-                                $img = $raw;
-                            } elseif (substr($raw, 0, 2) === '..') {
-                                $img = $raw;
-                            } elseif (substr($raw, 0, 1) === '/') {
-                                $img = '..' . $raw;
+                        $raw_db_images = $p['image'] ?? '';
+                        $images_array = explode('|', $raw_db_images);
+                        $first_image = !empty($images_array) ? $images_array[0] : '';
+
+                        if (!empty($first_image)) {
+                            if (strpos($first_image, '://') !== false) {
+                                $img = $first_image;
+                            } elseif (substr($first_image, 0, 3) === '../') {
+                                $img = $first_image;
+                            } elseif (substr($first_image, 0, 1) === '/') {
+                                $img = '..' . $first_image;
                             } else {
-                                $img = '../' . ltrim($raw, './');
+                                $img = '../' . ltrim($first_image, './');
                             }
                         } else {
+                            // Fallback de categoria
                             $cat = strtolower($p['category']);
                             if (strpos($cat, 'camis') !== false) $img = '../assets/img/camisabr.png';
                             elseif (strpos($cat, 'moleton') !== false || strpos($cat, 'moletons') !== false) $img = '../assets/img/moletomroxo.png';
@@ -212,20 +255,36 @@ if (!function_exists('is_active')) {
                     ?>
                     
                     <div class="product-card" data-category="<?php echo $p_cat; ?>"
-                        data-name="<?php echo $p_name; ?>" data-price="<?php echo $p['price']; ?>" data-img="<?php echo $img; ?>"
-                        data-imgs="<?php echo $img; ?>" data-sizes="P|M|G|GG|XG"
-                        data-longdesc="<?php echo isset($p['description']) ? htmlspecialchars($p['description']) : ''; ?>">
+                        data-name="<?php echo $p_name; ?>" 
+                        data-price="<?php echo $p['price']; ?>" 
+                        data-img="<?php echo $img; ?>"
+                        data-stock="<?php echo $qtd_estoque; ?>"
+                        data-imgs="<?php echo htmlspecialchars($raw_db_images); ?>" 
+                        data-sizes="<?php echo htmlspecialchars($sizes_data); ?>"
+                        data-longdesc="<?php echo htmlspecialchars($full_description); ?>">
+                        
                         <div class="card-image">
                             <img src="<?php echo $img; ?>" alt="<?php echo $p_name; ?>">
                             <div class="card-overlay">
                                 <button class="btn-quick-view">Ver Detalhes</button>
                             </div>
                         </div>
+                        
                         <div class="card-content">
                             <h3><?php echo $p_name; ?></h3>
-                            <p class="product-desc"><?php echo isset($p['description']) ? htmlspecialchars(mb_strimwidth($p['description'], 0, 50, '...')) : ''; ?></p>
+                            
+                            <!-- DESCRIÇÃO COMPLETA (SEM CORTE) -->
+                            <p class="product-desc"><?php echo htmlspecialchars($full_description); ?></p>
+                            
                             <p class="price">R$ <?php echo $p_price; ?></p>
-                            <button class="btn btn-add-cart">Adicionar ao Carrinho</button>
+                            
+                            <!-- BOTÃO COM VERIFICAÇÃO DE ESTOQUE -->
+                            <?php if ($qtd_estoque > 0): ?>
+                                <button class="btn btn-add-cart">Adicionar ao Carrinho</button>
+                            <?php else: ?>
+                                <button class="btn btn-disabled" disabled>Esgotado</button>
+                            <?php endif; ?>
+                            
                         </div>
                     </div>
 
