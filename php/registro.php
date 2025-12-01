@@ -2,6 +2,26 @@
 session_start();
 require 'conexao.php';
 
+// ==========================================
+// LÓGICA DE EXIBIÇÃO DA FOTO NA NAV (ADAPTADO)
+// ==========================================
+$foto_perfil = '../assets/img/placeholder-user.png'; // Foto padrão com caminho relativo
+
+if (isset($_SESSION['foto']) && !empty($_SESSION['foto'])) {
+    $temp_foto = $_SESSION['foto'];
+    
+    // Se a foto salva na sessão NÃO tiver "../" no começo, adicionamos
+    // porque estamos dentro da pasta php/ e precisamos subir um nível
+    if (substr($temp_foto, 0, 3) != '../') {
+        $foto_perfil = '../' . $temp_foto;
+    } else {
+        $foto_perfil = $temp_foto;
+    }
+}
+
+// ==========================================
+// LÓGICA DE REGISTRO (SEU CÓDIGO ORIGINAL)
+// ==========================================
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // 1. Pegando os nomes corretos do HTML
     $nome = $_POST['name']; 
@@ -9,7 +29,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $senha = password_hash($_POST['password'], PASSWORD_DEFAULT);
 
     // 2. Definindo foto padrão (caso não envie imagem)
-    // Atenção: Certifique-se de que esse arquivo existe ou use um caminho válido
     $fotoCaminho = "../assets/img/placeholder-user.png"; 
 
     // 3. Processando o Upload (Se houver)
@@ -26,13 +45,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         if (move_uploaded_file($_FILES['avatar']['tmp_name'], $diretorioFisico . $novoNome)) {
-            // Caminho para salvar no Banco (igual ao perfil.php)
+            // Caminho para salvar no Banco
             $fotoCaminho = "../assets/uploads/" . $novoNome;
         }
     }
 
     // 4. Inserção no banco
-    // Certifique-se que as colunas no banco são: nome, email, senha, foto
     $stmt = $conn->prepare("INSERT INTO users (nome, email, senha, foto) VALUES (?, ?, ?, ?)");
     $stmt->bind_param("ssss", $nome, $email, $senha, $fotoCaminho);
     
@@ -50,11 +68,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Criar Conta - Susanoo</title>
+    
+    <!-- CSS -->
     <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="../css/login-style.css">
+    
+    <!-- Fontes e Ícones -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+
     <script>(function(){const theme=localStorage.getItem('theme');if(theme==='light'){document.documentElement.classList.add('light-mode');}})();</script>
+
+    <!-- ESTILO ESPECÍFICO PARA A NAVBAR (Copiado da Index) -->
+    <style>
+        .nav-search { display:flex; align-items:center; gap:.5rem; }
+        .nav-search input[type="text"] { padding:.45rem .75rem; border-radius:24px; border:1px solid rgba(0,0,0,.08); background:transparent; color:inherit; min-width:160px; }
+        .nav-search .nav-search-btn { border:none; background:transparent; padding:.35rem; border-radius:50%; cursor:pointer; color:inherit; display:inline-flex; align-items:center; justify-content:center; }
+        .nav-search .nav-search-btn .fa-search { font-size:0.95rem; }
+        
+        /* Ajuste para garantir que o dropdown apareça corretamente sobre o fundo do login */
+        .profile-dropdown-menu { z-index: 1000; }
+    </style>
 </head>
 <body class="login-body">
 
@@ -68,10 +103,22 @@ if (!function_exists('is_active')) {
 }
 ?>
 
+<!-- NAVBAR ATUALIZADA -->
 <nav class="navbar scrolled" id="navbar">
     <div class="nav-container">
-        <div class="nav-search"><input type="text" placeholder="Pesquisar..."></div>
-        <div class="nav-logo"><a href="../index.php"><img src="../assets/img/LOGOSUSANOO.png" alt="LOGOSUSANOO"></a></div>
+        <!-- Form de Busca -->
+        <form action="produtos.php" method="GET" class="nav-search">
+            <input type="text" name="busca" placeholder="Pesquisar..." aria-label="Pesquisar">
+            <button type="submit" class="nav-search-btn" aria-label="Pesquisar">
+                <i class="fas fa-search"></i>
+            </button>
+        </form>
+
+        <!-- Logo (Caminho ajustado para ../) -->
+        <div class="nav-logo">
+            <a href="../index.php"><img src="../assets/img/LOGOSUSANOO.png" alt="LOGOSUSANOO"></a>
+        </div>
+
         <div class="nav-right-group">
             <ul class="nav-menu" id="nav-menu">
                 <li><a href="../index.php" class="nav-link <?php echo is_active('index.php', $current); ?>">Home</a></li>
@@ -80,8 +127,53 @@ if (!function_exists('is_active')) {
                 <li><a href="sobre.php" class="nav-link <?php echo is_active('sobre.php', $current); ?>">Sobre</a></li>
                 <li><a href="contato.php" class="nav-link <?php echo is_active('contato.php', $current); ?>">Contato</a></li>
             </ul>
+
             <div class="nav-icons">
-                <a href="login.php" class="nav-icon-link" aria-label="Login"><i class="fas fa-user"></i></a>
+                <!-- Wrapper do Dropdown de Perfil -->
+                <div class="profile-dropdown-wrapper">
+                    
+                    <?php if (!isset($_SESSION['user_id'])): ?>
+                        <!-- USUÁRIO DESLOGADO -->
+                        <a href="login.php" class="nav-icon-link" aria-label="Login">
+                            <i class="fas fa-user"></i>
+                        </a>
+
+                        <div class="profile-dropdown-menu">
+                            <ul class="dropdown-links">
+                                <li class="dropdown-link-item">
+                                    <a href="registro.php"><i class="fas fa-user-plus"></i> Registrar</a>
+                                </li>
+                                <li class="dropdown-link-item">
+                                    <a href="login.php"><i class="fas fa-sign-in-alt"></i> Login</a>
+                                </li>
+                            </ul>
+                        </div>
+
+                    <?php else: ?>
+                        <!-- USUÁRIO LOGADO -->
+                        <a href="#" class="nav-icon-link" aria-label="Perfil">
+                            <img src="<?php echo $foto_perfil; ?>" class="dropdown-avatar" style="width:28px; height:28px; border-radius:50%; object-fit:cover;">
+                        </a>
+
+                        <div class="profile-dropdown-menu">
+                            <div class="dropdown-header">
+                                <img src="<?php echo $foto_perfil; ?>" alt="Avatar" class="dropdown-avatar">
+                                <div>
+                                    <div class="dropdown-user-name"><?php echo htmlspecialchars($_SESSION['nome']); ?></div>
+                                    <div class="dropdown-user-email"><?php echo htmlspecialchars($_SESSION['email']); ?></div>
+                                </div>
+                            </div>
+
+                            <ul class="dropdown-links">
+                                <li class="dropdown-link-item"><a href="perfil.php"><i class="fas fa-id-card"></i> Visualizar Perfil</a></li>
+                                <li class="dropdown-link-item"><a href="configuracoes.php"><i class="fas fa-cog"></i> Configurações</a></li>
+                                <li class="dropdown-link-item"><a href="logout.php"><i class="fas fa-sign-out-alt"></i> Sair</a></li>
+                            </ul>
+                        </div>
+                    <?php endif; ?>
+                </div>
+                
+                <!-- Ícone do Carrinho -->
                 <a href="carrinho.php" class="nav-icon-link" aria-label="Carrinho"><i class="fas fa-shopping-bag"></i></a>
             </div>
         </div>
@@ -97,7 +189,7 @@ if (!function_exists('is_active')) {
                     <img id="avatarPreview" src="../assets/img/avatar.png" alt="Avatar" class="avatar-default" style="object-fit: cover;">
                 </div>
 
-                <form method="post" action="registro.php" enctype="multipart/form-data">
+                <form method="post" action="" enctype="multipart/form-data">
                     <label class="field">
                         <span class="label-title">Nome Completo</span>
                         <div class="input-wrap">

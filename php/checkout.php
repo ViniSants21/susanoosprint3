@@ -91,7 +91,7 @@ if (!function_exists('is_active')) {
                         <?php 
                         if (!isset($_SESSION['user_id'])): 
                         ?>
-                        <a href="php/login.php" class="nav-icon-link" aria-label="Login"><i class="fas fa-user"></i></a>
+                        <a href="../php/login.php" class="nav-icon-link" aria-label="Login"><i class="fas fa-user"></i></a>
                         <div class="profile-dropdown-menu">
                             <ul class="dropdown-links">
                                 <li class="dropdown-link-item"><a href="../php/registro.php"><i class="fas fa-user-plus"></i> Registrar</a></li>

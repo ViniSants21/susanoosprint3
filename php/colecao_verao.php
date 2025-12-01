@@ -74,7 +74,7 @@ function find_products_table($conn) {
 }
 $table = find_products_table($conn);
 
-// Seleciona APENAS produtos da coleção Essencial
+// Seleciona APENAS produtos da coleção Verão
 $stmt = $conn->prepare("SELECT * FROM `$table` WHERE collection = 'verao' ORDER BY id DESC");
 $stmt->execute();
 $products_res = $stmt->get_result();
@@ -206,13 +206,22 @@ if (!function_exists('is_active')) {
                             $qtd_estoque = $p['stock'];
                         }
                         
-                        // --- LÓGICA DE DESCRIÇÃO ---
-                        $full_description = '';
-                        if (isset($p['descricao']) && !empty($p['descricao'])) {
-                            $full_description = $p['descricao'];
-                        } elseif (isset($p['description']) && !empty($p['description'])) {
-                            $full_description = $p['description'];
+                        // --- LÓGICA DE DESCRIÇÃO CORRIGIDA ---
+                        // 1. Descrição Completa (para o modal/quickview)
+                        $rawLong = isset($p['descricao']) ? $p['descricao'] : (isset($p['description']) ? $p['description'] : '');
+                        if (empty($rawLong) && isset($p['short_desc']) && !empty($p['short_desc'])) {
+                            $rawLong = $p['short_desc'];
                         }
+
+                        // 2. Descrição Curta (para o card)
+                        $rawShort = isset($p['short_desc']) ? $p['short_desc'] : '';
+                        if (empty($rawShort) && !empty($rawLong)) {
+                            // Se não tiver descrição curta, trunca a longa em 100 caracteres
+                            $rawShort = mb_strimwidth($rawLong, 0, 100, '...');
+                        }
+                        
+                        $displayLong = htmlspecialchars($rawLong);
+                        $displayShort = htmlspecialchars($rawShort);
 
                         // --- LÓGICA DE TAMANHOS DINÂMICA ---
                         $sizes_data = "P|M|G|GGS"; 
@@ -260,7 +269,7 @@ if (!function_exists('is_active')) {
                         data-stock="<?php echo $qtd_estoque; ?>"
                         data-imgs="<?php echo htmlspecialchars($raw_db_images); ?>" 
                         data-sizes="<?php echo htmlspecialchars($sizes_data); ?>"
-                        data-longdesc="<?php echo htmlspecialchars($full_description); ?>">
+                        data-longdesc="<?php echo $displayLong; ?>">
                         
                         <div class="card-image">
                             <img src="<?php echo $img; ?>" alt="<?php echo $p_name; ?>">
@@ -272,8 +281,8 @@ if (!function_exists('is_active')) {
                         <div class="card-content">
                             <h3><?php echo $p_name; ?></h3>
                             
-                            <!-- DESCRIÇÃO COMPLETA -->
-                            <p class="product-desc"><?php echo htmlspecialchars($full_description); ?></p>
+                            <!-- CORRIGIDO: Exibe a descrição curta -->
+                            <p class="product-desc"><?php echo $displayShort; ?></p>
                             
                             <p class="price">R$ <?php echo $p_price; ?></p>
                             

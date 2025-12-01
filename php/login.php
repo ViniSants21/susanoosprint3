@@ -138,8 +138,7 @@ if (!function_exists('is_active')) {
                     </label>
                     <button type="submit" class="btn-login">Entrar</button>
                     <div class="form-footer">
-                        <a class="link" href="#">Esqueci minha senha</a>
-                        <span class="sep">•</span>
+                        <span class="sep"></span>
                         <a class="link" href="registro.php">Criar conta</a>
                     </div>
                 </form>
