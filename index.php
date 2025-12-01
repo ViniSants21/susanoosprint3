@@ -11,7 +11,6 @@ if (isset($_SESSION['foto']) && !empty($_SESSION['foto'])) {
     $foto_perfil = $_SESSION['foto'];
     
     // CORREÇÃO CRUCIAL:
-    // Se a foto foi salva como "../assets/...", removemos o "../" para funcionar na index
     if (substr($foto_perfil, 0, 3) == '../') {
         $foto_perfil = substr($foto_perfil, 3);
     }
@@ -49,7 +48,60 @@ if (!function_exists('is_active')) {
 		.nav-search .nav-search-btn{border:none;background:transparent;padding:.35rem;border-radius:50%;cursor:pointer;color:inherit;display:inline-flex;align-items:center;justify-content:center}
 		.nav-search .nav-search-btn .fa-search{font-size:0.95rem}
         
-        /* --- CSS ADICIONAL --- */
+        /* --- CSS CORRIGIDO PARA COLEÇÕES --- */
+        .collections-grid {
+            display: grid;
+            /* Força 3 colunas de tamanho igual */
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 2rem; /* Espaço entre os cards */
+            width: 100%;
+        }
+
+        .collection-card {
+            position: relative;
+            /* ALTURA AJUSTADA: 400px é um tamanho agradável (nem muito alto, nem pequeno) */
+            height: 400px; 
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .collection-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(139, 92, 246, 0.3);
+            border-color: #8B5CF6;
+        }
+
+        .collection-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Garante que a imagem preencha o card sem esticar */
+            transition: transform 0.5s ease;
+        }
+
+        .collection-card:hover img {
+            transform: scale(1.05);
+        }
+        
+        /* Ajuste do texto dentro do card */
+        .collection-overlay {
+            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.2) 60%, transparent 100%);
+            position: absolute; top:0; left:0; width:100%; height:100%;
+            display: flex; align-items: flex-end; padding: 2rem;
+        }
+
+        /* Responsividade: No celular vira 1 coluna */
+        @media (max-width: 900px) {
+            .collections-grid {
+                grid-template-columns: 1fr;
+            }
+            .collection-card {
+                height: 300px; /* Um pouco menor no celular */
+            }
+        }
+
+        /* --- RESTANTE DO CSS ADICIONAL --- */
     
     /* Seção de Avaliações */
     .testimonials-section {
@@ -169,7 +221,7 @@ if (!function_exists('is_active')) {
     .admin-float-btn {
         position: fixed;
         bottom: 30px;
-        left: 30px; /* Esquerda para não sobrepor o 'Voltar ao topo' */
+        left: 30px; 
         width: 55px;
         height: 55px;
         background: linear-gradient(135deg, #8b5cf6, #6d28d9);
@@ -303,7 +355,7 @@ if (!function_exists('is_active')) {
                     <div class="carousel-track">
                         <div class="carousel-icon" data-icon="kanji">桜</div>
                         <div class="carousel-icon" data-icon="kanji">和</div>
-                        <div class="carousel-icon" data-icon="kanji">〶</div>
+                        <div class="carousel-icon" data-icon="kanji">㋶</div>
                         <div class="carousel-icon" data-icon="kanji">美</div>
                         <div class="carousel-icon" data-icon="kanji">㋶</div>
                         <div class="carousel-icon" data-icon="kanji">光</div>
