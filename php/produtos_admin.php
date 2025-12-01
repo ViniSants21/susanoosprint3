@@ -1,21 +1,22 @@
 <?php
 // ==========================================
-// LÓGICA PHP (BACKEND) - ATUALIZADO
+// LÓGICA PHP (BACKEND) - PRODUTOS
 // ==========================================
 
 require_once 'conexao.php';
 
+// Função auxiliar para encontrar a tabela correta
 function find_products_table($conn) {
     $candidates = ['products', 'produtos', 'produts'];
     foreach ($candidates as $t) {
         $res = $conn->query("SHOW TABLES LIKE '" . $conn->real_escape_string($t) . "'");
         if ($res && $res->num_rows > 0) return $t;
     }
-    return 'products';
+    return 'products'; // fallback padrão
 }
 $table = find_products_table($conn);
 
-// 2. Processar Formulários
+// 2. Processar Formulários (Salvar/Excluir)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
 
@@ -31,15 +32,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stock = isset($_POST['product-stock']) ? intval($_POST['product-stock']) : 0;
         $descricao = $_POST['product-description'] ?? '';
 
-        // -- LÓGICA DE UPLOAD REFEITA (CAPA + GALERIA) --
-        
+        // -- LÓGICA DE UPLOAD --
         $uploadDir = __DIR__ . '/../assets/img/products/';
         if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
         $allowed = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
         
-        $newPaths = []; // Array para guardar os caminhos temporários
+        $newPaths = []; 
         
-        // 1. Processar a CAPA (Obrigatório ser a primeira do array se enviada)
+        // 1. Capa
         if (isset($_FILES['cover-image']) && $_FILES['cover-image']['error'] === UPLOAD_ERR_OK) {
             $ext = strtolower(pathinfo($_FILES['cover-image']['name'], PATHINFO_EXTENSION));
             if (in_array($ext, $allowed)) {
@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
-        // 2. Processar a GALERIA (Adiciona as demais fotos na sequencia)
+        // 2. Galeria
         if (isset($_FILES['gallery-images']) && is_array($_FILES['gallery-images']['name'])) {
             $count = count($_FILES['gallery-images']['name']);
             for ($i = 0; $i < $count; $i++) {
@@ -66,20 +66,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
-        // Monta a string final
         $imagePathsString = !empty($newPaths) ? implode('|', $newPaths) : null;
 
         if ($id) {
             // UPDATE
             if ($imagePathsString) {
-                // Se enviou novas imagens (Capa ou Galeria), substitui tudo
-                // Obs: Se o usuário quiser manter a capa antiga e mudar a galeria, teria que reenviar a capa.
-                // Para simplificar, assumimos que "Upload novo" = "Substituir imagens".
                 $sql = "UPDATE `$table` SET name=?, short_desc=?, category=?, collection=?, status=?, price=?, stock=?, descricao=?, image=?, updated_at=NOW() WHERE id=?";
                 $stmt = $conn->prepare($sql);
                 $stmt->bind_param("sssssdissi", $name, $short_desc, $category, $collection, $status, $price, $stock, $descricao, $imagePathsString, $id);
             } else {
-                // Mantém imagens antigas
                 $sql = "UPDATE `$table` SET name=?, short_desc=?, category=?, collection=?, status=?, price=?, stock=?, descricao=?, updated_at=NOW() WHERE id=?";
                 $stmt = $conn->prepare($sql);
                 $stmt->bind_param("sssssdisi", $name, $short_desc, $category, $collection, $status, $price, $stock, $descricao, $id);
@@ -124,25 +119,34 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gerenciar Produtos - Susanoo Admin</title>
+    <!-- Usa o mesmo CSS Global -->
     <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script>(function(){const theme=localStorage.getItem('theme');if(theme==='light'){document.documentElement.classList.add('light-mode');}})();</script>
+    
+    <!-- CSS Específico do Painel Admin (Copiado do admin.php para garantir consistência) -->
     <style>
-        /* ===== ESTILOS DO PAINEL ADMIN ===== */
         .admin-dashboard { background-color: var(--bg-primary); min-height: 100vh; padding-top: 80px; }
         .admin-container { display: flex; max-width: 1400px; margin: 0 auto; padding: 0 20px; }
+        
+        /* Sidebar */
         .admin-sidebar { width: 280px; background: var(--bg-card); border-radius: 20px; padding: 2rem 1.5rem; margin-right: 2rem; height: fit-content; position: sticky; top: 100px; box-shadow: var(--shadow-soft); border: 1px solid rgba(139, 92, 246, 0.1); }
         .admin-logo { text-align: center; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); }
         .admin-logo h2 { font-family: var(--font-display); color: var(--primary-purple); margin: 0; font-size: 1.8rem; }
+        .admin-logo span { color: var(--text-secondary); font-size: 0.9rem; }
         .admin-nav { list-style: none; padding: 0; margin: 0; }
         .admin-nav li { margin-bottom: 0.5rem; }
         .admin-nav a { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.2rem; text-decoration: none; color: var(--text-secondary); border-radius: 12px; transition: all 0.3s ease; font-weight: 500; }
-        .admin-nav a:hover, .admin-nav a.active { background: rgba(139, 92, 246, 0.1); color: var(--primary-purple); }
+        .admin-nav a:hover, .admin-nav a.active { background: rgba(139, 92, 246, 0.1); color: var(--primary-purple); transform: translateX(5px); }
+        .admin-nav a i { width: 20px; text-align: center; font-size: 1.1rem; }
+        
+        /* Conteúdo Principal */
         .admin-main { flex: 1; padding-bottom: 3rem; }
         .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); }
         .admin-title { font-family: var(--font-display); font-size: 2.5rem; color: var(--text-primary); margin: 0; }
         .admin-actions { display: flex; gap: 1rem; }
         
+        /* Estilos Específicos desta Página (Tabela e Filtros) */
         .products-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; gap: 1rem; }
         .search-box { position: relative; width: 300px; }
         .search-box input { width: 100%; padding: 0.8rem 1rem 0.8rem 2.5rem; border: 1px solid var(--border-color); border-radius: 10px; background: var(--bg-card); color: var(--text-primary); }
@@ -166,7 +170,7 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
         .user-details h4 { margin: 0 0 0.2rem 0; color: var(--text-primary); }
 
         /* Modal */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 1000; align-items: center; justify-content: center; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
         .modal.active { display: flex; }
         .modal-content { background: var(--bg-card); border-radius: 20px; padding: 2rem; width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow-strong); }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border-color); }
@@ -180,12 +184,13 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
         .upload-label { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem; display:block; font-weight:bold; }
         
         @media (max-width: 1024px) { .admin-container { flex-direction: column; } .admin-sidebar { width: 100%; position: static; margin-bottom: 2rem; } }
-        @media (max-width: 768px) { .admin-header, .products-header { flex-direction: column; align-items: flex-start; gap: 1rem; } .form-row { grid-template-columns: 1fr; } }
+        @media (max-width: 768px) { .admin-header, .products-header { flex-direction: column; align-items: flex-start; gap: 1rem; } .form-row { grid-template-columns: 1fr; } .data-table { overflow-x: auto; } }
     </style>
 </head>
 <body class="admin-dashboard">
 
 <div class="admin-container">
+    <!-- Sidebar Padronizada -->
     <aside class="admin-sidebar">
         <div class="admin-logo">
             <h2>Susanoo Admin</h2>
@@ -211,6 +216,7 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
             </div>
         </div>
 
+        <!-- Filtros -->
         <div class="products-header">
             <div class="search-box">
                 <i class="fas fa-search"></i>
@@ -228,6 +234,7 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
             </div>
         </div>
 
+        <!-- Tabela -->
         <div class="data-table">
             <table id="products-table">
                 <thead>
@@ -249,7 +256,8 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
                             $price = number_format($row['price'], 2, ',', '.');
                             
                             $imagesArray = !empty($row['image']) ? explode('|', $row['image']) : [];
-                            $mainImage = !empty($imagesArray) ? $imagesArray[0] : ''; // A primeira é sempre a CAPA agora
+                            $mainImage = !empty($imagesArray) ? $imagesArray[0] : '';
+                            // Ajuste do caminho da imagem (assumindo que assets está um nível acima)
                             $imgSrc = !empty($mainImage) ? '../' . $mainImage : 'https://via.placeholder.com/50';
                             
                             $dataImageString = isset($row['image']) ? htmlspecialchars($row['image']) : '';
@@ -268,7 +276,7 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
                             data-collection="<?php echo $dataCollection; ?>">
                             <td>
                                 <div class="user-info">
-                                    <img src="<?php echo $imgSrc; ?>" alt="Foto" class="user-avatar">
+                                    <img src="<?php echo $imgSrc; ?>" alt="Foto" class="user-avatar" onerror="this.src='https://via.placeholder.com/50'">
                                     <div class="user-details">
                                         <h4><?php echo htmlspecialchars($row['name']); ?></h4>
                                         <?php if(count($imagesArray) > 1): ?>
@@ -423,7 +431,7 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
     const addProductBtn = document.getElementById('add-product');
     const closeModalBtns = document.querySelectorAll('.close-modal');
     
-    // Elementos de Upload
+    // Uploads
     const coverArea = document.getElementById('cover-upload-area');
     const coverInput = document.getElementById('cover-image');
     const coverText = document.getElementById('cover-text');
@@ -445,7 +453,6 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
     closeModalBtns.forEach(btn => btn.addEventListener('click', () => modal.classList.remove('active')));
     modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('active'); });
 
-    // Lógica Upload CAPA
     coverArea.addEventListener('click', () => coverInput.click());
     coverInput.addEventListener('change', (e) => {
         if (e.target.files.length > 0) {
@@ -454,7 +461,6 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
         }
     });
 
-    // Lógica Upload GALERIA
     galleryArea.addEventListener('click', () => galleryInput.click());
     galleryInput.addEventListener('change', (e) => {
         if (e.target.files.length > 0) {
@@ -467,17 +473,15 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
     function resetUploadPreviews() {
         coverText.textContent = "Clique para escolher a Capa";
         coverIcon.className = "fas fa-star";
-        
         galleryText.textContent = "Clique para escolher fotos extras (Segure Ctrl para várias)";
         galleryIcon.className = "fas fa-images";
         galleryIcon.style.color = "";
     }
 
-    // --- EDITAR ---
+    // Editar
     document.querySelectorAll('.btn-edit').forEach(btn => {
         btn.addEventListener('click', function() {
             const row = this.closest('tr');
-            
             const id = row.getAttribute('data-id');
             const name = row.querySelector('.user-details h4').textContent;
             const category = row.cells[1].textContent.trim();
@@ -490,7 +494,6 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
             const shortDesc = row.getAttribute('data-short-desc');
             const imagesString = row.getAttribute('data-image');
             
-            // Separa Capa de Galeria
             const images = imagesString ? imagesString.split('|') : [];
             const hasImages = images.length > 0;
             const hasGallery = images.length > 1;
@@ -521,6 +524,7 @@ $products_result = $conn->query("SELECT * FROM `$table` ORDER BY id DESC");
         });
     });
 
+    // Excluir
     document.querySelectorAll('.btn-delete').forEach(btn => {
         btn.addEventListener('click', function() {
             if(!confirm('Tem certeza que deseja excluir?')) return;

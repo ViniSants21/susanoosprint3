@@ -265,70 +265,81 @@ if (!function_exists('is_active')) {
 <body>
 
 <!-- Navbar -->
+<?php
+// Certifique-se que o session_start() está no início do arquivo PHP
+if (session_status() === PHP_SESSION_NONE) { session_start(); }
+
+// Lógica active link
+$current = basename($_SERVER['PHP_SELF']);
+if (!function_exists('is_active')) {
+    function is_active($href, $current) {
+        $base = basename(parse_url($href, PHP_URL_PATH));
+        return $base === $current ? 'active' : '';
+    }
+}
+?>
+
 <nav class="navbar scrolled" id="navbar">
     <div class="nav-container">
-        <div class="nav-search">
-            <input type="text" placeholder="Pesquisar..." aria-label="Pesquisar">
-            <button class="nav-search-btn" aria-label="Pesquisar"><i class="fas fa-search"></i></button>
+        <!-- PESQUISA FUNCIONAL (Aponta para o próprio diretório) -->
+        <form action="produtos.php" method="GET" class="nav-search">
+            <input type="text" name="busca" placeholder="Pesquisar..." aria-label="Pesquisar" 
+                   value="<?php echo isset($_GET['busca']) ? htmlspecialchars($_GET['busca']) : ''; ?>">
+            <button type="submit" class="nav-search-btn" aria-label="Pesquisar">
+                <i class="fas fa-search"></i>
+            </button>
+        </form>
+
+        <div class="nav-logo">
+            <!-- Caminho volta uma pasta para pegar a logo -->
+            <a href="../index.php"><img src="../assets/img/LOGOSUSANOO.png" alt="LOGOSUSANOO"></a>
         </div>
-        <div class="nav-logo"><a href="../index.php"><img src="../assets/img/LOGOSUSANOO.png" alt="LOGOSUSANOO"></a></div>
+
         <div class="nav-right-group">
             <ul class="nav-menu" id="nav-menu">
+                <!-- Caminhos ajustados para sair da pasta php/ -->
                 <li><a href="../index.php" class="nav-link <?php echo is_active('index.php', $current); ?>">Home</a></li>
                 <li><a href="produtos.php" class="nav-link <?php echo is_active('produtos.php', $current); ?>">Produtos</a></li>
                 <li><a href="colecoes.php" class="nav-link <?php echo is_active('colecoes.php', $current); ?>">Coleções</a></li>
                 <li><a href="sobre.php" class="nav-link <?php echo is_active('sobre.php', $current); ?>">Sobre</a></li>
                 <li><a href="contato.php" class="nav-link <?php echo is_active('contato.php', $current); ?>">Contato</a></li>
             </ul>
+
             <div class="nav-icons">
-                    <div class="profile-dropdown-wrapper">
-                        
-                        <?php if (!isset($_SESSION['user_id'])): ?>
-                    <!-- USUÁRIO DESLOGADO -->
+                <div class="profile-dropdown-wrapper">
+                    <?php if (!isset($_SESSION['user_id'])): ?>
+                        <!-- USUÁRIO DESLOGADO -->
                         <a href="login.php" class="nav-icon-link" aria-label="Login">
-                        <i class="fas fa-user"></i>
+                            <i class="fas fa-user"></i>
                         </a>
-
-
                         <div class="profile-dropdown-menu">
                             <ul class="dropdown-links">
-                                <li class="dropdown-link-item">
-                                <a href="../php/registro.php"><i class="fas fa-user-plus"></i> Registrar</a>
-                                </li>
-                                <li class="dropdown-link-item">
-                                    <a href="../php/login.php"><i class="fas fa-sign-in-alt"></i> Login</a>
-                                </li>
+                                <li class="dropdown-link-item"><a href="registro.php"><i class="fas fa-user-plus"></i> Registrar</a></li>
+                                <li class="dropdown-link-item"><a href="login.php"><i class="fas fa-sign-in-alt"></i> Login</a></li>
                             </ul>
                         </div>
-
-
                     <?php else: ?>
-                    <!-- USUÁRIO LOGADO -->
-                    <a href="#" class="nav-icon-link" aria-label="Perfil">
-                    <img src="<?php echo $_SESSION['foto']; ?>"
-                    class="dropdown-avatar"
-                    style="width:28px; height:28px; border-radius:50%; object-fit:cover;">
-                    </a>
-
-
-<div class="profile-dropdown-menu">
-<div class="dropdown-header">
-<img src="<?php echo $_SESSION['foto']; ?>" alt="Avatar" class="dropdown-avatar">
-<div>
-<div class="dropdown-user-name"><?php echo $_SESSION['nome']; ?></div>
-<div class="dropdown-user-email"><?php echo $_SESSION['email']; ?></div>
-</div>
-</div>
-
-
-<ul class="dropdown-links">
-<li class="dropdown-link-item"><a href="../php/perfil.php"><i class="fas fa-id-card"></i> Visualizar Perfil</a></li>
-<li class="dropdown-link-item"><a href="../php/configuracoes.php"><i class="fas fa-cog"></i> Configurações</a></li>
-<li class="dropdown-link-item"><a href="../php/logout.php"><i class="fas fa-sign-out-alt"></i> Sair</a></li>
-</ul>
-</div>
-<?php endif; ?>
-</div>
+                        <!-- USUÁRIO LOGADO -->
+                        <a href="#" class="nav-icon-link" aria-label="Perfil">
+                            <!-- Aqui usamos $_SESSION['foto'] direto pois já deve conter ../ -->
+                            <img src="<?php echo $_SESSION['foto']; ?>" class="dropdown-avatar" style="width:28px; height:28px; border-radius:50%; object-fit:cover;" onerror="this.src='../assets/img/placeholder-user.png'">
+                        </a>
+                        <div class="profile-dropdown-menu">
+                            <div class="dropdown-header">
+                                <img src="<?php echo $_SESSION['foto']; ?>" alt="Avatar" class="dropdown-avatar" onerror="this.src='../assets/img/placeholder-user.png'">
+                                <div>
+                                    <div class="dropdown-user-name"><?php echo $_SESSION['nome']; ?></div>
+                                    <div class="dropdown-user-email"><?php echo $_SESSION['email']; ?></div>
+                                </div>
+                            </div>
+                            <ul class="dropdown-links">
+                                <li class="dropdown-link-item"><a href="perfil.php"><i class="fas fa-id-card"></i> Visualizar Perfil</a></li>
+                                <li class="dropdown-link-item"><a href="configuracoes.php"><i class="fas fa-cog"></i> Configurações</a></li>
+                                <li class="dropdown-link-item"><a href="logout.php"><i class="fas fa-sign-out-alt"></i> Sair</a></li>
+                            </ul>
+                        </div>
+                    <?php endif; ?>
+                </div>
                 <a href="carrinho.php" class="nav-icon-link" aria-label="Carrinho"><i class="fas fa-shopping-bag"></i></a>
             </div>
         </div>
