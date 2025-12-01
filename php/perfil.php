@@ -223,7 +223,7 @@ $res_orders = $conn->query($sql_orders);
                             </ul>
                         </div>
                     </div>
-                    <a href="../carrinho.php" class="nav-icon-link" aria-label="Carrinho"><i class="fas fa-shopping-bag"></i></a>
+                    <a href="../php/carrinho.php" class="nav-icon-link" aria-label="Carrinho"><i class="fas fa-shopping-bag"></i></a>
                 </div>
             </div>
             <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>

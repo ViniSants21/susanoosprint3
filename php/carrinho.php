@@ -12,6 +12,10 @@
     <!-- Ícones e Fontes -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    
+    <!-- BIBLIOTECA SWEETALERT2 (Para o alerta bonitinho) -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>(function(){const theme=localStorage.getItem('theme');if(theme==='light'){document.documentElement.classList.add('light-mode');}})();</script>
 
     <!-- Estilos locais -->
@@ -28,6 +32,11 @@
             display: flex;
             justify-content: space-between;
             margin-bottom: 10px;
+        }
+
+        /* Ajuste fino para o SweetAlert ficar com a fonte do site */
+        div:where(.swal2-container) div:where(.swal2-popup) {
+            font-family: 'Noto Sans JP', sans-serif !important;
         }
     </style>
 </head>
@@ -309,15 +318,44 @@ if (!function_exists('is_active')) {
                 
                 if (code === 'SUSANOO30') {
                     localStorage.setItem('susanooDiscount', 'SUSANOO30');
-                    alert('Cupom de 30% aplicado com sucesso!');
+                    
+                    // ALERTA BONITINHO DE SUCESSO
+                    Swal.fire({
+                        title: 'Sucesso!',
+                        text: 'Cupom de 30% aplicado com sucesso!',
+                        icon: 'success',
+                        confirmButtonText: 'Ótimo',
+                        confirmButtonColor: '#10B981', // Verde
+                        background: '#fff',
+                        color: '#000'
+                    });
+
                     renderCart();
                 } else if (code === '') {
                     localStorage.removeItem('susanooDiscount');
-                    alert('Cupom removido.');
+                    
+                    // ALERTA DE REMOÇÃO
+                    Swal.fire({
+                        title: 'Removido',
+                        text: 'Cupom removido.',
+                        icon: 'info',
+                        confirmButtonText: 'Ok',
+                        confirmButtonColor: '#333'
+                    });
+
                     renderCart();
                 } else {
-                    alert('Cupom inválido ou expirado.');
                     localStorage.removeItem('susanooDiscount');
+                    
+                    // ALERTA BONITINHO DE ERRO
+                    Swal.fire({
+                        title: 'Oops...',
+                        text: 'Este cupom é inválido ou expirou.',
+                        icon: 'error',
+                        confirmButtonText: 'Tentar novamente',
+                        confirmButtonColor: '#d33'
+                    });
+
                     renderCart();
                 }
             });
