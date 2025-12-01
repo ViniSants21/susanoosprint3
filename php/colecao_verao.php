@@ -23,7 +23,7 @@
 
          /* --- Banner Promocional --- */
         .promo-banner-section {
-            width: 100vw;
+            width: 105%;
             position: relative;
             left: 50%;
             right: 50%;
@@ -173,7 +173,7 @@ if (!function_exists('is_active')) {
 
 <!-- Banner -->
 <section class="promo-banner-section">
-    <img src="../assets/img/ban3.png"
+    <img src="../assets/img/Verao1.png"
          alt="Banner promocional da nova coleção"
          class="promo-banner-image"
          style="pointer-events: none; cursor: default;">

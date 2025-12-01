@@ -111,7 +111,7 @@
     background: transparent;
     border: none;
     color: #fff;
-    -moz-appearance: textfield;
+    
 }
 .quantity-input::-webkit-outer-spin-button,
 .quantity-input::-webkit-inner-spin-button {

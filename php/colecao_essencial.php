@@ -173,7 +173,7 @@ if (!function_exists('is_active')) {
 
 <!-- Banner -->
 <section class="promo-banner-section">
-    <img src="../assets/img/essentials.png"
+    <img src="../assets/img/Essentials1.png"
          alt="Banner promocional da nova coleção"
          class="promo-banner-image"
          style="pointer-events: none; cursor: default;">

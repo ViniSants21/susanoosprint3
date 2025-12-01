@@ -276,33 +276,36 @@ if (!function_exists('is_active')) {
 
 <body class="home">
 
-    <!-- Navbar -->
     <nav class="navbar" id="navbar">
-        <div class="nav-container">
-            <form action="php/produtos.php" method="GET" class="nav-search">
-                <input type="text" name="busca" placeholder="Pesquisar..." aria-label="Pesquisar">
-                <button type="submit" class="nav-search-btn" aria-label="Pesquisar">
-                    <i class="fas fa-search"></i>
-                </button>
-            </form>
-            <div class="nav-logo"><a href="index.php"><img src="assets/img/LOGOSUSANOO.png" alt="LOGOSUSANOO"></a></div>
-            <div class="nav-right-group">
-                <ul class="nav-menu" id="nav-menu">
-                    <li><a href="index.php" class="nav-link <?php echo is_active('index.php', $current); ?>">Home</a></li>
-                    <li><a href="php/produtos.php" class="nav-link <?php echo is_active('produtos.php', $current); ?>">Produtos</a></li>
-                    <li><a href="php/colecoes.php" class="nav-link <?php echo is_active('colecoes.php', $current); ?>">Coleções</a></li>
-                    <li><a href="php/sobre.php" class="nav-link <?php echo is_active('sobre.php', $current); ?>">Sobre</a></li>
-                    <li><a href="php/contato.php" class="nav-link <?php echo is_active('contato.php', $current); ?>">Contato</a></li>
-                </ul>
-                <div class="nav-icons">
-                    <div class="profile-dropdown-wrapper">
-                        
+    <div class="nav-container">
+        <!-- IMPLEMENTAÇÃO DA PESQUISA FUNCIONAL -->
+        <form action="php/produtos.php" method="GET" class="nav-search">
+            <input type="text" name="busca" placeholder="Pesquisar..." aria-label="Pesquisar">
+            <button type="submit" class="nav-search-btn" aria-label="Pesquisar">
+                <i class="fas fa-search"></i>
+            </button>
+        </form>
+
+        <div class="nav-logo">
+            <a href="index.php"><img src="assets/img/LOGOSUSANOO.png" alt="LOGOSUSANOO"></a>
+        </div>
+
+        <div class="nav-right-group">
+            <ul class="nav-menu" id="nav-menu">
+                <li><a href="index.php" class="nav-link <?php echo is_active('index.php', $current); ?>">Home</a></li>
+                <li><a href="php/produtos.php" class="nav-link <?php echo is_active('produtos.php', $current); ?>">Produtos</a></li>
+                <li><a href="php/colecoes.php" class="nav-link <?php echo is_active('colecoes.php', $current); ?>">Coleções</a></li>
+                <li><a href="php/sobre.php" class="nav-link <?php echo is_active('sobre.php', $current); ?>">Sobre</a></li>
+                <li><a href="php/contato.php" class="nav-link <?php echo is_active('contato.php', $current); ?>">Contato</a></li>
+            </ul>
+
+            <div class="nav-icons">
+                <div class="profile-dropdown-wrapper">
                     <?php if (!isset($_SESSION['user_id'])): ?>
                         <!-- USUÁRIO DESLOGADO -->
                         <a href="php/login.php" class="nav-icon-link" aria-label="Login">
                             <i class="fas fa-user"></i>
                         </a>
-
                         <div class="profile-dropdown-menu">
                             <ul class="dropdown-links">
                                 <li class="dropdown-link-item">
@@ -313,24 +316,19 @@ if (!function_exists('is_active')) {
                                 </li>
                             </ul>
                         </div>
-
                     <?php else: ?>
                         <!-- USUÁRIO LOGADO -->
                         <a href="#" class="nav-icon-link" aria-label="Perfil">
-                            <!-- AQUI ESTÁ A CORREÇÃO DA FOTO -->
                             <img src="<?php echo $foto_perfil; ?>" class="dropdown-avatar" style="width:28px; height:28px; border-radius:50%; object-fit:cover;">
                         </a>
-
                         <div class="profile-dropdown-menu">
                             <div class="dropdown-header">
-                                <!-- FOTO CORRIGIDA TAMBÉM AQUI -->
                                 <img src="<?php echo $foto_perfil; ?>" alt="Avatar" class="dropdown-avatar">
                                 <div>
                                     <div class="dropdown-user-name"><?php echo $_SESSION['nome']; ?></div>
                                     <div class="dropdown-user-email"><?php echo $_SESSION['email']; ?></div>
                                 </div>
                             </div>
-
                             <ul class="dropdown-links">
                                 <li class="dropdown-link-item"><a href="php/perfil.php"><i class="fas fa-id-card"></i> Visualizar Perfil</a></li>
                                 <li class="dropdown-link-item"><a href="php/configuracoes.php"><i class="fas fa-cog"></i> Configurações</a></li>
@@ -338,14 +336,13 @@ if (!function_exists('is_active')) {
                             </ul>
                         </div>
                     <?php endif; ?>
-                    </div>
-
-                    <a href="php/carrinho.php" class="nav-icon-link" aria-label="Carrinho"><i class="fas fa-shopping-bag"></i></a>
                 </div>
+                <a href="php/carrinho.php" class="nav-icon-link" aria-label="Carrinho"><i class="fas fa-shopping-bag"></i></a>
             </div>
-            <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
         </div>
-    </nav>
+        <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
+    </div>
+</nav>
 
     <!-- BANNER DE LANÇAMENTOS -->
     <section class="new-arrival-banner">
